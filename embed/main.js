@@ -170,8 +170,13 @@
       heroEl.alt = '';
       heroEl.style.display = 'none';
       heroEl.parentElement.classList.add('is-empty');
+      const dock = document.querySelector('.detail-gallery-dock');
+      if (dock) dock.hidden = true;
       return;
     }
+
+    const dock = document.querySelector('.detail-gallery-dock');
+    if (dock) dock.hidden = false;
 
     heroEl.style.display = '';
     heroEl.parentElement.classList.remove('is-empty');
@@ -192,7 +197,7 @@
       im.alt = '';
       im.loading = 'lazy';
       im.decoding = 'async';
-      im.sizes = '96px';
+      im.sizes = '124px';
       b.appendChild(im);
       b.addEventListener('click', () => {
         heroEl.src = url;
