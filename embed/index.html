@@ -32,6 +32,8 @@
               width="48"
               height="48"
               alt=""
+              decoding="async"
+              fetchpriority="low"
             />
             <span class="brand-text">
               <strong>Siler Chef</strong>
@@ -75,6 +77,8 @@
             width="112"
             height="112"
             alt=""
+            decoding="async"
+            fetchpriority="high"
           />
           <h1 class="gold-text">Global Flavors, Happy Tables, Unforgettable Moments</h1>
           <p class="tagline">Reno · Private dining · Bespoke menus</p>
@@ -92,6 +96,42 @@
         </div>
       </section>
 
+      <section class="module module--pillars observe" aria-label="At a glance">
+        <div class="shell">
+          <ul class="pillar-grid">
+            <li class="pillar-item">
+              <span class="pillar-label">Coverage</span>
+              <strong>Reno · Tahoe · Bay Area</strong>
+              <span class="pillar-meta">Travel for qualified private events</span>
+            </li>
+            <li class="pillar-item">
+              <span class="pillar-label">Service</span>
+              <strong>Plated &amp; family-style</strong>
+              <span class="pillar-meta">Pacing matched to your gathering</span>
+            </li>
+            <li class="pillar-item">
+              <span class="pillar-label">Dietary</span>
+              <strong>By arrangement</strong>
+              <span class="pillar-meta">Allergies, faith, lifestyle preferences</span>
+            </li>
+            <li class="pillar-item">
+              <span class="pillar-label">Booking</span>
+              <strong>Live calendar</strong>
+              <span class="pillar-meta">Reserve online — confirmation from our team</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="module module--quote observe">
+        <div class="shell">
+          <blockquote class="pull-quote">
+            <p>Every menu is a conversation — between season, setting, and the people at your table.</p>
+            <cite>Chef Julian Siler</cite>
+          </blockquote>
+        </div>
+      </section>
+
       <main>
         <section id="cuisines" class="flow-section section-cuisines observe">
           <header class="section-head section-head--premium">
@@ -104,16 +144,77 @@
           <div id="cuisines-mount"></div>
         </section>
 
+        <section class="module module--split observe">
+          <div class="shell module-split-grid">
+            <div class="module-split-visual">
+              <img
+                src="images/cuisines/french-cuisine/gallery/01.jpg"
+                alt=""
+                width="900"
+                height="1200"
+                loading="lazy"
+                decoding="async"
+                sizes="(max-width: 900px) 100vw, (max-width: 1400px) 46vw, 600px"
+              />
+            </div>
+            <div class="module-split-copy">
+              <p class="module-eyebrow">Craft</p>
+              <h3 class="module-title gold-text">Technique, warmth, precision</h3>
+              <p class="module-lede">
+                Pastry, sauces, and plating informed by fine-dining discipline — composed for the intimacy of your home or chosen venue.
+              </p>
+              <a class="btn btn-ghost" href="#services">Occasions &amp; workshops</a>
+            </div>
+          </div>
+        </section>
+
         <section id="services" class="flow-section observe">
           <header class="section-head">
             <h2 class="gold-text">Services &amp; Occasions</h2>
             <p>
-              Same layout for events, workshops, and private invitations — open a card to see the four experience
-              columns and the image strip. Use <code>embed/images/services-and-occasions/&lt;folder&gt;/</code> with
-              the same <code>hero</code> / <code>gallery</code> naming.
+              Corporate milestones, workshops, family tables, and intimate celebrations — open any card for experience
+              pillars and a full image strip.
             </p>
           </header>
           <div id="services-mount"></div>
+        </section>
+
+        <section class="module module--stats observe">
+          <div class="shell">
+            <div class="stats-grid">
+              <div class="stat">
+                <span class="stat-num">6</span>
+                <span class="stat-label">Cuisine portfolios</span>
+              </div>
+              <div class="stat">
+                <span class="stat-num">5</span>
+                <span class="stat-label">Occasion archetypes</span>
+              </div>
+              <div class="stat">
+                <span class="stat-num">1</span>
+                <span class="stat-label">Chef-led experience</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="module module--cta observe">
+          <div class="shell">
+            <div class="cta-panel">
+              <h3 class="cta-title gold-text">Plan your next gathering</h3>
+              <p class="cta-sub">Reserve on the live calendar or reach out — we confirm details and menu direction together.</p>
+              <div class="cta-actions">
+                <a
+                  class="btn btn-primary"
+                  href="https://www.silerchef.com/book-online"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Book online</a
+                >
+                <a class="btn btn-ghost" href="#contact">Contact</a>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section id="contact" class="flow-section observe">
@@ -165,10 +266,12 @@
       </main>
 
       <footer class="site-footer">
-        <p>
-          © <span id="y"></span> SILERCHEF · Reno, Nevada ·
-          <a href="https://www.silerchef.com/">silerchef.com</a>
-        </p>
+        <div class="shell">
+          <p>
+            © <span id="y"></span> SILERCHEF · Reno, Nevada ·
+            <a href="https://www.silerchef.com/">silerchef.com</a>
+          </p>
+        </div>
       </footer>
     </div>
 

@@ -175,6 +175,10 @@
 
     heroEl.style.display = '';
     heroEl.parentElement.classList.remove('is-empty');
+    heroEl.decoding = 'async';
+    if ('fetchPriority' in heroEl) {
+      heroEl.fetchPriority = 'high';
+    }
     heroEl.src = urls[0];
     heroEl.alt = 'Gallery';
 
@@ -187,6 +191,8 @@
       im.src = url;
       im.alt = '';
       im.loading = 'lazy';
+      im.decoding = 'async';
+      im.sizes = '96px';
       b.appendChild(im);
       b.addEventListener('click', () => {
         heroEl.src = url;
@@ -274,7 +280,17 @@
       const img = document.createElement('img');
       img.alt = '';
       img.loading = 'lazy';
+      img.decoding = 'async';
       img.src = `${baseFolder}/${item.slug}/thumb.jpg`;
+      if (premiumCuisine) {
+        img.sizes = '(max-width: 640px) 100vw, (max-width: 1400px) 50vw, 650px';
+        img.width = 800;
+        img.height = 1067;
+      } else {
+        img.sizes = '(max-width: 900px) 100vw, (max-width: 1400px) 33vw, 380px';
+        img.width = 480;
+        img.height = 360;
+      }
       img.addEventListener('error', function onThumbErr() {
         img.removeEventListener('error', onThumbErr);
         img.src = `${baseFolder}/${item.slug}/01.jpg`;
