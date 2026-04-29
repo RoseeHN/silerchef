@@ -1,0 +1,47 @@
+/**
+ * Wix Velo: Dev Mode açık → Backend → Yeni Web Modülü → adı: railway
+ * (Dosya adı: railway.jsw)
+ *
+ * Ön koşullar:
+ * 1) Gizli Anahtar Yöneticisi'nde "chefapi" değeri = Railway'deki WIX_API_KEY ile aynı olmalı.
+ * 2) RAILWAY_BASE'i kendi public Railway URL'in ile değiştir (sonunda / olmasın).
+ *
+ * Sayfa kodu örneği:
+ *   import { pingRailway } from 'backend/railway';
+ *   $w.onReady(async () => {
+ *     const res = await pingRailway();
+ *     console.log(res);
+ *   });
+ */
+import { getSecret } from 'wix-secrets-backend';
+import { fetch } from 'wix-fetch';
+import { webMethod, Permissions } from 'wix-web-module';
+
+const RAILWAY_BASE = 'https://YOUR-PROJECT.up.railway.app';
+
+export const pingRailway = webMethod(Permissions.Anyone, async () => {
+  const token = await getSecret('chefapi');
+  const base = RAILWAY_BASE.replace(/\/$/, '');
+  const url = `${base}/api/ping`;
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const text = await response.text();
+  let body;
+  try {
+    body = JSON.parse(text);
+  } catch {
+    body = { raw: text };
+  }
+
+  if (!response.ok) {
+    throw new Error(`Railway ${response.status}: ${text}`);
+  }
+
+  return body;
+});
