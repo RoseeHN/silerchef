@@ -591,4 +591,42 @@
     );
     io.observe(el);
   });
+
+  function getBookingApiUrl() {
+    let base = '';
+    if (typeof window !== 'undefined' && window.__SILERCHEF_API_BASE__) {
+      base = String(window.__SILERCHEF_API_BASE__).trim();
+    }
+    if (!base) {
+      const meta = document.querySelector('meta[name="silerchef-api-base"]');
+      if (meta) base = (meta.getAttribute('content') || '').trim();
+    }
+    if (!base) return '/api/booking';
+    return base.replace(/\/$/, '') + '/api/booking';
+  }
+
+  async function applyBookingFromApi() {
+    try {
+      const r = await fetch(getBookingApiUrl(), { credentials: 'omit', mode: 'cors' });
+      if (!r.ok) return;
+      const cfg = await r.json();
+      if (cfg.url) {
+        document.querySelectorAll('[data-booking-link]').forEach((a) => {
+          a.setAttribute('href', cfg.url);
+        });
+      }
+      if (cfg.headline) {
+        const h = document.querySelector('[data-booking-headline]');
+        if (h) h.textContent = cfg.headline;
+      }
+      if (cfg.summary) {
+        const p = document.querySelector('[data-booking-summary]');
+        if (p) p.textContent = cfg.summary;
+      }
+    } catch (_) {
+      /* keep defaults from HTML when offline or file:// */
+    }
+  }
+
+  applyBookingFromApi();
 })();

@@ -60,6 +60,22 @@ app.get('/api/ping', requireApiKey, (_req, res) => {
   res.json({ ok: true, authenticated: true });
 });
 
+/** Public booking config for the embed (copy URL + text from Wix Bookings / site). */
+function bookingEnv(key) {
+  const v = process.env[key];
+  return typeof v === 'string' && v.trim() ? v.trim() : null;
+}
+
+app.get('/api/booking', (_req, res) => {
+  res.json({
+    url:
+      bookingEnv('WIX_BOOKING_URL') ||
+      'https://www.silerchef.com/book-online',
+    headline: bookingEnv('WIX_BOOKING_HEADLINE'),
+    summary: bookingEnv('WIX_BOOKING_SUMMARY'),
+  });
+});
+
 const embedDir = path.join(__dirname, '..', 'embed');
 app.use(
   express.static(embedDir, {
