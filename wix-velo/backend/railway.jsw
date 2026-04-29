@@ -17,7 +17,7 @@ import { getSecret } from 'wix-secrets-backend';
 import { fetch } from 'wix-fetch';
 import { webMethod, Permissions } from 'wix-web-module';
 
-const RAILWAY_BASE = 'https://YOUR-PROJECT.up.railway.app';
+const RAILWAY_BASE = 'https://silerchefapi-production.up.railway.app';
 
 export const pingRailway = webMethod(Permissions.Anyone, async () => {
   const token = await getSecret('chefapi');
