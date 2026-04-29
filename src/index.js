@@ -35,6 +35,15 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+/** Allow this app to be shown inside a Wix (or silerchef.com) full-page iframe. */
+app.use((_req, res, next) => {
+  res.setHeader(
+    'Content-Security-Policy',
+    "frame-ancestors 'self' https://silerchef.com https://www.silerchef.com https://*.wix.com https://*.wixsite.com"
+  );
+  next();
+});
+
 function requireApiKey(req, res, next) {
   if (!WIX_API_KEY) {
     res.status(500).json({ error: 'server_misconfigured', detail: 'WIX_API_KEY missing' });
