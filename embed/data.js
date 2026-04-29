@@ -9,7 +9,7 @@
       intro:
         'Curated courses inspired by ' +
         themeLabel +
-        '. Selections below are representative — Chef Julian tailors every menu to your occasion.',
+        '. Selections below are representative — Chef Siler tailors every menu to your occasion.',
       blocks: [
         {
           title: 'Starters & Cold Appetizers',

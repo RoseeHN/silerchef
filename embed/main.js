@@ -147,7 +147,7 @@
           if (e.isIntersecting) e.target.classList.add('is-visible');
         });
       },
-      { rootMargin: '0px 0px -6% 0px', threshold: 0.08 }
+      { rootMargin: '0px 0px 14% 0px', threshold: 0.06 }
     );
     root.querySelectorAll('.observe').forEach((el) => io.observe(el));
   }
@@ -463,7 +463,7 @@
           if (e.isIntersecting) e.target.classList.add('is-visible');
         });
       },
-      { rootMargin: '0px 0px -8% 0px', threshold: 0.05 }
+      { rootMargin: '0px 0px 14% 0px', threshold: 0.06 }
     );
     io.observe(el);
   });
