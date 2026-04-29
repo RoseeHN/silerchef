@@ -372,7 +372,7 @@
       const open = nav.classList.toggle('is-open');
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
-    nav.querySelectorAll('a[href^="#"]').forEach((a) => {
+    nav.querySelectorAll('a').forEach((a) => {
       a.addEventListener('click', () => {
         nav.classList.remove('is-open');
         toggle.setAttribute('aria-expanded', 'false');
