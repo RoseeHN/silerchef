@@ -84,8 +84,9 @@
           <header class="section-head">
             <h2 class="gold-text">Cuisines</h2>
             <p>
-              Photos grouped by culinary tradition. Name files <strong>01.jpg</strong> …
-              <strong>08.jpg</strong> inside each folder below (repository path under <code>embed/images/cuisines/</code>).
+              Choose a world cuisine to open course cards (starters, hot appetizers, mains, desserts) and a
+              hero gallery. Add <code>hero.jpg</code>, <code>thumb.jpg</code>, and <code>gallery/01.jpg</code>… in
+              each folder under <code>embed/images/cuisines/</code>.
             </p>
           </header>
           <div id="cuisines-mount"></div>
@@ -95,8 +96,9 @@
           <header class="section-head">
             <h2 class="gold-text">Services &amp; Occasions</h2>
             <p>
-              Gallery slots for each occasion type. Same naming: <strong>01.jpg</strong>–<strong>08.jpg</strong> in
-              <code>embed/images/services-and-occasions/&lt;folder&gt;/</code>.
+              Same layout for events, workshops, and private invitations — open a card to see the four experience
+              columns and the image strip. Use <code>embed/images/services-and-occasions/&lt;folder&gt;/</code> with
+              the same <code>hero</code> / <code>gallery</code> naming.
             </p>
           </header>
           <div id="services-mount"></div>
@@ -158,9 +160,41 @@
       </footer>
     </div>
 
+    <div id="detail-overlay" class="detail-overlay" hidden aria-hidden="true">
+      <div class="detail-backdrop" tabindex="-1"></div>
+      <div
+        class="detail-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="detail-title"
+      >
+        <div class="detail-toolbar">
+          <button type="button" class="detail-close btn btn-ghost" aria-label="Close">← Back</button>
+        </div>
+        <div class="detail-sheet-inner">
+          <header class="detail-header">
+            <h2 id="detail-title" class="detail-title gold-text"></h2>
+            <p id="detail-intro" class="detail-intro"></p>
+          </header>
+          <div id="detail-blocks" class="detail-blocks"></div>
+          <div class="detail-visual">
+            <div class="detail-hero-wrap">
+              <img id="detail-hero-img" class="detail-hero-img" alt="" />
+            </div>
+            <div class="detail-strip-bar">
+              <button type="button" class="detail-strip-prev" aria-label="Scroll thumbnails left">‹</button>
+              <div id="detail-strip" class="detail-strip"></div>
+              <button type="button" class="detail-strip-next" aria-label="Scroll thumbnails right">›</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
       document.getElementById("y").textContent = new Date().getFullYear();
     </script>
+    <script src="data.js" defer></script>
     <script src="main.js" defer></script>
   </body>
 </html>
