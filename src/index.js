@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 
@@ -59,7 +60,17 @@ app.get('/api/ping', requireApiKey, (_req, res) => {
   res.json({ ok: true, authenticated: true });
 });
 
+const embedDir = path.join(__dirname, '..', 'embed');
+app.use(
+  express.static(embedDir, {
+    extensions: ['html'],
+    index: ['index.html'],
+    maxAge: process.env.NODE_ENV === 'production' ? 3600000 : 0,
+  })
+);
+
 app.use((_req, res) => {
+  if (res.headersSent) return;
   res.status(404).json({ error: 'not_found' });
 });
 

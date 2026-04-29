@@ -1,0 +1,34 @@
+SilerChef — photo folder map for the web team (Duygu Hanim / client)
+
+Match this structure when grouping photos. After grouping, place JPGs in the
+same paths inside the Git project under: embed/images/
+
+File names per folder: 01.jpg, 02.jpg, ... 08.jpg (eight slots per section).
+
+--- Cuisines (site: Cuisines menu) ---
+
+  embed/images/cuisines/american-cuisine/
+  embed/images/cuisines/french-cuisine/
+  embed/images/cuisines/greek-cuisine/
+  embed/images/cuisines/italian-cuisine/
+  embed/images/cuisines/middle-eastern-cuisine/
+  embed/images/cuisines/turkish-cuisine/
+
+--- Services and occasions (site: Services and occasions menu) ---
+
+  embed/images/services-and-occasions/anniversary-celebrations/
+  embed/images/services-and-occasions/birthday-events/
+  embed/images/services-and-occasions/family-dinners/
+  embed/images/services-and-occasions/special-events/
+  embed/images/services-and-occasions/special-occasion-dining/
+
+After files are added, commit and push; Railway will serve the full-page embed
+at the service root URL (index.html).
+
+Optional: also upload the same images to Wix Media for non-embed pages.
+
+Notes from client messages:
+- Direct on-site booking (separate from Wix Bookings flow) is a future scope;
+  Nisa will quote if requested.
+- Menus for kitchens / special days: deliver when ready; this site section is
+  for photo galleries by category.

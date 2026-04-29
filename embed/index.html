@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#141214" />
+    <title>SilerChef — Personal Chef & Culinary Artist | Reno, Nevada</title>
+    <meta
+      name="description"
+      content="Fine dining at home in Reno, Nevada. World cuisines, bespoke menus, and unforgettable occasions."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Outfit:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-texture" aria-hidden="true"></div>
+    <div class="bg-vignette" aria-hidden="true"></div>
+
+    <div class="page">
+      <header class="site-header">
+        <div class="header-inner">
+          <a class="brand-lockup" href="#home">
+            <span class="mono-wrap" aria-hidden="true"><span>SLR</span></span>
+            <span class="brand-text">
+              <strong>Siler Chef</strong>
+              <small>Personal Chef & Culinary Artist</small>
+            </span>
+          </a>
+          <button
+            type="button"
+            class="nav-toggle"
+            aria-label="Open menu"
+            aria-expanded="false"
+            aria-controls="site-nav"
+          >
+            <span></span><span></span><span></span>
+          </button>
+          <nav id="site-nav" aria-label="Primary">
+            <ul>
+              <li><a href="#home">Home</a></li>
+              <li><a href="#cuisines">Cuisines</a></li>
+              <li><a href="#services">Services &amp; Occasions</a></li>
+              <li>
+                <a
+                  class="nav-cta"
+                  href="https://www.silerchef.com/book-online"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Book Online</a
+                >
+              </li>
+              <li><a href="#contact">Contact</a></li>
+            </ul>
+          </nav>
+        </div>
+      </header>
+
+      <section id="home" class="hero observe">
+        <div class="hero-inner">
+          <div class="mono-wrap" aria-hidden="true"><span>SLR</span></div>
+          <h1 class="gold-text">Global Flavors, Happy Tables, Unforgettable Moments</h1>
+          <p class="tagline">Reno · Private dining · Bespoke menus</p>
+          <p style="max-width: 36rem; margin: 0 auto 1.5rem; color: var(--text-muted); font-size: 0.95rem">
+            Exquisite world cuisines in the comfort of your home. Chef Julian Siler curates and executes
+            masterful experiences for your most special occasions.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#cuisines">Explore Cuisines</a>
+            <a class="btn btn-ghost" href="https://www.silerchef.com/book-online" target="_blank" rel="noopener"
+              >Book on Wix</a
+            >
+            <a class="btn btn-ghost" href="#contact">Contact</a>
+          </div>
+        </div>
+      </section>
+
+      <main>
+        <section id="cuisines" class="flow-section observe">
+          <header class="section-head">
+            <h2 class="gold-text">Cuisines</h2>
+            <p>
+              Photos grouped by culinary tradition. Name files <strong>01.jpg</strong> …
+              <strong>08.jpg</strong> inside each folder below (repository path under <code>embed/images/cuisines/</code>).
+            </p>
+          </header>
+          <div id="cuisines-mount"></div>
+        </section>
+
+        <section id="services" class="flow-section observe">
+          <header class="section-head">
+            <h2 class="gold-text">Services &amp; Occasions</h2>
+            <p>
+              Gallery slots for each occasion type. Same naming: <strong>01.jpg</strong>–<strong>08.jpg</strong> in
+              <code>embed/images/services-and-occasions/&lt;folder&gt;/</code>.
+            </p>
+          </header>
+          <div id="services-mount"></div>
+        </section>
+
+        <section id="contact" class="flow-section observe">
+          <header class="section-head">
+            <h2 class="gold-text">Contact</h2>
+            <p>Reach us directly — same details as on our business card.</p>
+          </header>
+          <div class="contact-grid">
+            <div class="contact-col">
+              <div class="contact-item">
+                <span class="contact-icon" aria-hidden="true">☎</span>
+                <div>
+                  <a href="tel:+17753896677">+1 (775) 389-6677</a>
+                </div>
+              </div>
+              <div class="contact-item">
+                <span class="contact-icon" aria-hidden="true">f</span>
+                <div>
+                  <a href="https://www.facebook.com/silerchef" target="_blank" rel="noopener">silerchef</a>
+                </div>
+              </div>
+              <div class="contact-item">
+                <span class="contact-icon" aria-hidden="true">◎</span>
+                <div>
+                  <a href="https://www.instagram.com/silerchef" target="_blank" rel="noopener">@silerchef</a>
+                </div>
+              </div>
+            </div>
+            <div class="contact-col">
+              <div class="contact-item">
+                <span class="contact-icon" aria-hidden="true">✉</span>
+                <div>
+                  <a href="mailto:silerchef@gmail.com">silerchef@gmail.com</a>
+                </div>
+              </div>
+              <div class="contact-item">
+                <span class="contact-icon" aria-hidden="true">⌂</span>
+                <div>
+                  <a href="https://www.silerchef.com/">www.silerchef.com</a>
+                </div>
+              </div>
+              <div class="contact-item">
+                <span class="contact-icon" aria-hidden="true">📍</span>
+                <div>Reno, Nevada, USA</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <p>
+          © <span id="y"></span> SILERCHEF · Reno, Nevada ·
+          <a href="https://www.silerchef.com/">silerchef.com</a>
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      document.getElementById("y").textContent = new Date().getFullYear();
+    </script>
+    <script src="main.js" defer></script>
+  </body>
+</html>
