@@ -1027,6 +1027,7 @@ body.detail-open {
 .detail-hero-stage {
   flex-shrink: 0;
   width: 100%;
+  max-width: 100%;
   padding: 0;
   border-bottom: 1px solid rgba(197, 160, 89, 0.12);
 }
@@ -1034,7 +1035,7 @@ body.detail-open {
 .detail-sheet-inner {
   flex: 1;
   min-height: 0;
-  padding: 1.25rem 1.15rem 1.25rem;
+  padding: 1.25rem 1.15rem 1.75rem;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -1085,7 +1086,7 @@ body.detail-open {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 1rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0;
 }
 
 .meal-card {
@@ -1137,9 +1138,11 @@ body.detail-open {
 
 .detail-gallery-dock {
   flex-shrink: 0;
-  padding: 1rem 1.15rem 1.35rem;
-  border-top: 1px solid rgba(197, 160, 89, 0.18);
-  background: linear-gradient(180deg, rgba(12, 11, 12, 0.6), rgba(20, 18, 20, 0.95));
+  margin-top: 1.75rem;
+  padding: 1.15rem 0.35rem 0.35rem;
+  border-top: 1px solid rgba(197, 160, 89, 0.22);
+  background: linear-gradient(180deg, rgba(14, 12, 14, 0.35), rgba(22, 19, 21, 0.85));
+  border-radius: var(--radius);
 }
 
 .detail-gallery-label {
@@ -1156,15 +1159,17 @@ body.detail-open {
   border-radius: 0;
   overflow: hidden;
   border: none;
-  aspect-ratio: 21 / 9;
-  max-height: min(38vh, 320px);
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: min(42vh, 400px);
   background: var(--bg-elevated);
 }
 
 @media (max-width: 640px) {
   .detail-hero-wrap {
-    aspect-ratio: 16 / 10;
-    max-height: min(42vh, 260px);
+    aspect-ratio: 4 / 3;
+    max-height: min(44vh, 280px);
   }
 }
 

@@ -153,8 +153,31 @@
   }
 
   let stripScrollHandler = null;
+  let stripAutoplayTimer = null;
+  let dockInteractionCleanup = null;
+
+  function clearAutoplayTimer() {
+    if (stripAutoplayTimer) {
+      clearInterval(stripAutoplayTimer);
+      stripAutoplayTimer = null;
+    }
+  }
+
+  function teardownDockListeners() {
+    if (dockInteractionCleanup) {
+      dockInteractionCleanup();
+      dockInteractionCleanup = null;
+    }
+  }
+
+  function resetCarouselTimers() {
+    clearAutoplayTimer();
+    teardownDockListeners();
+  }
 
   function setupCarousel(heroEl, stripEl, urls) {
+    resetCarouselTimers();
+
     heroEl.removeAttribute('src');
     stripEl.innerHTML = '';
     const prevBtn = document.querySelector('.detail-strip-prev');
@@ -166,16 +189,16 @@
       stripScrollHandler = null;
     }
 
+    const dock = document.querySelector('.detail-gallery-dock');
+
     if (!urls.length) {
       heroEl.alt = '';
       heroEl.style.display = 'none';
       heroEl.parentElement.classList.add('is-empty');
-      const dock = document.querySelector('.detail-gallery-dock');
       if (dock) dock.hidden = true;
       return;
     }
 
-    const dock = document.querySelector('.detail-gallery-dock');
     if (dock) dock.hidden = false;
 
     heroEl.style.display = '';
@@ -184,8 +207,22 @@
     if ('fetchPriority' in heroEl) {
       heroEl.fetchPriority = 'high';
     }
-    heroEl.src = urls[0];
-    heroEl.alt = 'Gallery';
+
+    let currentIdx = 0;
+
+    function goToIndex(idx, scrollThumb) {
+      const n = urls.length;
+      currentIdx = ((idx % n) + n) % n;
+      heroEl.src = urls[currentIdx];
+      heroEl.alt = 'Gallery image ' + (currentIdx + 1);
+      const thumbs = stripEl.querySelectorAll('.detail-thumb');
+      thumbs.forEach((t, i) => {
+        t.classList.toggle('is-active', i === currentIdx);
+      });
+      if (scrollThumb && thumbs[currentIdx]) {
+        thumbs[currentIdx].scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+      }
+    }
 
     urls.forEach((url, idx) => {
       const b = document.createElement('button');
@@ -200,12 +237,12 @@
       im.sizes = '124px';
       b.appendChild(im);
       b.addEventListener('click', () => {
-        heroEl.src = url;
-        stripEl.querySelectorAll('.detail-thumb').forEach((t) => t.classList.remove('is-active'));
-        b.classList.add('is-active');
+        goToIndex(idx, true);
       });
       stripEl.appendChild(b);
     });
+
+    goToIndex(0, false);
 
     const scrollAmount = () => Math.min(stripEl.clientWidth * 0.85, 280);
 
@@ -220,6 +257,34 @@
     if (prevBtn && nextBtn) {
       prevBtn.addEventListener('click', stripScrollHandler.prev);
       nextBtn.addEventListener('click', stripScrollHandler.next);
+    }
+
+    const prefersReduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function scheduleAutoplay() {
+      clearAutoplayTimer();
+      if (urls.length <= 1 || prefersReduced) return;
+      stripAutoplayTimer = window.setInterval(() => {
+        goToIndex(currentIdx + 1, true);
+      }, 4500);
+    }
+
+    if (dock && urls.length > 1 && !prefersReduced) {
+      const pause = () => clearAutoplayTimer();
+      const resume = () => scheduleAutoplay();
+      dock.addEventListener('mouseenter', pause);
+      dock.addEventListener('mouseleave', resume);
+      dock.addEventListener('focusin', pause);
+      dock.addEventListener('focusout', resume);
+      dockInteractionCleanup = () => {
+        dock.removeEventListener('mouseenter', pause);
+        dock.removeEventListener('mouseleave', resume);
+        dock.removeEventListener('focusin', pause);
+        dock.removeEventListener('focusout', resume);
+      };
+      scheduleAutoplay();
     }
   }
 
@@ -257,6 +322,7 @@
 
   function closeDetail() {
     if (!overlay) return;
+    resetCarouselTimers();
     overlay.hidden = true;
     overlay.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('detail-open');
