@@ -41,11 +41,36 @@
   ];
 
   const SERVICES = [
-    { slug: 'anniversary-celebrations', title: 'Anniversary Celebrations' },
-    { slug: 'birthday-events', title: 'Birthday Events' },
-    { slug: 'family-dinners', title: 'Family Dinners' },
-    { slug: 'special-events', title: 'Special Events' },
-    { slug: 'special-occasion-dining', title: 'Special Occasion Dining' },
+    {
+      slug: 'anniversary-celebrations',
+      title: 'Anniversary Celebrations',
+      no: '01',
+      tagline: 'Milestones at the table — courses paced as quiet luxury.',
+    },
+    {
+      slug: 'birthday-events',
+      title: 'Birthday Events',
+      no: '02',
+      tagline: 'Chef-led joy — timing built for laughter and togetherness.',
+    },
+    {
+      slug: 'family-dinners',
+      title: 'Family Dinners',
+      no: '03',
+      tagline: 'Generous plates — home comfort without the restaurant rush.',
+    },
+    {
+      slug: 'special-events',
+      title: 'Special Events',
+      no: '04',
+      tagline: 'Corporate and private — polished flow from reception to last bite.',
+    },
+    {
+      slug: 'special-occasion-dining',
+      title: 'Special Occasion Dining',
+      no: '05',
+      tagline: 'Intimate arcs — proposals, reunions, chef’s-table focus.',
+    },
   ];
 
   function pad2(n) {
@@ -110,11 +135,36 @@
     if (!copy || !copy.blocks) return;
     copy.blocks.forEach((block) => {
       const article = document.createElement('article');
-      article.className = 'meal-card observe';
+      article.className = 'meal-card observe' + (block.image ? ' meal-card--with-visual' : '');
+
+      const inner = document.createElement('div');
+      inner.className = 'meal-card__inner';
+
+      if (block.image) {
+        const fig = document.createElement('figure');
+        fig.className = 'meal-card__photo';
+        const img = document.createElement('img');
+        img.src = block.image;
+        img.alt = '';
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.sizes = '(max-width: 520px) 72px, 108px';
+        img.addEventListener('error', () => {
+          fig.remove();
+          article.classList.remove('meal-card--with-visual');
+        });
+        fig.appendChild(img);
+        inner.appendChild(fig);
+      }
+
+      const body = document.createElement('div');
+      body.className = 'meal-card__body';
+
       const h = document.createElement('h4');
       h.className = 'meal-card-title';
       h.textContent = block.title;
-      article.appendChild(h);
+      body.appendChild(h);
+
       const ul = document.createElement('ul');
       ul.className = 'meal-card-list';
       (block.items || []).forEach((item) => {
@@ -130,7 +180,10 @@
         }
         ul.appendChild(li);
       });
-      article.appendChild(ul);
+      body.appendChild(ul);
+
+      inner.appendChild(body);
+      article.appendChild(inner);
       container.appendChild(article);
     });
     observeFresh(container);
@@ -154,12 +207,20 @@
 
   let stripScrollHandler = null;
   let stripAutoplayTimer = null;
+  let stripMarqueeRaf = null;
   let dockInteractionCleanup = null;
 
   function clearAutoplayTimer() {
     if (stripAutoplayTimer) {
       clearInterval(stripAutoplayTimer);
       stripAutoplayTimer = null;
+    }
+  }
+
+  function cancelStripMarquee() {
+    if (stripMarqueeRaf != null) {
+      cancelAnimationFrame(stripMarqueeRaf);
+      stripMarqueeRaf = null;
     }
   }
 
@@ -172,7 +233,18 @@
 
   function resetCarouselTimers() {
     clearAutoplayTimer();
+    cancelStripMarquee();
     teardownDockListeners();
+  }
+
+  /** Centers a thumbnail inside the horizontal strip only — avoids scrollIntoView scrolling the modal vertically. */
+  function scrollThumbIntoStrip(stripEl, thumb, behavior) {
+    if (!stripEl || !thumb) return;
+    const maxScroll = Math.max(0, stripEl.scrollWidth - stripEl.clientWidth);
+    const thumbCenter = thumb.offsetLeft + thumb.offsetWidth / 2;
+    let left = thumbCenter - stripEl.clientWidth / 2;
+    left = Math.max(0, Math.min(maxScroll, left));
+    stripEl.scrollTo({ left, behavior: behavior || 'smooth' });
   }
 
   function setupCarousel(heroEl, stripEl, urls) {
@@ -220,7 +292,7 @@
         t.classList.toggle('is-active', i === currentIdx);
       });
       if (scrollThumb && thumbs[currentIdx]) {
-        thumbs[currentIdx].scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+        scrollThumbIntoStrip(stripEl, thumbs[currentIdx], 'smooth');
       }
     }
 
@@ -267,13 +339,41 @@
       clearAutoplayTimer();
       if (urls.length <= 1 || prefersReduced) return;
       stripAutoplayTimer = window.setInterval(() => {
-        goToIndex(currentIdx + 1, true);
-      }, 4500);
+        goToIndex(currentIdx + 1, false);
+      }, 5200);
+    }
+
+    function startStripMarquee() {
+      cancelStripMarquee();
+      if (urls.length <= 1 || prefersReduced) return;
+      let last = performance.now();
+      const speedPxPerSec = 42;
+      function tick(now) {
+        const dt = Math.min(48, now - last);
+        last = now;
+        const maxScroll = stripEl.scrollWidth - stripEl.clientWidth;
+        if (maxScroll <= 4) {
+          stripMarqueeRaf = requestAnimationFrame(tick);
+          return;
+        }
+        stripEl.scrollLeft += (speedPxPerSec * dt) / 1000;
+        if (stripEl.scrollLeft >= maxScroll - 1) {
+          stripEl.scrollLeft = 0;
+        }
+        stripMarqueeRaf = requestAnimationFrame(tick);
+      }
+      stripMarqueeRaf = requestAnimationFrame(tick);
     }
 
     if (dock && urls.length > 1 && !prefersReduced) {
-      const pause = () => clearAutoplayTimer();
-      const resume = () => scheduleAutoplay();
+      const pause = () => {
+        clearAutoplayTimer();
+        cancelStripMarquee();
+      };
+      const resume = () => {
+        scheduleAutoplay();
+        startStripMarquee();
+      };
       dock.addEventListener('mouseenter', pause);
       dock.addEventListener('mouseleave', resume);
       dock.addEventListener('focusin', pause);
@@ -284,7 +384,7 @@
         dock.removeEventListener('focusin', pause);
         dock.removeEventListener('focusout', resume);
       };
-      scheduleAutoplay();
+      resume();
     }
   }
 
@@ -313,11 +413,20 @@
     overlay.setAttribute('aria-hidden', 'false');
     document.body.classList.add('detail-open');
 
+    const sheetInner = overlay.querySelector('.detail-sheet-inner');
+    if (sheetInner) sheetInner.scrollTop = 0;
+
     collectGalleryUrls(baseFolder, slug).then((urls) => {
       setupCarousel(detailHero, detailStrip, urls);
     });
 
-    if (detailClose) detailClose.focus();
+    if (detailClose) {
+      try {
+        detailClose.focus({ preventScroll: true });
+      } catch {
+        detailClose.focus();
+      }
+    }
   }
 
   function closeDetail() {
@@ -330,17 +439,18 @@
 
   function mountHub(containerId, items, kind, baseFolder, options) {
     const layout = options && options.layout;
-    const premiumCuisine = layout === 'cuisine-premium';
+    const premium =
+      layout === 'cuisine-premium' || layout === 'service-premium';
 
     const root = document.getElementById(containerId);
     if (!root) return;
     const grid = document.createElement('div');
-    grid.className = premiumCuisine ? 'hub-grid hub-grid--cuisines' : 'hub-grid hub-grid--services';
+    grid.className = premium ? 'hub-grid hub-grid--cuisines' : 'hub-grid hub-grid--services';
 
     items.forEach((item) => {
       const card = document.createElement('button');
       card.type = 'button';
-      card.className = premiumCuisine ? 'hub-card hub-card--cuisine observe' : 'hub-card observe';
+      card.className = premium ? 'hub-card hub-card--cuisine observe' : 'hub-card observe';
       card.setAttribute('aria-haspopup', 'dialog');
       const aria =
         item.tagline != null ? `${item.title}. ${item.tagline}` : `${item.title}. View details and gallery.`;
@@ -353,7 +463,7 @@
       img.loading = 'lazy';
       img.decoding = 'async';
       img.src = `${baseFolder}/${item.slug}/thumb.jpg`;
-      if (premiumCuisine) {
+      if (premium) {
         img.sizes = '(max-width: 640px) 100vw, (max-width: 1400px) 50vw, 700px';
         img.width = 800;
         img.height = 600;
@@ -373,7 +483,7 @@
       });
       visual.appendChild(img);
 
-      if (premiumCuisine) {
+      if (premium) {
         const overlay = document.createElement('div');
         overlay.className = 'hub-card-overlay';
         const num = document.createElement('span');
@@ -387,7 +497,7 @@
         tag.textContent = item.tagline || '';
         const cta = document.createElement('span');
         cta.className = 'hub-card-cta';
-        cta.textContent = 'Menu & gallery';
+        cta.textContent = kind === 'service' ? 'Plan & gallery' : 'Menu & gallery';
         overlay.appendChild(num);
         overlay.appendChild(titleEl);
         overlay.appendChild(tag);
@@ -397,7 +507,7 @@
 
       card.appendChild(visual);
 
-      if (!premiumCuisine) {
+      if (!premium) {
         const body = document.createElement('div');
         body.className = 'hub-card-body';
         const h = document.createElement('h3');
@@ -421,28 +531,42 @@
   }
 
   mountHub('cuisines-mount', CUISINES, 'cuisine', 'images/cuisines', { layout: 'cuisine-premium' });
-  mountHub('services-mount', SERVICES, 'service', 'images/services-and-occasions', { layout: 'default' });
+  mountHub('services-mount', SERVICES, 'service', 'images/services-and-occasions', { layout: 'service-premium' });
 
   if (detailClose) detailClose.addEventListener('click', closeDetail);
   const backdropEl = overlay && overlay.querySelector('.detail-backdrop');
   if (backdropEl) backdropEl.addEventListener('click', closeDetail);
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && overlay && !overlay.hidden) closeDetail();
+    if (e.key === 'Escape' && overlay && !overlay.hidden) {
+      closeDetail();
+      return;
+    }
+    if (e.key === 'Escape' && nav && nav.classList.contains('is-open')) {
+      setMobileNavOpen(false);
+    }
   });
 
   const nav = document.getElementById('site-nav');
   const toggle = document.querySelector('.nav-toggle');
+
+  function setMobileNavOpen(open) {
+    if (!nav || !toggle) return;
+    nav.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    document.body.classList.toggle('nav-drawer-open', open);
+  }
+
   if (toggle && nav) {
     toggle.addEventListener('click', () => {
-      const open = nav.classList.toggle('is-open');
-      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      setMobileNavOpen(!nav.classList.contains('is-open'));
+    });
+    nav.addEventListener('click', (e) => {
+      if (e.target === nav) setMobileNavOpen(false);
     });
     nav.querySelectorAll('a').forEach((a) => {
-      a.addEventListener('click', () => {
-        nav.classList.remove('is-open');
-        toggle.setAttribute('aria-expanded', 'false');
-      });
+      a.addEventListener('click', () => setMobileNavOpen(false));
     });
   }
 

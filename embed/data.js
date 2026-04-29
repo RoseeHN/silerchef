@@ -4,7 +4,20 @@
  * OR Events, Training, Invitations-style columns for services).
  */
 (function (global) {
-  function cuisineDefaults(themeLabel) {
+  function pad2(n) {
+    return String(n).padStart(2, '0');
+  }
+
+  /** One illustrative image per course block; paths resolve under each cuisine folder. */
+  function cuisineBlockImage(slug, index1Based) {
+    return 'images/cuisines/' + slug + '/gallery/' + pad2(index1Based) + '.jpg';
+  }
+
+  function serviceBlockImage(slug, index1Based) {
+    return 'images/services-and-occasions/' + slug + '/gallery/' + pad2(index1Based) + '.jpg';
+  }
+
+  function cuisineDefaults(slug, themeLabel) {
     return {
       intro:
         'Curated courses inspired by ' +
@@ -13,6 +26,7 @@
       blocks: [
         {
           title: 'Starters & Cold Appetizers',
+          image: cuisineBlockImage(slug, 1),
           items: [
             {
               name: 'Seasonal crudités & artisan board',
@@ -26,6 +40,7 @@
         },
         {
           title: 'Hot Appetizers',
+          image: cuisineBlockImage(slug, 2),
           items: [
             {
               name: 'Pass-around small plates',
@@ -39,6 +54,7 @@
         },
         {
           title: 'Main Courses',
+          image: cuisineBlockImage(slug, 3),
           items: [
             {
               name: 'Chef’s centerpiece plate',
@@ -52,6 +68,7 @@
         },
         {
           title: 'Desserts',
+          image: cuisineBlockImage(slug, 4),
           items: [
             {
               name: 'Plated sweet finale',
@@ -67,7 +84,7 @@
     };
   }
 
-  function serviceDefaults(occasionLabel) {
+  function serviceDefaults(slug, occasionLabel) {
     return {
       intro:
         'Planning and culinary framework for ' +
@@ -76,6 +93,7 @@
       blocks: [
         {
           title: 'Events & Celebrations',
+          image: serviceBlockImage(slug, 1),
           items: [
             {
               name: 'Timeline & flow',
@@ -89,6 +107,7 @@
         },
         {
           title: 'Workshops & Culinary Training',
+          image: serviceBlockImage(slug, 2),
           items: [
             {
               name: 'Hands-on sessions',
@@ -102,6 +121,7 @@
         },
         {
           title: 'Invitations & Private Gatherings',
+          image: serviceBlockImage(slug, 3),
           items: [
             {
               name: 'Intimate dining format',
@@ -115,6 +135,7 @@
         },
         {
           title: 'Signature Experiences',
+          image: serviceBlockImage(slug, 4),
           items: [
             {
               name: 'Custom menu arc',
@@ -132,19 +153,19 @@
 
   global.SC_SITE = {
     cuisines: {
-      'american-cuisine': cuisineDefaults('American cuisine'),
-      'french-cuisine': cuisineDefaults('French cuisine'),
-      'greek-cuisine': cuisineDefaults('Greek cuisine'),
-      'italian-cuisine': cuisineDefaults('Italian cuisine'),
-      'middle-eastern-cuisine': cuisineDefaults('Middle Eastern cuisine'),
-      'turkish-cuisine': cuisineDefaults('Turkish cuisine'),
+      'american-cuisine': cuisineDefaults('american-cuisine', 'American cuisine'),
+      'french-cuisine': cuisineDefaults('french-cuisine', 'French cuisine'),
+      'greek-cuisine': cuisineDefaults('greek-cuisine', 'Greek cuisine'),
+      'italian-cuisine': cuisineDefaults('italian-cuisine', 'Italian cuisine'),
+      'middle-eastern-cuisine': cuisineDefaults('middle-eastern-cuisine', 'Middle Eastern cuisine'),
+      'turkish-cuisine': cuisineDefaults('turkish-cuisine', 'Turkish cuisine'),
     },
     services: {
-      'anniversary-celebrations': serviceDefaults('anniversary celebrations'),
-      'birthday-events': serviceDefaults('birthday gatherings'),
-      'family-dinners': serviceDefaults('family dinners'),
-      'special-events': serviceDefaults('special events'),
-      'special-occasion-dining': serviceDefaults('special-occasion dining'),
+      'anniversary-celebrations': serviceDefaults('anniversary-celebrations', 'anniversary celebrations'),
+      'birthday-events': serviceDefaults('birthday-events', 'birthday gatherings'),
+      'family-dinners': serviceDefaults('family-dinners', 'family dinners'),
+      'special-events': serviceDefaults('special-events', 'special events'),
+      'special-occasion-dining': serviceDefaults('special-occasion-dining', 'special-occasion dining'),
     },
   };
 })(typeof window !== 'undefined' ? window : globalThis);
