@@ -421,15 +421,24 @@ html.is-scrolled .site-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4rem 1.25rem 3.5rem;
+  padding: 4rem 0 3.5rem;
   text-align: center;
 }
 
 .hero-inner {
-  max-width: min(52rem, 100%);
-  margin: 0 auto;
+  width: 100%;
+  max-width: var(--page-max);
+  margin-left: auto;
+  margin-right: auto;
   padding-left: var(--page-gutter);
   padding-right: var(--page-gutter);
+  box-sizing: border-box;
+}
+
+.hero-inner > * {
+  max-width: 52rem;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .hero h1 {
@@ -659,7 +668,8 @@ main {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
-  max-width: min(44rem, 100%);
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   padding: 2rem;
   border-radius: var(--radius);
@@ -854,7 +864,7 @@ main {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(1.15rem, 2.5vw, 1.85rem);
   width: 100%;
-  max-width: min(1100px, calc(var(--page-max) - var(--page-gutter) * 2));
+  max-width: 100%;
   margin: 0 auto;
 }
 

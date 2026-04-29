@@ -288,7 +288,7 @@
       img.decoding = 'async';
       img.src = `${baseFolder}/${item.slug}/thumb.jpg`;
       if (premiumCuisine) {
-        img.sizes = '(max-width: 640px) 100vw, (max-width: 1100px) 50vw, 550px';
+        img.sizes = '(max-width: 640px) 100vw, (max-width: 1400px) 50vw, 700px';
         img.width = 800;
         img.height = 600;
       } else {
