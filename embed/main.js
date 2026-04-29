@@ -2,12 +2,42 @@
 
 (function () {
   const CUISINES = [
-    { slug: 'american-cuisine', title: 'American Cuisine' },
-    { slug: 'french-cuisine', title: 'French Cuisine' },
-    { slug: 'greek-cuisine', title: 'Greek Cuisine' },
-    { slug: 'italian-cuisine', title: 'Italian Cuisine' },
-    { slug: 'middle-eastern-cuisine', title: 'Middle Eastern Cuisine' },
-    { slug: 'turkish-cuisine', title: 'Turkish Cuisine' },
+    {
+      slug: 'american-cuisine',
+      title: 'American Cuisine',
+      no: '01',
+      tagline: 'Heritage comfort reimagined with contemporary finesse.',
+    },
+    {
+      slug: 'french-cuisine',
+      title: 'French Cuisine',
+      no: '02',
+      tagline: 'Classical technique and season-led elegance.',
+    },
+    {
+      slug: 'greek-cuisine',
+      title: 'Greek Cuisine',
+      no: '03',
+      tagline: 'Mediterranean clarity — olive oil, herbs, and the sea.',
+    },
+    {
+      slug: 'italian-cuisine',
+      title: 'Italian Cuisine',
+      no: '04',
+      tagline: 'Regional soul — handmade pasta and trattoria warmth.',
+    },
+    {
+      slug: 'middle-eastern-cuisine',
+      title: 'Middle Eastern Cuisine',
+      no: '05',
+      tagline: 'Spice routes, mezze abundance, and shared tables.',
+    },
+    {
+      slug: 'turkish-cuisine',
+      title: 'Turkish Cuisine',
+      no: '06',
+      tagline: 'Anatolian depth — fire, hospitality, and ritual.',
+    },
   ];
 
   const SERVICES = [
@@ -206,17 +236,23 @@
     document.body.classList.remove('detail-open');
   }
 
-  function mountHub(containerId, items, kind, baseFolder) {
+  function mountHub(containerId, items, kind, baseFolder, options) {
+    const layout = options && options.layout;
+    const premiumCuisine = layout === 'cuisine-premium';
+
     const root = document.getElementById(containerId);
     if (!root) return;
     const grid = document.createElement('div');
-    grid.className = 'hub-grid';
+    grid.className = premiumCuisine ? 'hub-grid hub-grid--cuisines' : 'hub-grid hub-grid--services';
 
     items.forEach((item) => {
       const card = document.createElement('button');
       card.type = 'button';
-      card.className = 'hub-card observe';
+      card.className = premiumCuisine ? 'hub-card hub-card--cuisine observe' : 'hub-card observe';
       card.setAttribute('aria-haspopup', 'dialog');
+      const aria =
+        item.tagline != null ? `${item.title}. ${item.tagline}` : `${item.title}. View details and gallery.`;
+      card.setAttribute('aria-label', aria);
 
       const visual = document.createElement('div');
       visual.className = 'hub-card-visual';
@@ -235,19 +271,43 @@
       });
       visual.appendChild(img);
 
-      const body = document.createElement('div');
-      body.className = 'hub-card-body';
-      const h = document.createElement('h3');
-      h.className = 'hub-card-title';
-      h.textContent = item.title;
-      const p = document.createElement('p');
-      p.className = 'hub-card-hint';
-      p.textContent = 'View courses & gallery';
-      body.appendChild(h);
-      body.appendChild(p);
+      if (premiumCuisine) {
+        const overlay = document.createElement('div');
+        overlay.className = 'hub-card-overlay';
+        const num = document.createElement('span');
+        num.className = 'hub-card-index';
+        num.textContent = item.no || '';
+        const titleEl = document.createElement('h3');
+        titleEl.className = 'hub-card-overlay-title';
+        titleEl.textContent = item.title;
+        const tag = document.createElement('p');
+        tag.className = 'hub-card-overlay-tagline';
+        tag.textContent = item.tagline || '';
+        const cta = document.createElement('span');
+        cta.className = 'hub-card-cta';
+        cta.textContent = 'Menu & gallery';
+        overlay.appendChild(num);
+        overlay.appendChild(titleEl);
+        overlay.appendChild(tag);
+        overlay.appendChild(cta);
+        visual.appendChild(overlay);
+      }
 
       card.appendChild(visual);
-      card.appendChild(body);
+
+      if (!premiumCuisine) {
+        const body = document.createElement('div');
+        body.className = 'hub-card-body';
+        const h = document.createElement('h3');
+        h.className = 'hub-card-title';
+        h.textContent = item.title;
+        const p = document.createElement('p');
+        p.className = 'hub-card-hint';
+        p.textContent = 'View courses & gallery';
+        body.appendChild(h);
+        body.appendChild(p);
+        card.appendChild(body);
+      }
 
       card.addEventListener('click', () => openDetail(kind, item.slug, item.title));
 
@@ -258,8 +318,8 @@
     observeFresh(root);
   }
 
-  mountHub('cuisines-mount', CUISINES, 'cuisine', 'images/cuisines');
-  mountHub('services-mount', SERVICES, 'service', 'images/services-and-occasions');
+  mountHub('cuisines-mount', CUISINES, 'cuisine', 'images/cuisines', { layout: 'cuisine-premium' });
+  mountHub('services-mount', SERVICES, 'service', 'images/services-and-occasions', { layout: 'default' });
 
   if (detailClose) detailClose.addEventListener('click', closeDetail);
   const backdropEl = overlay && overlay.querySelector('.detail-backdrop');

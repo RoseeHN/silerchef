@@ -625,6 +625,146 @@ main {
   color: var(--text-muted);
 }
 
+/* Services hub — compact cards */
+.hub-grid--services {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+/* ——— Cuisines — editorial premium grid ——— */
+.section-cuisines {
+  padding-top: 1rem;
+}
+
+.section-head--premium .section-eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold-3);
+  margin: 0 0 0.5rem;
+  opacity: 0.9;
+}
+
+.section-head--premium .section-lede {
+  margin: 0.75rem auto 0;
+  max-width: 34rem;
+  font-size: 1rem;
+  font-weight: 300;
+  color: rgba(243, 234, 209, 0.72);
+  line-height: 1.65;
+}
+
+.hub-grid--cuisines {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.15rem, 2.5vw, 1.85rem);
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .hub-grid--cuisines {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
+.hub-card--cuisine {
+  padding: 0;
+  border-radius: 18px;
+  background: #101010;
+  border: 1px solid rgba(197, 160, 89, 0.2);
+  box-shadow:
+    0 4px 0 rgba(197, 160, 89, 0.06),
+    0 28px 56px rgba(0, 0, 0, 0.55);
+}
+
+.hub-card--cuisine:hover,
+.hub-card--cuisine:focus-visible {
+  transform: translateY(-6px);
+  border-color: rgba(212, 188, 106, 0.42);
+  box-shadow:
+    0 4px 0 rgba(197, 160, 89, 0.12),
+    0 36px 72px rgba(0, 0, 0, 0.55);
+}
+
+.hub-card--cuisine .hub-card-visual {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 17px;
+}
+
+.hub-card--cuisine .hub-card-visual img {
+  transition: transform 0.65s var(--ease);
+  transform: scale(1.01);
+}
+
+.hub-card--cuisine:hover .hub-card-visual img,
+.hub-card--cuisine:focus-visible .hub-card-visual img {
+  transform: scale(1.08);
+}
+
+.hub-card-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: stretch;
+  padding: 1.35rem 1.4rem 1.5rem;
+  text-align: left;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(6, 5, 6, 0.96) 0%,
+    rgba(10, 9, 10, 0.55) 42%,
+    transparent 72%
+  );
+}
+
+.hub-card-index {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, 3rem);
+  font-weight: 500;
+  line-height: 0.95;
+  margin-bottom: 0.45rem;
+  background: linear-gradient(145deg, #f5ebd4 0%, #d4bc6a 38%, #9a7639 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 0.02em;
+}
+
+.hub-card-overlay-title {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(252, 249, 243, 0.96);
+  margin: 0 0 0.45rem;
+}
+
+.hub-card-overlay-tagline {
+  font-size: 0.84rem;
+  font-weight: 300;
+  line-height: 1.5;
+  color: rgba(252, 249, 243, 0.62);
+  margin: 0 0 0.85rem;
+  max-width: 22rem;
+}
+
+.hub-card-cta {
+  display: inline-block;
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-2);
+  opacity: 0.95;
+}
+
+.hub-card--cuisine .hub-card-visual.is-fallback .hub-card-overlay-tagline {
+  max-width: none;
+}
+
 /* ——— Detail overlay ——— */
 body.detail-open {
   overflow: hidden;
