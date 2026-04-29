@@ -1,14 +1,21 @@
-SilerChef — photo folder map for the web team (Duygu Hanim / client)
+SilerChef — photo workflow for the web team (Duygu Hanim / client)
 
-Match this structure when grouping photos. Place JPGs under embed/images/ (same
-paths in Git).
+Source folder in this repo:  silerchef.com pictures /   (raw exports from the client)
 
-Hub cards + detail panel use:
+Regenerate deployable images (classify, copy, renumber, hero/thumb):
 
-  thumb.jpg          — optional small image on the grid card (fallback: 01.jpg)
-  hero.jpg           — large hero image at top of the sliding gallery section
-  gallery/01.jpg … gallery/14.jpg — horizontal sliding thumbnails (strip)
-  OR legacy: 01.jpg … 08.jpg in the folder root if no gallery/ folder yet
+  npm run photos
+
+The script copies all JPGs into embed/images/.../gallery/ as 01.jpg, 02.jpg, …
+and sets hero.jpg + thumb.jpg from 01. It also copies WhatsApp business card
+to embed/images/brand/business-card.jpg when that file exists in the repo root.
+
+Classification uses filename keywords (e.g. pasta → Italian, smoked meat →
+American, most cakes/pastry → French) and moves a few items from the large
+French set into anniversary, Turkish, and Middle Eastern folders so no section
+stays empty.
+
+In the browser, the detail panel loads up to 99 gallery images per folder.
 
 --- Cuisines ---
 
@@ -27,10 +34,11 @@ Hub cards + detail panel use:
   embed/images/services-and-occasions/special-events/
   embed/images/services-and-occasions/special-occasion-dining/
 
-Editable English menu copy lives in: embed/data.js (SC_SITE).
+Editable English copy: embed/data.js (SC_SITE).
 
-After files are added, commit and push; Railway serves the embed at the service root.
+After npm run photos, commit and push; Railway serves the embed at the service root.
 
 Notes:
 - Direct on-site booking (outside Wix Bookings) is separate scope / pricing.
-- Menus and texts can be refined in embed/data.js per cuisine or service slug.
+- To change which file goes to which folder, edit scripts/distribute-photos.mjs
+  (classify function) and run npm run photos again.

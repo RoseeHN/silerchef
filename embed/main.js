@@ -61,24 +61,39 @@
     });
   }
 
+  async function probeAll(urls) {
+    const out = [];
+    const chunk = 30;
+    for (let i = 0; i < urls.length; i += chunk) {
+      const slice = urls.slice(i, i + chunk);
+      const results = await Promise.all(slice.map((u) => probeImage(u)));
+      results.forEach((u) => {
+        if (u) out.push(u);
+      });
+    }
+    return out;
+  }
+
   async function collectGalleryUrls(baseFolder, slug) {
     const base = `${baseFolder}/${slug}`;
     const found = [];
     const hero = await probeImage(`${base}/hero.jpg`);
     if (hero) found.push(hero);
 
-    for (let i = 1; i <= 14; i++) {
-      const u = `${base}/gallery/${pad2(i)}.jpg`;
-      const ok = await probeImage(u);
-      if (ok) found.push(ok);
+    const gallerySlots = [];
+    for (let i = 1; i <= 99; i++) {
+      gallerySlots.push(`${base}/gallery/${pad2(i)}.jpg`);
     }
+    const fromGallery = await probeAll(gallerySlots);
+    fromGallery.forEach((u) => found.push(u));
 
     if (found.length <= (hero ? 1 : 0)) {
-      for (let i = 1; i <= 8; i++) {
-        const u = `${base}/${pad2(i)}.jpg`;
-        const ok = await probeImage(u);
-        if (ok) found.push(ok);
+      const legacy = [];
+      for (let i = 1; i <= 99; i++) {
+        legacy.push(`${base}/${pad2(i)}.jpg`);
       }
+      const fromLegacy = await probeAll(legacy);
+      fromLegacy.forEach((u) => found.push(u));
     }
 
     return [...new Set(found)];
