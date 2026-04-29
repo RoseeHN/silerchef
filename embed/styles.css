@@ -120,11 +120,11 @@ section[id] {
     0 0 0 1px rgba(0, 0, 0, 0.25);
 }
 
-.brand-logo--hero {
-  width: min(6.75rem, 24vw);
-  height: min(6.75rem, 24vw);
-  margin: 0 auto 1.35rem;
-  filter: drop-shadow(0 6px 32px rgba(0, 0, 0, 0.4));
+.brand-logo--hero-inline {
+  width: 3.25rem;
+  height: 3.25rem;
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 22px rgba(0, 0, 0, 0.45));
 }
 
 /* ——— Header (luxury bar: frosted rail + centered nav + jewel CTA) ——— */
@@ -423,15 +423,14 @@ html.is-scrolled .site-header {
 
 /* ——— Hero ——— */
 .hero {
-  min-height: min(88vh, 820px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 0 3.5rem;
-  text-align: center;
+  padding: clamp(2.5rem, 6vw, 4rem) 0 clamp(2.75rem, 5vw, 3.75rem);
 }
 
-.hero-inner {
+.hero--editorial {
+  position: relative;
+}
+
+.hero-inner:not(.hero-inner--split) {
   width: 100%;
   max-width: var(--page-max);
   margin-left: auto;
@@ -441,18 +440,141 @@ html.is-scrolled .site-header {
   box-sizing: border-box;
 }
 
-.hero-inner > * {
+.hero-inner:not(.hero-inner--split) > * {
   max-width: 52rem;
   margin-left: auto;
   margin-right: auto;
 }
 
+.hero-inner.hero-inner--split {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.hero-inner--split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  gap: clamp(1.75rem, 4vw, 3.25rem);
+  align-items: center;
+}
+
+.hero-panel--visual {
+  position: relative;
+}
+
+.hero-frame {
+  margin: 0;
+  overflow: hidden;
+  border-radius: calc(var(--radius) + 6px);
+  border: 1px solid rgba(197, 160, 89, 0.32);
+  box-shadow:
+    0 12px 48px rgba(0, 0, 0, 0.48),
+    inset 0 0 0 1px rgba(255, 248, 235, 0.07);
+  background: var(--bg-elevated);
+}
+
+.hero-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hero-frame--feature {
+  aspect-ratio: 3 / 4;
+  max-height: min(62vh, 560px);
+}
+
+.hero-frame--feature img {
+  object-position: center;
+}
+
+.hero-panel__strip {
+  display: flex;
+  gap: 0.85rem;
+  margin-top: 0.85rem;
+  align-items: stretch;
+}
+
+.hero-frame--chef {
+  flex: 0 0 clamp(7.25rem, 20vw, 9.75rem);
+  aspect-ratio: 3 / 4;
+  position: relative;
+}
+
+.hero-frame--chef img {
+  object-position: 50% 22%;
+}
+
+.hero-frame__caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0.5rem 0.45rem;
+  font-family: var(--font-ui);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-align: center;
+  color: rgba(252, 249, 243, 0.96);
+  background: linear-gradient(to top, rgba(10, 9, 10, 0.94) 30%, transparent);
+}
+
+.hero-frame--accent {
+  flex: 1 1 auto;
+  min-width: 0;
+  aspect-ratio: 4 / 3;
+  max-height: 10rem;
+}
+
+.hero-panel--copy {
+  text-align: left;
+}
+
+.hero-copy-top {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1.2rem;
+}
+
+.hero-eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold-3);
+  opacity: 0.92;
+}
+
+.hero-headline {
+  margin: 0 0 0.65rem;
+  font-size: clamp(2rem, 4.2vw, 3.05rem);
+  line-height: 1.12;
+}
+
+.hero-tagline {
+  margin: 0 0 1.15rem;
+}
+
+.hero-lede {
+  margin: 0 0 1.5rem;
+  max-width: 34rem;
+  color: var(--text-muted);
+  font-size: 0.96rem;
+  line-height: 1.65;
+}
+
+.hero-inner--split .hero-actions {
+  justify-content: flex-start;
+}
+
 .hero h1 {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(2.25rem, 5vw, 3.35rem);
-  line-height: 1.15;
-  margin: 0 0 0.75rem;
   letter-spacing: 0.02em;
 }
 
@@ -461,14 +583,47 @@ html.is-scrolled .site-header {
   color: var(--text-muted);
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  margin: 0 0 1.75rem;
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  justify-content: center;
+}
+
+@media (max-width: 900px) {
+  .hero-inner--split {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .hero-panel--visual {
+    max-width: min(26rem, 100%);
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  }
+
+  .hero-frame--feature {
+    max-height: min(52vh, 440px);
+  }
+
+  .hero-panel--copy {
+    text-align: center;
+  }
+
+  .hero-copy-top {
+    justify-content: center;
+  }
+
+  .hero-inner--split .hero-actions {
+    justify-content: center;
+  }
+
+  .hero-lede {
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 .btn {
