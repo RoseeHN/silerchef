@@ -3,6 +3,7 @@
 const path = require('path');
 const express = require('express');
 const cors = require('cors');
+const { createWixContactFromReservation } = require('./wixContact');
 
 const PORT = Number(process.env.PORT) || 3000;
 const WIX_API_KEY = process.env.WIX_API_KEY;
@@ -20,7 +21,8 @@ const corsOptions = {
     const allowed =
       /\.wix\.com$/i.test(origin) ||
       /\.wixsite\.com$/i.test(origin) ||
-      /^https:\/\/(www\.)?silerchef\.com$/i.test(origin);
+      /^https:\/\/(www\.)?silerchef\.com$/i.test(origin) ||
+      /^https:\/\/[a-z0-9][a-z0-9-]*\.up\.railway\.app$/i.test(origin);
     const extra = (process.env.ALLOWED_ORIGINS || '')
       .split(',')
       .map((s) => s.trim())
@@ -83,6 +85,44 @@ app.get('/api/booking', (_req, res) => {
     headline: bookingEnv('WIX_BOOKING_HEADLINE'),
     summary: bookingEnv('WIX_BOOKING_SUMMARY'),
   });
+});
+
+function validEmail(s) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+}
+
+/** Creates a Wix CRM contact with full reservation note (Bookings calendar needs separate setup). */
+app.post('/api/reservations', async (req, res) => {
+  const p = req.body;
+  if (!p || typeof p !== 'object') {
+    res.status(400).json({ error: 'invalid_body' });
+    return;
+  }
+  const firstName = String(p.firstName || '').trim();
+  const lastName = String(p.lastName || '').trim();
+  const email = String(p.email || '').trim();
+  if (!firstName || !lastName || !email || !validEmail(email)) {
+    res.status(400).json({ error: 'validation', detail: 'name_email_required' });
+    return;
+  }
+  try {
+    const result = await createWixContactFromReservation(p);
+    if (!result.ok) {
+      if (result.code === 'missing_wix_config') {
+        res.status(503).json({
+          error: 'server_misconfigured',
+          detail: 'Set WIX_META_SITE_ID and WIX_API_KEY (Contacts: Manage) on Railway.',
+        });
+        return;
+      }
+      res.status(502).json({ error: 'wix_error', status: result.status, detail: result.detail });
+      return;
+    }
+    res.json({ ok: true, contactId: result.contactId });
+  } catch (e) {
+    console.error('reservation_error', e);
+    res.status(500).json({ error: 'server_error' });
+  }
 });
 
 const embedDir = path.join(__dirname, '..', 'embed');

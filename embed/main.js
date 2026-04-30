@@ -537,16 +537,6 @@
   const backdropEl = overlay && overlay.querySelector('.detail-backdrop');
   if (backdropEl) backdropEl.addEventListener('click', closeDetail);
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && overlay && !overlay.hidden) {
-      closeDetail();
-      return;
-    }
-    if (e.key === 'Escape' && nav && nav.classList.contains('is-open')) {
-      setMobileNavOpen(false);
-    }
-  });
-
   const nav = document.getElementById('site-nav');
   const toggle = document.querySelector('.nav-toggle');
 
@@ -605,15 +595,52 @@
     return base.replace(/\/$/, '') + '/api/booking';
   }
 
+  function getApiBaseUrl() {
+    const u = getBookingApiUrl();
+    if (u.startsWith('http')) return u.replace(/\/api\/booking\/?$/, '');
+    return '';
+  }
+
+  function getReservationPostUrl() {
+    const b = getApiBaseUrl();
+    return b ? b + '/api/reservations' : '/api/reservations';
+  }
+
+  const bookingOverlay = document.getElementById('booking-overlay');
+  const bookingForm = document.getElementById('booking-form');
+  const bookingSuccess = document.getElementById('booking-success');
+  const bookingError = document.getElementById('booking-error');
+  const bookingBackdrop = bookingOverlay && bookingOverlay.querySelector('.booking-backdrop');
+  const bookingCloseBtn = bookingOverlay && bookingOverlay.querySelector('.booking-close');
+  const bookingDoneBtn = bookingOverlay && bookingOverlay.querySelector('.booking-done');
+
+  function setBookingOpen(open) {
+    if (!bookingOverlay) return;
+    bookingOverlay.hidden = !open;
+    bookingOverlay.setAttribute('aria-hidden', open ? 'false' : 'true');
+    document.body.classList.toggle('booking-open', open);
+    if (open) {
+      setMobileNavOpen(false);
+      const first = bookingForm && bookingForm.querySelector('input[name="firstName"]');
+      if (first) requestAnimationFrame(() => first.focus());
+    } else if (bookingForm && bookingSuccess && bookingError) {
+      bookingForm.reset();
+      bookingForm.hidden = false;
+      bookingForm.querySelector('input[name="guestCount"]').value = '2';
+      bookingSuccess.hidden = true;
+      bookingError.hidden = true;
+      bookingError.textContent = '';
+    }
+  }
+
   async function applyBookingFromApi() {
     try {
       const r = await fetch(getBookingApiUrl(), { credentials: 'omit', mode: 'cors' });
       if (!r.ok) return;
       const cfg = await r.json();
       if (cfg.url) {
-        document.querySelectorAll('[data-booking-link]').forEach((a) => {
-          a.setAttribute('href', cfg.url);
-        });
+        const fb = document.getElementById('booking-fallback-link');
+        if (fb) fb.setAttribute('href', cfg.url);
       }
       if (cfg.headline) {
         const h = document.querySelector('[data-booking-headline]');
@@ -624,9 +651,81 @@
         if (p) p.textContent = cfg.summary;
       }
     } catch (_) {
-      /* keep defaults from HTML when offline or file:// */
+      /* offline */
     }
   }
 
+  document.querySelectorAll('[data-booking-trigger]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      setBookingOpen(true);
+    });
+  });
+
+  if (bookingCloseBtn) bookingCloseBtn.addEventListener('click', () => setBookingOpen(false));
+  if (bookingBackdrop) bookingBackdrop.addEventListener('click', () => setBookingOpen(false));
+  if (bookingDoneBtn) bookingDoneBtn.addEventListener('click', () => setBookingOpen(false));
+
+  if (bookingForm) {
+    bookingForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!bookingError) return;
+      bookingError.hidden = true;
+      bookingError.textContent = '';
+      const fd = new FormData(bookingForm);
+      const guestRaw = fd.get('guestCount');
+      const payload = {
+        firstName: fd.get('firstName'),
+        lastName: fd.get('lastName'),
+        email: fd.get('email'),
+        phone: fd.get('phone') || '',
+        preferredDate: fd.get('preferredDate') || '',
+        preferredTime: fd.get('preferredTime') || '',
+        guestCount: guestRaw === '' || guestRaw === null ? null : Number(guestRaw),
+        notes: fd.get('notes') || '',
+      };
+      try {
+        const res = await fetch(getReservationPostUrl(), {
+          method: 'POST',
+          credentials: 'omit',
+          mode: 'cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const msg =
+            (typeof data.detail === 'string' && data.detail) ||
+            (data.error === 'server_misconfigured' && 'Booking is not configured on the server yet.') ||
+            (typeof data.error === 'string' && data.error) ||
+            'Something went wrong. Try again or use the calendar link below.';
+          bookingError.textContent = msg;
+          bookingError.hidden = false;
+          return;
+        }
+        bookingForm.hidden = true;
+        if (bookingSuccess) bookingSuccess.hidden = false;
+      } catch {
+        bookingError.textContent = 'Network error. Check your connection and try again.';
+        bookingError.hidden = false;
+      }
+    });
+  }
+
   applyBookingFromApi();
+
+  document.addEventListener('keydown', (e) => {
+    const bookingOv = document.getElementById('booking-overlay');
+    if (e.key === 'Escape' && bookingOv && !bookingOv.hidden) {
+      setBookingOpen(false);
+      return;
+    }
+    if (e.key === 'Escape' && overlay && !overlay.hidden) {
+      closeDetail();
+      return;
+    }
+    if (e.key === 'Escape' && nav && nav.classList.contains('is-open')) {
+      setMobileNavOpen(false);
+    }
+  });
 })();
