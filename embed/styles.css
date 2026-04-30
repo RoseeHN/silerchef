@@ -2593,13 +2593,13 @@ html.booking-open {
   padding: 0;
 }
 
-/* Note: avoid vh for max-height inside tall iframes (Wix) — vh = full iframe height → huge boxes */
+/* Default: compact strip (no MP4 yet, or still image only) */
 .cinematic-video-wrap {
   position: relative;
   border-radius: calc(var(--radius) + 6px);
   overflow: hidden;
-  aspect-ratio: 21 / 9;
-  max-height: min(22rem, 42vmin);
+  aspect-ratio: 2.4 / 1;
+  max-height: min(9.5rem, 38vmin);
   width: 100%;
   margin-inline: auto;
   background: var(--bg-elevated);
@@ -2612,8 +2612,21 @@ html.booking-open {
 
 @media (max-width: 720px) {
   .cinematic-video-wrap {
+    aspect-ratio: 2 / 1;
+    max-height: min(7.25rem, 34vmin);
+  }
+}
+
+/* When images/video/chef-reel.mp4 exists — wider cinematic strip */
+.module--cinematic.cinematic--has-video .cinematic-video-wrap {
+  aspect-ratio: 21 / 9;
+  max-height: min(22rem, 42vmin);
+}
+
+@media (max-width: 720px) {
+  .module--cinematic.cinematic--has-video .cinematic-video-wrap {
     aspect-ratio: 16 / 9;
-    max-height: min(13rem, 58vmin);
+    max-height: min(12rem, 52vmin);
   }
 }
 

@@ -726,54 +726,83 @@
     const video = document.getElementById('chef-reel-video');
     const btn = document.getElementById('chef-reel-sound');
     const fbImg = document.getElementById('chef-reel-fallback');
+    const capVideo = section && section.querySelector('.cinematic-caption__video');
+    const capStill = section && section.querySelector('.cinematic-caption__still');
     if (!section || !video) return;
 
+    const videoUrl = new URL('images/video/chef-reel.mp4', window.location.href).href;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-    function setFallback() {
+    function applyStillMode() {
+      section.classList.remove('cinematic--has-video');
       section.classList.add('cinematic--fallback');
-      if (fbImg) fbImg.removeAttribute('hidden');
+      video.removeAttribute('autoplay');
       video.pause();
+      if (fbImg) fbImg.removeAttribute('hidden');
+      if (capVideo) capVideo.setAttribute('hidden', '');
+      if (capStill) capStill.removeAttribute('hidden');
       if (btn) btn.hidden = true;
     }
 
-    video.addEventListener('error', setFallback);
+    function applyVideoMode() {
+      section.classList.add('cinematic--has-video');
+      section.classList.remove('cinematic--fallback');
+      video.setAttribute('autoplay', '');
+      if (fbImg) fbImg.setAttribute('hidden', '');
+      if (capVideo) capVideo.removeAttribute('hidden');
+      if (capStill) capStill.setAttribute('hidden', '');
+      if (btn) btn.hidden = false;
+    }
+
+    video.addEventListener('error', () => {
+      applyStillMode();
+    });
 
     if (reduce.matches) {
-      video.removeAttribute('autoplay');
-      video.pause();
-      if (btn) btn.hidden = true;
+      applyStillMode();
       return;
     }
 
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            if (video.preload === 'none') video.preload = 'metadata';
-            video.play().catch(() => {});
-          } else {
-            video.pause();
-          }
-        });
-      },
-      { threshold: 0.15, rootMargin: '0px 0px -6% 0px' }
-    );
-    io.observe(section);
-
-    if (btn) {
-      btn.addEventListener('click', () => {
-        video.muted = !video.muted;
-        const unmuted = !video.muted;
-        btn.setAttribute('aria-pressed', unmuted ? 'true' : 'false');
-        btn.setAttribute('aria-label', unmuted ? 'Mute' : 'Turn sound on');
-        const icon = btn.querySelector('i');
-        if (icon) {
-          icon.className = unmuted ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+    fetch(videoUrl, { method: 'HEAD', cache: 'no-store' })
+      .then((r) => {
+        if (!r.ok) {
+          applyStillMode();
+          return;
         }
-        if (unmuted) video.play().catch(() => {});
+        applyVideoMode();
+
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                if (video.preload === 'none') video.preload = 'metadata';
+                video.play().catch(() => {});
+              } else {
+                video.pause();
+              }
+            });
+          },
+          { threshold: 0.15, rootMargin: '0px 0px -6% 0px' }
+        );
+        io.observe(section);
+
+        if (btn) {
+          btn.addEventListener('click', () => {
+            video.muted = !video.muted;
+            const unmuted = !video.muted;
+            btn.setAttribute('aria-pressed', unmuted ? 'true' : 'false');
+            btn.setAttribute('aria-label', unmuted ? 'Mute' : 'Turn sound on');
+            const icon = btn.querySelector('i');
+            if (icon) {
+              icon.className = unmuted ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+            }
+            if (unmuted) video.play().catch(() => {});
+          });
+        }
+      })
+      .catch(() => {
+        applyStillMode();
       });
-    }
   })();
 
   document.addEventListener('keydown', (e) => {

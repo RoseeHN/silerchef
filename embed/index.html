@@ -302,7 +302,7 @@
         </div>
       </section>
 
-      <section id="reel" class="module module--cinematic observe" aria-labelledby="reel-label">
+      <section id="reel" class="module module--cinematic cinematic--fallback observe" aria-labelledby="reel-label">
         <div class="shell cinematic-shell">
           <p id="reel-label" class="cinematic-kicker">At the pass</p>
           <figure class="cinematic-frame">
@@ -311,12 +311,11 @@
                 id="chef-reel-video"
                 class="cinematic-video"
                 poster="images/cuisines/italian-cuisine/gallery/05.jpg"
-                autoplay
                 playsinline
                 muted
                 loop
                 preload="none"
-                aria-label="Short reel — Chef Siler in the kitchen"
+                aria-label="Kitchen reel / still image"
               >
                 <source src="images/video/chef-reel.mp4" type="video/mp4" />
               </video>
@@ -329,7 +328,6 @@
                 height="800"
                 loading="lazy"
                 decoding="async"
-                hidden
               />
               <div class="cinematic-video__edge" aria-hidden="true"></div>
               <button
@@ -338,13 +336,15 @@
                 class="cinematic-sound"
                 aria-label="Turn sound on"
                 aria-pressed="false"
+                hidden
               >
                 <i class="fa-solid fa-volume-xmark" aria-hidden="true"></i>
                 <span class="cinematic-sound__txt">Sound</span>
               </button>
             </div>
-            <figcaption class="cinematic-caption">
-              <span>Autoplays muted · Sound optional</span>
+            <figcaption class="cinematic-caption" id="chef-reel-caption">
+              <span class="cinematic-caption__video" hidden>Muted autoplay · Sound optional</span>
+              <span class="cinematic-caption__still">Still — from the pass</span>
             </figcaption>
           </figure>
         </div>
