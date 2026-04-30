@@ -63,6 +63,12 @@ html.is-embed .page {
   min-height: max(min(100vh, 100dvh), 2800px);
 }
 
+/* Iframe + content-visibility: auto can under-count scroll height (Contact/footer feel “cut off”) */
+html.is-embed .flow-section {
+  content-visibility: visible;
+  contain-intrinsic-size: unset;
+}
+
 /* Wix / mobile WebKit: gradient “gold” text can render invisible (clip + no font) → looks like a black empty page */
 html.is-embed .bg-vignette {
   opacity: 0.45;
