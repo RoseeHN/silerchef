@@ -44,6 +44,7 @@ function buildFrameAncestorsCsp() {
     'https://silerchef.com',
     'https://www.silerchef.com',
     'https://*.wix.com',
+    'https://*.editor.wix.com',
     'https://*.wixsite.com',
     'https://*.editorx.io',
     'https://*.wixstudio.com',
