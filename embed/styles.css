@@ -1300,12 +1300,20 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .social-tile__icon svg {
   width: 1.2rem;
   height: 1.2rem;
   display: block;
+}
+
+.social-tile__icon i {
+  font-size: 1.15rem;
+  line-height: 1;
+  display: block;
+  -webkit-font-smoothing: antialiased;
 }
 
 .social-tile--instagram:hover {
@@ -1388,9 +1396,20 @@ main {
 
 .contact-icon {
   flex-shrink: 0;
-  width: 1.1rem;
-  opacity: 0.75;
-  margin-top: 0.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  min-height: 1.35rem;
+  margin-top: 0.08rem;
+  color: var(--gold-3);
+  opacity: 0.88;
+  font-size: 0.92rem;
+}
+
+.contact-icon i {
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
 }
 
 @media (max-width: 600px) {
@@ -1473,8 +1492,17 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  line-height: 0;
   color: #fff;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+}
+
+.whatsapp-fab__glyph i {
+  font-size: 1.7rem;
+  line-height: 1;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 @media (max-width: 520px) {
@@ -1488,6 +1516,10 @@ main {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+  }
+
+  .whatsapp-fab__glyph i {
+    font-size: 2rem;
   }
 
   .whatsapp-fab {
@@ -2433,10 +2465,22 @@ body.booking-open {
     color var(--t-hover-slow) var(--ease-flow);
 }
 
+.pillar-icon :is(svg, i) {
+  display: block;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
+
 .pillar-icon svg {
   width: 1.42rem;
   height: 1.42rem;
-  display: block;
+}
+
+.pillar-icon i {
+  font-size: 1.32rem;
+  line-height: 1;
+  width: 1.42rem;
+  text-align: center;
 }
 
 .pillar-item:hover .pillar-icon {
