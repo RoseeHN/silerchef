@@ -561,15 +561,28 @@
   }
 
   let scrollRaf = 0;
+  const pageScrollEl = document.querySelector('.page');
+  const usePageScroll =
+    document.documentElement.classList.contains('is-embed') && pageScrollEl;
+
+  function readScrollTopForHeader() {
+    if (usePageScroll) return pageScrollEl.scrollTop;
+    return window.scrollY;
+  }
+
   const onScroll = () => {
     if (scrollRaf) return;
     scrollRaf = requestAnimationFrame(() => {
       scrollRaf = 0;
-      document.documentElement.classList.toggle('is-scrolled', window.scrollY > 40);
+      document.documentElement.classList.toggle('is-scrolled', readScrollTopForHeader() > 40);
     });
   };
   onScroll();
-  window.addEventListener('scroll', onScroll, { passive: true });
+  if (usePageScroll) {
+    pageScrollEl.addEventListener('scroll', onScroll, { passive: true });
+  } else {
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
 
   document.querySelectorAll('.observe').forEach((el) => {
     if (!('IntersectionObserver' in window)) {
