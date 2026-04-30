@@ -46,6 +46,21 @@ body {
   overflow-x: hidden;
 }
 
+/* Inside Wix iframe: parent often forgets height — fill viewport / iOS safe heights */
+html.is-embed {
+  height: auto;
+  min-height: 100%;
+}
+html.is-embed body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+}
+html.is-embed .page {
+  min-height: min(100vh, 100dvh);
+  min-height: -webkit-fill-available;
+}
+
 a[href],
 button,
 label[for],

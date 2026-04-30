@@ -37,12 +37,27 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-/** Allow this app to be shown inside a Wix (or silerchef.com) full-page iframe. */
+/** Allow embedding from Wix / silerchef.com / optional FRAME_ANCESTORS_EXTRA (comma-separated origins). */
+function buildFrameAncestorsCsp() {
+  const parts = [
+    "'self'",
+    'https://silerchef.com',
+    'https://www.silerchef.com',
+    'https://*.wix.com',
+    'https://*.wixsite.com',
+    'https://*.editorx.io',
+    'https://*.wixstudio.com',
+  ];
+  const extra = (process.env.FRAME_ANCESTORS_EXTRA || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  extra.forEach((o) => parts.push(o));
+  return `frame-ancestors ${parts.join(' ')}`;
+}
+
 app.use((_req, res, next) => {
-  res.setHeader(
-    'Content-Security-Policy',
-    "frame-ancestors 'self' https://silerchef.com https://www.silerchef.com https://*.wix.com https://*.wixsite.com"
-  );
+  res.setHeader('Content-Security-Policy', buildFrameAncestorsCsp());
   next();
 });
 
