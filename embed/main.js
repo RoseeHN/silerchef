@@ -561,28 +561,15 @@
   }
 
   let scrollRaf = 0;
-  const pageScrollEl = document.querySelector('.page');
-  const usePageScroll =
-    document.documentElement.classList.contains('is-embed') && pageScrollEl;
-
-  function readScrollTopForHeader() {
-    if (usePageScroll) return pageScrollEl.scrollTop;
-    return window.scrollY;
-  }
-
   const onScroll = () => {
     if (scrollRaf) return;
     scrollRaf = requestAnimationFrame(() => {
       scrollRaf = 0;
-      document.documentElement.classList.toggle('is-scrolled', readScrollTopForHeader() > 40);
+      document.documentElement.classList.toggle('is-scrolled', window.scrollY > 40);
     });
   };
   onScroll();
-  if (usePageScroll) {
-    pageScrollEl.addEventListener('scroll', onScroll, { passive: true });
-  } else {
-    window.addEventListener('scroll', onScroll, { passive: true });
-  }
+  window.addEventListener('scroll', onScroll, { passive: true });
 
   document.querySelectorAll('.observe').forEach((el) => {
     if (!('IntersectionObserver' in window)) {
@@ -821,7 +808,12 @@
   if (window.parent !== window && 'ResizeObserver' in window) {
     const postEmbedHeight = () => {
       try {
-        const h = document.documentElement.scrollHeight;
+        const pageEl = document.querySelector('.page');
+        const h = Math.max(
+          document.documentElement.scrollHeight,
+          document.body ? document.body.scrollHeight : 0,
+          pageEl ? pageEl.scrollHeight : 0
+        );
         window.parent.postMessage({ source: 'silerchef-embed', height: h }, '*');
       } catch (_) {}
     };
@@ -830,6 +822,8 @@
     });
     ro.observe(document.documentElement);
     if (document.body) ro.observe(document.body);
+    const pageForRo = document.querySelector('.page');
+    if (pageForRo) ro.observe(pageForRo);
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
       requestAnimationFrame(postEmbedHeight);
     } else {

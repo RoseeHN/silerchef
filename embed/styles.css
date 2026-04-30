@@ -60,37 +60,33 @@ body {
   overflow-y: visible;
 }
 
-/* Iframe: tek dikey scroll — yalnızca .page kayar (html/body çift scrollbar önlenir) */
+/*
+ * Wix iframe: tek dikey kaydırma — scroll kökü html.
+ * İçerik .page içinde taşarsa documentElement.scrollHeight tam yüksekliği verir;
+ * postMessage ile iframe bu yüksekliğe çekilince iç çubuk kalkar, yalnızca Wix sayfası kayar.
+ * (.page üzerinde overflow-y kaydırmayı bırakmak scrollHeight’ı viewport’ta tutup çift çubuğa yol açıyordu.)
+ */
 html.is-embed {
   height: 100%;
-  min-height: 100dvh;
-  overflow: hidden;
-}
-html.is-embed body {
-  height: 100%;
-  min-height: 0;
-  margin: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  -webkit-overflow-scrolling: touch;
-}
-html.is-embed .page {
-  position: relative;
-  z-index: 1;
-  flex: 1 1 auto;
-  min-height: 0;
-  width: 100%;
-  overflow-x: clip;
+  overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   scroll-padding-top: 6.25rem;
   scroll-padding-bottom: max(5.5rem, calc(env(safe-area-inset-bottom, 0px) + 4rem));
-  padding-bottom: max(5rem, calc(env(safe-area-inset-bottom, 0px) + 4rem));
 }
-
-html.is-embed section[id] {
-  scroll-margin-top: 0;
+html.is-embed body {
+  margin: 0;
+  min-height: min-content;
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+html.is-embed .page {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  overflow-x: clip;
+  overflow-y: visible;
+  padding-bottom: max(5rem, calc(env(safe-area-inset-bottom, 0px) + 4rem));
 }
 
 /* Wix / mobile WebKit: gradient “gold” text can render invisible (clip + no font) → looks like a black empty page */
