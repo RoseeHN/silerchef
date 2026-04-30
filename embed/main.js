@@ -805,6 +805,20 @@
       });
   })();
 
+  if (window.parent !== window && 'ResizeObserver' in window) {
+    const postEmbedHeight = () => {
+      try {
+        const h = document.documentElement.scrollHeight;
+        window.parent.postMessage({ source: 'silerchef-embed', height: h }, '*');
+      } catch (_) {}
+    };
+    const ro = new ResizeObserver(() => {
+      requestAnimationFrame(postEmbedHeight);
+    });
+    ro.observe(document.documentElement);
+    window.addEventListener('load', postEmbedHeight);
+  }
+
   document.addEventListener('keydown', (e) => {
     const bookingOv = document.getElementById('booking-overlay');
     if (e.key === 'Escape' && bookingOv && !bookingOv.hidden) {
