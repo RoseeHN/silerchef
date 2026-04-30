@@ -716,6 +716,58 @@
 
   applyBookingFromApi();
 
+  (function initChefReel() {
+    const section = document.getElementById('reel');
+    const video = document.getElementById('chef-reel-video');
+    const btn = document.getElementById('chef-reel-sound');
+    const fbImg = document.getElementById('chef-reel-fallback');
+    if (!section || !video) return;
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    function setFallback() {
+      section.classList.add('cinematic--fallback');
+      if (fbImg) fbImg.removeAttribute('hidden');
+      video.pause();
+      if (btn) btn.hidden = true;
+    }
+
+    video.addEventListener('error', setFallback);
+
+    if (reduce.matches) {
+      video.removeAttribute('autoplay');
+      video.pause();
+      if (btn) btn.hidden = true;
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) video.play().catch(() => {});
+          else video.pause();
+        });
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -6% 0px' }
+    );
+    io.observe(section);
+    video.play().catch(() => {});
+
+    if (btn) {
+      btn.addEventListener('click', () => {
+        video.muted = !video.muted;
+        const unmuted = !video.muted;
+        btn.setAttribute('aria-pressed', unmuted ? 'true' : 'false');
+        btn.setAttribute('aria-label', unmuted ? 'Mute' : 'Turn sound on');
+        const icon = btn.querySelector('i');
+        if (icon) {
+          icon.className = unmuted ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+        }
+        if (unmuted) video.play().catch(() => {});
+      });
+    }
+  })();
+
   document.addEventListener('keydown', (e) => {
     const bookingOv = document.getElementById('booking-overlay');
     if (e.key === 'Escape' && bookingOv && !bookingOv.hidden) {

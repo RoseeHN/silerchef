@@ -2535,6 +2535,164 @@ html.booking-open {
   margin: 0 auto;
 }
 
+/* ——— Cinematic reel (muted autoplay; MP4 at images/video/chef-reel.mp4) ——— */
+.module--cinematic {
+  position: relative;
+  padding: clamp(1.25rem, 3.5vw, 2.25rem) 0 clamp(1.75rem, 4vw, 2.75rem);
+}
+
+.module--cinematic::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: min(52vw, 28rem);
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 80% at 50% 50%, rgba(197, 160, 89, 0.09), transparent 65%),
+    radial-gradient(ellipse 50% 60% at 20% 40%, rgba(212, 188, 106, 0.05), transparent 55%);
+}
+
+.cinematic-shell {
+  position: relative;
+  z-index: 1;
+  max-width: min(var(--page-max), 72rem);
+}
+
+.cinematic-kicker {
+  margin: 0 0 0.85rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(243, 234, 209, 0.42);
+  text-align: center;
+}
+
+.cinematic-frame {
+  margin: 0;
+  padding: 0;
+}
+
+.cinematic-video-wrap {
+  position: relative;
+  border-radius: calc(var(--radius) + 6px);
+  overflow: hidden;
+  aspect-ratio: 21 / 9;
+  max-height: min(42vh, 22rem);
+  background: var(--bg-elevated);
+  border: 1px solid rgba(197, 160, 89, 0.28);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(255, 248, 235, 0.06);
+}
+
+@media (max-width: 720px) {
+  .cinematic-video-wrap {
+    aspect-ratio: 16 / 9;
+    max-height: min(48vh, 18rem);
+  }
+}
+
+.cinematic-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.cinematic-fallback-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.cinematic--fallback .cinematic-video {
+  display: none;
+}
+
+.cinematic--fallback .cinematic-fallback-img {
+  display: block !important;
+}
+
+.cinematic-video__edge {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 80px rgba(0, 0, 0, 0.35),
+    inset 0 -32px 48px rgba(0, 0, 0, 0.25);
+  border-radius: inherit;
+}
+
+.cinematic-sound {
+  position: absolute;
+  right: max(0.65rem, env(safe-area-inset-right));
+  bottom: max(0.65rem, env(safe-area-inset-bottom));
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 250, 235, 0.18);
+  background: rgba(14, 12, 14, 0.72);
+  color: var(--gold-2);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition:
+    border-color 0.25s var(--ease-flow),
+    color 0.25s var(--ease-flow),
+    background 0.25s var(--ease-flow);
+}
+
+.cinematic-sound:hover {
+  border-color: rgba(212, 188, 106, 0.45);
+  color: var(--gold-1);
+  background: rgba(22, 20, 22, 0.88);
+}
+
+.cinematic-sound:focus-visible {
+  outline: 2px solid rgba(212, 188, 106, 0.65);
+  outline-offset: 2px;
+}
+
+.cinematic-sound i {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.cinematic-sound__txt {
+  font-family: var(--font-ui);
+}
+
+.cinematic-caption {
+  margin: 0.65rem 0 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  color: rgba(243, 234, 209, 0.38);
+}
+
+@media (max-width: 900px) {
+  .cinematic-sound {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
 .module--quote {
   position: relative;
   padding: clamp(1rem, 3vw, 2rem) 0;

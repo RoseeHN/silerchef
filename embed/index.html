@@ -302,6 +302,54 @@
         </div>
       </section>
 
+      <section id="reel" class="module module--cinematic observe" aria-labelledby="reel-label">
+        <div class="shell cinematic-shell">
+          <p id="reel-label" class="cinematic-kicker">At the pass</p>
+          <figure class="cinematic-frame">
+            <div class="cinematic-video-wrap">
+              <video
+                id="chef-reel-video"
+                class="cinematic-video"
+                poster="images/cuisines/italian-cuisine/gallery/05.jpg"
+                autoplay
+                playsinline
+                muted
+                loop
+                preload="metadata"
+                aria-label="Short reel — Chef Siler in the kitchen"
+              >
+                <source src="images/video/chef-reel.mp4" type="video/mp4" />
+              </video>
+              <img
+                id="chef-reel-fallback"
+                class="cinematic-fallback-img"
+                src="images/cuisines/italian-cuisine/gallery/05.jpg"
+                alt=""
+                width="1920"
+                height="800"
+                loading="lazy"
+                decoding="async"
+                hidden
+              />
+              <div class="cinematic-video__edge" aria-hidden="true"></div>
+              <button
+                type="button"
+                id="chef-reel-sound"
+                class="cinematic-sound"
+                aria-label="Turn sound on"
+                aria-pressed="false"
+              >
+                <i class="fa-solid fa-volume-xmark" aria-hidden="true"></i>
+                <span class="cinematic-sound__txt">Sound</span>
+              </button>
+            </div>
+            <figcaption class="cinematic-caption">
+              <span>Autoplays muted · Sound optional</span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
       <main>
         <section id="cuisines" class="flow-section section-cuisines observe">
           <header class="section-head section-head--premium section-head--with-callout">
