@@ -2550,7 +2550,13 @@ html.booking-open {
 /* ——— Cinematic reel (muted autoplay; MP4 at images/video/chef-reel.mp4) ——— */
 .module--cinematic {
   position: relative;
-  padding: clamp(1.25rem, 3.5vw, 2.25rem) 0 clamp(1.75rem, 4vw, 2.75rem);
+  padding: clamp(0.85rem, 2.5vw, 1.75rem) 0 clamp(1rem, 3vw, 2rem);
+}
+
+@media (min-width: 721px) {
+  .module--cinematic {
+    padding: clamp(1.25rem, 3.5vw, 2.25rem) 0 clamp(1.75rem, 4vw, 2.75rem);
+  }
 }
 
 .module--cinematic::before {
@@ -2559,13 +2565,19 @@ html.booking-open {
   left: 0;
   right: 0;
   top: 50%;
-  height: min(52vw, 28rem);
+  height: min(40vmin, 18rem);
   transform: translateY(-50%);
   pointer-events: none;
   z-index: 0;
   background:
     radial-gradient(ellipse 70% 80% at 50% 50%, rgba(197, 160, 89, 0.09), transparent 65%),
     radial-gradient(ellipse 50% 60% at 20% 40%, rgba(212, 188, 106, 0.05), transparent 55%);
+}
+
+@media (max-width: 720px) {
+  .module--cinematic::before {
+    height: min(36vmin, 14rem);
+  }
 }
 
 .cinematic-shell {
@@ -2588,32 +2600,39 @@ html.booking-open {
   padding: 0;
 }
 
+/* Note: avoid vh for max-height inside tall iframes (Wix) — vh = full iframe height → huge boxes */
 .cinematic-video-wrap {
   position: relative;
   border-radius: calc(var(--radius) + 6px);
   overflow: hidden;
   aspect-ratio: 21 / 9;
-  max-height: min(42vh, 22rem);
+  max-height: min(22rem, 42vmin);
+  width: 100%;
+  margin-inline: auto;
   background: var(--bg-elevated);
   border: 1px solid rgba(197, 160, 89, 0.28);
   box-shadow:
     0 24px 80px rgba(0, 0, 0, 0.45),
     inset 0 0 0 1px rgba(255, 248, 235, 0.06);
+  contain: layout style;
 }
 
 @media (max-width: 720px) {
   .cinematic-video-wrap {
     aspect-ratio: 16 / 9;
-    max-height: min(48vh, 18rem);
+    max-height: min(13rem, 58vmin);
   }
 }
 
 .cinematic-video {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center;
+  /* intrinsic video dimensions must not participate in layout (prevents mobile “jump” / giant column) */
 }
 
 .cinematic-fallback-img {
