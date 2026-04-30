@@ -1,35 +1,44 @@
 <!--
-  Wix → Embed → Website / HTML iframe
-  1) Bu bloğu yapıştırın. 2) Bölümü tam genişlik yapın.
-  3) iframe'e sabit yükseklik şart — Wix çoğu zaman %100 yüksekliği vermez (ekran siyah kalır).
-  İki kaydırma çubuğu görürseniz: biri Wix sayfası, biri iframe içi — iframe yüksekliğini içerikle
-  eşlemek (ör. Custom Code ile postMessage dinleyip height ayarlamak) veya tam ekran bölüm kullanmak tek çubuğa yaklaştırır.
+  Wix → Siler Chef embed (tek kaydırma çubuğu için)
+  — Bu dosyanın TAMAMINI (iframe + script) Wix HTML öğesine yapıştırın.
+  — Bölüm: tam genişlik. HTML kutusuna Wix’te "max yükseklik + scroll" vermeyin (iç scroll + iframe scroll = 2 çubuk).
+  — Script, Railway sayfasının gönderdiği yükseklikle iframe’i büyütür; içeride kaydırma kalkar.
+  — Railway URL değişirse aşağıdaki RAILWAY_ORIGIN’i güncelleyin.
 -->
 <div
-  style="
-    width: 100%;
-    min-height: 6200px;
-    background: #141214;
-    margin: 0;
-    padding: 0;
-    line-height: 0;
-  "
+  id="silerchef-embed-shell"
+  style="width: 100%; min-height: min(100vh, 900px); background: #141214; margin: 0; padding: 0; line-height: 0"
 >
   <iframe
+    id="silerchef-embed-frame"
     src="https://silerchefapi-production.up.railway.app/?embed=1"
     title="Siler Chef"
     width="100%"
-    height="6200"
-    style="
-      width: 100%;
-      min-height: 6200px;
-      height: 6200px;
-      max-width: 100%;
-      border: 0;
-      display: block;
-    "
+    height="900"
+    scrolling="no"
+    style="width: 100%; min-height: min(100vh, 900px); height: 900px; max-width: 100%; border: 0; display: block; overflow: hidden"
     loading="eager"
     referrerpolicy="strict-origin-when-cross-origin"
     allow="fullscreen"
   ></iframe>
 </div>
+<script>
+  (function () {
+    var RAILWAY_ORIGIN = 'https://silerchefapi-production.up.railway.app';
+    var frame = document.getElementById('silerchef-embed-frame');
+    var shell = document.getElementById('silerchef-embed-shell');
+    if (!frame) return;
+    function applyHeight(px) {
+      var h = Math.min(Math.max(400, Math.ceil(px)), 100000);
+      frame.style.height = h + 'px';
+      frame.style.minHeight = h + 'px';
+      if (shell) shell.style.minHeight = h + 'px';
+    }
+    window.addEventListener('message', function (e) {
+      if (e.origin !== RAILWAY_ORIGIN) return;
+      var d = e.data;
+      if (!d || d.source !== 'silerchef-embed' || typeof d.height !== 'number') return;
+      applyHeight(d.height + 32);
+    });
+  })();
+</script>

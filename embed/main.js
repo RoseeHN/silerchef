@@ -816,6 +816,12 @@
       requestAnimationFrame(postEmbedHeight);
     });
     ro.observe(document.documentElement);
+    if (document.body) ro.observe(document.body);
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      requestAnimationFrame(postEmbedHeight);
+    } else {
+      document.addEventListener('DOMContentLoaded', postEmbedHeight);
+    }
     window.addEventListener('load', postEmbedHeight);
   }
 
