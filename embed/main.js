@@ -560,8 +560,13 @@
     });
   }
 
+  let scrollRaf = 0;
   const onScroll = () => {
-    document.documentElement.classList.toggle('is-scrolled', window.scrollY > 40);
+    if (scrollRaf) return;
+    scrollRaf = requestAnimationFrame(() => {
+      scrollRaf = 0;
+      document.documentElement.classList.toggle('is-scrolled', window.scrollY > 40);
+    });
   };
   onScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
@@ -744,14 +749,17 @@
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
-          if (e.isIntersecting) video.play().catch(() => {});
-          else video.pause();
+          if (e.isIntersecting) {
+            if (video.preload === 'none') video.preload = 'metadata';
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
         });
       },
       { threshold: 0.15, rootMargin: '0px 0px -6% 0px' }
     );
     io.observe(section);
-    video.play().catch(() => {});
 
     if (btn) {
       btn.addEventListener('click', () => {
