@@ -40,6 +40,7 @@
 
 html {
   scroll-behavior: auto;
+  overflow-x: hidden;
 }
 
 @media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
@@ -56,20 +57,23 @@ body {
   background: var(--bg);
   line-height: 1.6;
   overflow-x: hidden;
+  overflow-y: visible;
 }
 
 /* Inside Wix iframe: parent often forgets height — fill viewport / iOS safe heights */
+/* Single vertical scroll root — avoids nested html/body scrollbars inside iframe */
 html.is-embed {
   height: auto;
   min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
   scroll-padding-bottom: max(5.5rem, calc(env(safe-area-inset-bottom, 0px) + 4rem));
 }
 html.is-embed body {
-  min-height: 100vh;
-  min-height: 100dvh;
-  min-height: -webkit-fill-available;
-  -webkit-overflow-scrolling: touch;
+  min-height: 0;
   overflow-x: clip;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
   /* Room past last section so footer isn’t under the fixed WhatsApp chip / home indicator */
   padding-bottom: max(5rem, calc(env(safe-area-inset-bottom, 0px) + 4rem));
 }
