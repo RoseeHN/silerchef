@@ -1913,7 +1913,8 @@ body.detail-open {
 }
 
 /* ——— Booking modal (in-flow reservations → Wix CRM via API) ——— */
-body.booking-open {
+body.booking-open,
+html.booking-open {
   overflow: hidden;
 }
 
@@ -1921,11 +1922,20 @@ body.booking-open {
   position: fixed;
   inset: 0;
   z-index: 210;
+  box-sizing: border-box;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 0.75rem;
-  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  justify-content: flex-start;
+  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  padding: max(0.5rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right))
+    max(0.5rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   isolation: isolate;
 }
 
@@ -1934,7 +1944,7 @@ body.booking-open {
 }
 
 .booking-backdrop {
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: 0;
   background: rgba(6, 5, 6, 0.82);
@@ -1946,7 +1956,11 @@ body.booking-open {
   position: relative;
   z-index: 1;
   width: min(92vw, 28rem);
-  max-height: min(92vh, 86vh);
+  flex: 0 0 auto;
+  margin-top: auto;
+  margin-bottom: auto;
+  max-height: 88vh;
+  max-height: min(88dvh, calc(100dvh - max(1rem, env(safe-area-inset-top)) - max(1rem, env(safe-area-inset-bottom))));
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;

@@ -619,7 +619,9 @@
     bookingOverlay.hidden = !open;
     bookingOverlay.setAttribute('aria-hidden', open ? 'false' : 'true');
     document.body.classList.toggle('booking-open', open);
+    document.documentElement.classList.toggle('booking-open', open);
     if (open) {
+      bookingOverlay.scrollTop = 0;
       setMobileNavOpen(false);
       const first = bookingForm && bookingForm.querySelector('input[name="firstName"]');
       if (first) requestAnimationFrame(() => first.focus());
