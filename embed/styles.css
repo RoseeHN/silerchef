@@ -646,6 +646,13 @@ html.is-scrolled .site-header {
     width: 100%;
     padding: 0.72rem 1rem;
   }
+
+  /* Sağ üst: menü + header üstünde kalsın; hamburger’e çarpmasın (sağdan boşluk) */
+  .whatsapp-fab {
+    top: max(0.55rem, env(safe-area-inset-top, 0px));
+    bottom: auto;
+    right: max(4.75rem, calc(env(safe-area-inset-right, 0px) + 3.5rem));
+  }
 }
 
 body.nav-drawer-open {
@@ -1469,12 +1476,12 @@ main {
   color: var(--gold-3);
 }
 
-/* Floating WhatsApp — uses same number as contact (+1 775 389 6677) */
+/* Floating WhatsApp — above mobile nav scrim (z 70) + header (75), below detail (200) & booking (210) */
 .whatsapp-fab {
   position: fixed;
   right: max(1rem, env(safe-area-inset-right, 0px));
   bottom: max(1rem, env(safe-area-inset-bottom, 0px));
-  z-index: 60;
+  z-index: 92;
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;

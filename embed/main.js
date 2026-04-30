@@ -542,6 +542,10 @@
 
   function setMobileNavOpen(open) {
     if (!nav || !toggle) return;
+    if (open) {
+      setBookingOpen(false);
+      closeDetail();
+    }
     nav.classList.toggle('is-open', open);
     toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
