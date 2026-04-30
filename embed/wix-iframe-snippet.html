@@ -1,14 +1,12 @@
 <!--
-  Wix → Embed → Website / HTML iframe bileşenine yapıştırın.
-  URL’yi kendi Railway adresinizle değiştirin.
-  Bölümü Editörde “Stretch” / tam genişlik yapın; yükseklik için min-height kritik.
+  Wix → Embed → Website / HTML iframe
+  1) Bu bloğu yapıştırın. 2) Bölümü tam genişlik yapın.
+  3) iframe'e sabit yükseklik şart — Wix çoğu zaman %100 yüksekliği vermez (ekran siyah kalır).
 -->
 <div
   style="
     width: 100%;
-    min-height: 100vh;
-    min-height: 100dvh;
-    min-height: -webkit-fill-available;
+    min-height: 4200px;
     background: #141214;
     margin: 0;
     padding: 0;
@@ -16,17 +14,17 @@
   "
 >
   <iframe
-    src="https://silerchefapi-production.up.railway.app/"
+    src="https://silerchefapi-production.up.railway.app/?embed=1"
     title="Siler Chef"
+    width="100%"
+    height="4200"
     style="
       width: 100%;
-      min-height: 100vh;
-      min-height: 100dvh;
-      min-height: -webkit-fill-available;
-      height: 100%;
+      min-height: 4200px;
+      height: 4200px;
+      max-width: 100%;
       border: 0;
       display: block;
-      vertical-align: top;
     "
     loading="eager"
     referrerpolicy="strict-origin-when-cross-origin"

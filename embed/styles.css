@@ -59,6 +59,26 @@ html.is-embed body {
 html.is-embed .page {
   min-height: min(100vh, 100dvh);
   min-height: -webkit-fill-available;
+  /* Wix iframe often gets ~0 height from parent — ensure document is tall enough to scroll inside when iframe finally gets pixels */
+  min-height: max(min(100vh, 100dvh), 2800px);
+}
+
+/* Wix / mobile WebKit: gradient “gold” text can render invisible (clip + no font) → looks like a black empty page */
+html.is-embed .gold-text {
+  color: var(--gold-2) !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  -webkit-text-fill-color: var(--gold-2) !important;
+}
+
+html.is-embed .bg-vignette {
+  opacity: 0.45;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+html.is-embed .bg-texture {
+  opacity: 0.55;
 }
 
 a[href],

@@ -3,6 +3,19 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      (function () {
+        try {
+          if (window.parent !== window) document.documentElement.classList.add('is-embed');
+        } catch (e) {
+          document.documentElement.classList.add('is-embed');
+        }
+        try {
+          var q = window.location.search || '';
+          if (/[?&]embed=1(?:&|$)/.test(q)) document.documentElement.classList.add('is-embed');
+        } catch (e2) {}
+      })();
+    </script>
     <meta name="theme-color" content="#141214" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="googlebot" content="index, follow" />
@@ -106,13 +119,6 @@
     <link rel="icon" type="image/png" href="images/brand/silerchef-logo.png" />
   </head>
   <body>
-    <script>
-      try {
-        if (window.parent !== window) document.documentElement.classList.add('is-embed');
-      } catch (e) {
-        document.documentElement.classList.add('is-embed');
-      }
-    </script>
     <div class="bg-texture" aria-hidden="true"></div>
     <div class="bg-vignette" aria-hidden="true"></div>
 
