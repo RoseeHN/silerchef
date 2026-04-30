@@ -64,14 +64,6 @@ html.is-embed .page {
 }
 
 /* Wix / mobile WebKit: gradient “gold” text can render invisible (clip + no font) → looks like a black empty page */
-html.is-embed .gold-text {
-  color: var(--gold-2) !important;
-  background: none !important;
-  -webkit-background-clip: unset !important;
-  background-clip: unset !important;
-  -webkit-text-fill-color: var(--gold-2) !important;
-}
-
 html.is-embed .bg-vignette {
   opacity: 0.45;
   background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.35) 100%);
@@ -139,6 +131,25 @@ section[id] {
   background-clip: text;
   color: transparent;
   font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* iOS / mobile Chrome: background-clip:text + transparent often fails → only #141214 visible ("black screen") */
+@media (max-width: 900px) {
+  .gold-text,
+  .brand-text strong,
+  .hub-card-index,
+  .stat-num {
+    color: var(--gold-2) !important;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    -webkit-text-fill-color: var(--gold-2) !important;
+  }
+
+  .bg-vignette {
+    opacity: 0.5;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.38) 100%);
+  }
 }
 
 .brand-logo {
