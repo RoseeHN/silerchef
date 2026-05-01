@@ -1482,7 +1482,7 @@ main {
 .whatsapp-fab {
   position: fixed;
   top: 50%;
-  right: calc(-1 * max(2.6rem, env(safe-area-inset-right, 0px)));
+  right: max(0.45rem, calc(env(safe-area-inset-right, 0px) + 0.2rem));
   bottom: auto;
   transform: translateY(-50%);
   z-index: 120;
@@ -1491,9 +1491,8 @@ main {
   gap: 0.55rem;
   min-height: 3.5rem;
   padding: 0.72rem 1.12rem 0.72rem 0.82rem;
-  border-radius: 1.2rem 0 0 1.2rem;
+  border-radius: 1.2rem;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  border-right: none;
   text-decoration: none;
   color: #0c120f;
   font-size: 0.68rem;
@@ -1504,22 +1503,20 @@ main {
   box-shadow:
     0 12px 30px rgba(0, 0, 0, 0.42),
     inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(10px);
   transition:
     transform var(--t-hover-slow) var(--ease-flow),
-    right var(--t-hover-slow) var(--ease-flow),
     box-shadow var(--t-hover-slow) var(--ease-flow);
 }
 
 .whatsapp-fab:hover {
-  right: 0;
-  transform: translateY(-50%);
+  transform: translateY(-50%) translateX(-0.22rem);
   box-shadow:
     0 18px 44px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.42);
 }
 
 .whatsapp-fab:active {
-  right: 0;
   transform: translateY(-50%) scale(0.985);
 }
 
@@ -1549,19 +1546,32 @@ main {
     position: fixed !important;
     top: auto !important;
     left: auto !important;
-    right: calc(-1 * max(2.1rem, env(safe-area-inset-right, 0px))) !important;
-    bottom: max(1rem, calc(env(safe-area-inset-bottom, 0px) + 0.55rem)) !important;
+    right: max(0.7rem, calc(env(safe-area-inset-right, 0px) + 0.35rem)) !important;
+    bottom: max(1rem, calc(env(safe-area-inset-bottom, 0px) + 0.85rem)) !important;
     transform: none !important;
     min-height: 3.35rem;
-    padding: 0.78rem 1rem 0.78rem 0.78rem;
-    border-radius: 1.15rem 0 0 1.15rem;
-    z-index: 120;
+    padding: 0.8rem 1rem 0.8rem 0.84rem;
+    border-radius: 1.15rem;
+    max-width: calc(100vw - 1.4rem);
+    z-index: 140;
   }
 
   .whatsapp-fab:hover,
   .whatsapp-fab:active {
-    right: 0 !important;
     transform: none !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .hero-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+    min-height: 3.2rem;
   }
 }
 

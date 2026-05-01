@@ -1,0 +1,17 @@
+{
+  "name": "silerchef/site",
+  "description": "SilerChef public site, admin panel, and reservation API in plain PHP",
+  "type": "project",
+  "require": {
+    "php": "^8.2",
+    "ext-curl": "*",
+    "ext-pdo": "*",
+    "ext-pgsql": "*",
+    "ext-pdo_pgsql": "*",
+    "ext-pdo_sqlite": "*",
+    "ext-sqlite3": "*"
+  },
+  "config": {
+    "sort-packages": true
+  }
+}

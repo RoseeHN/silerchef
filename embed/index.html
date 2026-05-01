@@ -20,6 +20,8 @@
     <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="googlebot" content="index, follow" />
     <meta name="author" content="Chef Siler — Siler Chef" />
+    <meta name="application-name" content="Siler Chef" />
+    <meta name="format-detection" content="telephone=no" />
     <meta name="geo.region" content="US-NV" />
     <meta name="geo.placename" content="Reno" />
     <!-- Rezervasyon API’si Railway’de. Site Wix’teyse Railway genel adresini yazın (sonda / yok), örn: https://xxxx.up.railway.app -->
@@ -34,6 +36,7 @@
     <link rel="canonical" href="https://www.silerchef.com/" />
     <link rel="alternate" hreflang="en-US" href="https://www.silerchef.com/" />
     <link rel="alternate" hreflang="x-default" href="https://www.silerchef.com/" />
+    <link rel="preload" as="image" href="images/cuisines/italian-cuisine/gallery/05.jpg" fetchpriority="high" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Siler Chef" />
@@ -104,6 +107,35 @@
               "https://www.facebook.com/silerchef",
               "https://www.silerchef.com/"
             ]
+          },
+          {
+            "@type": "Service",
+            "@id": "https://www.silerchef.com/#service",
+            "serviceType": "Personal chef and private dining service",
+            "provider": { "@id": "https://www.silerchef.com/#business" },
+            "areaServed": [
+              { "@type": "City", "name": "Reno" },
+              { "@type": "AdministrativeArea", "name": "Lake Tahoe" },
+              { "@type": "AdministrativeArea", "name": "San Francisco Bay Area" }
+            ],
+            "availableLanguage": ["en-US"],
+            "audience": {
+              "@type": "Audience",
+              "geographicArea": [
+                { "@type": "State", "name": "Nevada" },
+                { "@type": "AdministrativeArea", "name": "Lake Tahoe" },
+                { "@type": "AdministrativeArea", "name": "San Francisco Bay Area" }
+              ]
+            },
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Private chef experiences",
+              "itemListElement": [
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Private in-home dining" } },
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Custom tasting menus" } },
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Chef-led celebrations and events" } }
+              ]
+            }
           }
         ]
       }
@@ -192,12 +224,12 @@
         <div class="shell hero-inner hero-inner--split">
           <div class="hero-panel hero-panel--visual">
             <figure class="hero-frame hero-frame--feature">
-              <img
-                src="images/cuisines/italian-cuisine/gallery/05.jpg"
-                alt=""
-                width="900"
-                height="1125"
-                loading="eager"
+                <img
+                  src="images/cuisines/italian-cuisine/gallery/05.jpg"
+                  alt="Signature private dining plate by Siler Chef for in-home fine dining in Reno and Lake Tahoe"
+                  width="900"
+                  height="1125"
+                  loading="eager"
                 decoding="async"
                 fetchpriority="high"
                 sizes="(max-width: 900px) 100vw, 48vw"
@@ -207,7 +239,7 @@
               <figure class="hero-frame hero-frame--accent">
                 <img
                   src="images/cuisines/middle-eastern-cuisine/gallery/05.jpg"
-                  alt=""
+                  alt="Global fusion plated dish prepared by Siler Chef for a private dining event"
                   width="600"
                   height="450"
                   loading="lazy"
