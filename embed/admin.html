@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#141214" />
+    <title>Siler Chef Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <div class="admin-shell">
+      <header class="admin-header">
+        <div>
+          <p class="admin-kicker">Siler Chef</p>
+          <h1>Admin Panel</h1>
+          <p class="admin-sub">Content, blocked dates, and reservation review in one place.</p>
+        </div>
+        <div class="admin-actions">
+          <a class="ghost-link" href="./index.html" target="_blank" rel="noopener noreferrer">Open site</a>
+          <button id="logout-btn" class="ghost-button" type="button" hidden>Log out</button>
+        </div>
+      </header>
+
+      <main class="admin-main">
+        <section id="login-card" class="panel panel--login">
+          <h2>Secure access</h2>
+          <p>Use your Railway admin credentials to open the dashboard.</p>
+          <form id="login-form" class="stack-form">
+            <label>
+              <span>Username</span>
+              <input id="login-username" name="username" type="text" autocomplete="username" required />
+            </label>
+            <label>
+              <span>Password</span>
+              <input id="login-password" name="password" type="password" autocomplete="current-password" required />
+            </label>
+            <p id="login-error" class="error" hidden></p>
+            <button class="primary-button" type="submit">Enter admin</button>
+          </form>
+        </section>
+
+        <section id="dashboard" hidden>
+          <div class="summary-grid">
+            <article class="panel summary-card">
+              <span class="summary-label">Blocked dates</span>
+              <strong id="summary-blocked">0</strong>
+            </article>
+            <article class="panel summary-card">
+              <span class="summary-label">Reservations</span>
+              <strong id="summary-reservations">0</strong>
+            </article>
+            <article class="panel summary-card">
+              <span class="summary-label">Pending</span>
+              <strong id="summary-pending">0</strong>
+            </article>
+          </div>
+
+          <div class="editor-grid">
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Content</p>
+                  <h2>Full site content JSON</h2>
+                </div>
+                <button id="save-content-btn" class="primary-button" type="button">Save content</button>
+              </div>
+              <p class="panel-note">
+                This editor controls hero texts, menus, contact data, service outlines, cuisine cards, and all sample menu content.
+              </p>
+              <p id="content-status" class="status" hidden></p>
+              <textarea id="content-json" class="code-editor" spellcheck="false"></textarea>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Availability</p>
+                  <h2>Blocked dates</h2>
+                </div>
+                <button id="save-availability-btn" class="primary-button" type="button">Save dates</button>
+              </div>
+              <p class="panel-note">One line per date. Format: <code>YYYY-MM-DD | Optional note</code></p>
+              <label class="stack-form">
+                <span>Availability note</span>
+                <textarea id="availability-note" rows="3"></textarea>
+              </label>
+              <label class="stack-form">
+                <span>Blocked dates</span>
+                <textarea id="blocked-dates" class="code-editor code-editor--short" spellcheck="false"></textarea>
+              </label>
+              <p id="availability-status" class="status" hidden></p>
+            </section>
+          </div>
+
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <p class="panel-kicker">Reservations</p>
+                <h2>Incoming requests</h2>
+              </div>
+              <button id="refresh-btn" class="ghost-button" type="button">Refresh</button>
+            </div>
+            <p class="panel-note">
+              Requests are stored locally in the app data directory and still sent to Wix CRM when the sync succeeds.
+            </p>
+            <div id="reservations-empty" class="empty-state" hidden>No reservation requests yet.</div>
+            <div id="reservations-list" class="reservations-list"></div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script src="admin.js" defer></script>
+  </body>
+</html>

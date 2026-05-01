@@ -2,6 +2,7 @@ node_modules/
 .env
 .DS_Store
 npm-debug.log*
+.runtime-data/
 
 # Large local drops & Desktop/iCloud noise — keeps git status/add fast
 *.MOV

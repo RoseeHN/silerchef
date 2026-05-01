@@ -67,6 +67,26 @@
     },
   ];
 
+  let availabilityState = { note: '', blockedDates: [] };
+
+  function mergeDeep(base, override) {
+    if (Array.isArray(base)) return Array.isArray(override) ? override : base;
+    if (!base || typeof base !== 'object') return override === undefined ? base : override;
+    const out = { ...base };
+    if (!override || typeof override !== 'object') return out;
+    Object.keys(override).forEach((key) => {
+      const value = override[key];
+      if (Array.isArray(value)) {
+        out[key] = value;
+      } else if (value && typeof value === 'object' && out[key] && typeof out[key] === 'object' && !Array.isArray(out[key])) {
+        out[key] = mergeDeep(out[key], value);
+      } else if (value !== undefined) {
+        out[key] = value;
+      }
+    });
+    return out;
+  }
+
   function pad2(n) {
     return String(n).padStart(2, '0');
   }
@@ -609,6 +629,156 @@
     return b ? b + '/api/reservations' : '/api/reservations';
   }
 
+  function getSiteContentUrl() {
+    const b = getApiBaseUrl();
+    return b ? b + '/api/site-content' : '/api/site-content';
+  }
+
+  function getAvailabilityUrl() {
+    const b = getApiBaseUrl();
+    return b ? b + '/api/availability' : '/api/availability';
+  }
+
+  function setNodeText(selector, value) {
+    if (value == null) return;
+    const el = document.querySelector(selector);
+    if (el) el.textContent = String(value);
+  }
+
+  function setLink(selector, href, text) {
+    const el = document.querySelector(selector);
+    if (!el) return;
+    if (href) el.setAttribute('href', href);
+    if (text != null) el.textContent = String(text);
+  }
+
+  function replaceCardCollection(target, value) {
+    if (!Array.isArray(value) || !value.length) return;
+    target.splice(0, target.length, ...value);
+  }
+
+  function applySiteSettings(content) {
+    if (!content || typeof content !== 'object') return;
+    const site = content.site || {};
+    const hero = site.hero || {};
+    const quote = site.quote || {};
+    const cuisinesSection = site.cuisinesSection || {};
+    const servicesSection = site.servicesSection || {};
+    const craft = site.craft || {};
+    const stats = site.stats || {};
+    const cta = site.cta || {};
+    const booking = site.booking || {};
+    const contact = site.contact || {};
+
+    setNodeText('.hero-headline', hero.headline);
+    setNodeText('.hero-tagline', hero.tagline);
+    setNodeText('.hero-lede', hero.lede);
+    setNodeText('.pull-quote p', quote.text);
+    setNodeText('.pull-quote cite', quote.cite);
+    setNodeText('#cuisines .section-lede', cuisinesSection.lede);
+    setNodeText('#cuisines .section-sample-notice__kicker', cuisinesSection.noticeKicker);
+    setNodeText('#cuisines .section-sample-notice__body', cuisinesSection.noticeBody);
+    setNodeText('#services .section-lede', servicesSection.lede);
+    setNodeText('#services .section-sample-notice__kicker', servicesSection.noticeKicker);
+    setNodeText('#services .section-sample-notice__body', servicesSection.noticeBody);
+    setNodeText('.module-eyebrow', craft.eyebrow);
+    setNodeText('.module-title', craft.title);
+    const craftBodies = document.querySelectorAll('.module-split-copy .module-lede');
+    if (craftBodies[0] && craft.body1 != null) craftBodies[0].textContent = String(craft.body1);
+    if (craftBodies[1] && craft.body2 != null) craftBodies[1].textContent = String(craft.body2);
+    const craftActions = document.querySelectorAll('.module-split-actions a');
+    if (craftActions[0]) {
+      if (craft.primaryHref) craftActions[0].setAttribute('href', craft.primaryHref);
+      if (craft.primaryLabel != null) craftActions[0].textContent = String(craft.primaryLabel);
+    }
+    if (craftActions[1]) {
+      if (craft.secondaryHref) craftActions[1].setAttribute('href', craft.secondaryHref);
+      if (craft.secondaryLabel != null) craftActions[1].textContent = String(craft.secondaryLabel);
+    }
+    const statNums = document.querySelectorAll('.stat-num');
+    if (statNums[0] && stats.cuisinePortfolios != null) statNums[0].textContent = String(stats.cuisinePortfolios);
+    if (statNums[1] && stats.occasionArchetypes != null) statNums[1].textContent = String(stats.occasionArchetypes);
+    if (statNums[2] && stats.chefExperience != null) statNums[2].textContent = String(stats.chefExperience);
+    setNodeText('[data-booking-headline]', cta.headline);
+    setNodeText('[data-booking-summary]', cta.summary);
+    setNodeText('#booking-title', booking.title);
+    setNodeText('.booking-lede', booking.lede);
+    setNodeText('.booking-success__title', booking.successTitle);
+    setNodeText('.booking-success__text', booking.successText);
+    setLink('#booking-fallback-link', booking.fallbackUrl);
+    const detailNotice = document.querySelector('.detail-sample-notice p');
+    if (detailNotice && site.detailNotice) {
+      detailNotice.textContent = String(site.detailNotice);
+    }
+    setNodeText('#contact h2', contact.title);
+    setNodeText('#contact .section-head p', contact.subtitle);
+    setLink('a[href^="tel:"]', contact.phoneHref, contact.phone);
+    setLink('a[href^="mailto:"]', contact.emailHref, contact.email);
+    const websiteLink = document.querySelector('#contact a[href^="https://www.silerchef.com/"]');
+    if (websiteLink) {
+      if (contact.websiteHref) websiteLink.setAttribute('href', contact.websiteHref);
+      if (contact.website != null) websiteLink.textContent = String(contact.website);
+    }
+    const locationNode = document.querySelector('#contact .contact-col:last-child .contact-item:last-child div');
+    if (locationNode && contact.location != null) locationNode.textContent = String(contact.location);
+    const socialTiles = document.querySelectorAll('.contact-social a');
+    if (socialTiles[0] && contact.instagramHref) socialTiles[0].setAttribute('href', contact.instagramHref);
+    if (socialTiles[1] && contact.whatsappHref) socialTiles[1].setAttribute('href', contact.whatsappHref);
+    if (socialTiles[2] && contact.facebookHref) socialTiles[2].setAttribute('href', contact.facebookHref);
+  }
+
+  function remountHubs() {
+    const cuisinesMount = document.getElementById('cuisines-mount');
+    const servicesMount = document.getElementById('services-mount');
+    if (cuisinesMount) cuisinesMount.innerHTML = '';
+    if (servicesMount) servicesMount.innerHTML = '';
+    mountHub('cuisines-mount', CUISINES, 'cuisine', 'images/cuisines', { layout: 'cuisine-premium' });
+    mountHub('services-mount', SERVICES, 'service', 'images/services-and-occasions', { layout: 'service-premium' });
+  }
+
+  async function loadRuntimeContent() {
+    try {
+      const res = await fetch(getSiteContentUrl(), { credentials: 'omit', mode: 'cors' });
+      if (!res.ok) return;
+      const content = await res.json();
+      if (!content || typeof content !== 'object') return;
+      applySiteSettings(content);
+      replaceCardCollection(CUISINES, content.cuisineCards);
+      replaceCardCollection(SERVICES, content.serviceCards);
+      if (content.cuisines || content.services) {
+        window.SC_SITE = mergeDeep(window.SC_SITE || {}, {
+          cuisines: content.cuisines || undefined,
+          services: content.services || undefined,
+        });
+      }
+      remountHubs();
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  async function loadAvailability() {
+    try {
+      const res = await fetch(getAvailabilityUrl(), { credentials: 'omit', mode: 'cors' });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data && typeof data === 'object') {
+        availabilityState = {
+          note: typeof data.note === 'string' ? data.note : '',
+          blockedDates: Array.isArray(data.blockedDates) ? data.blockedDates : [],
+        };
+      }
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function getBlockedDateMessage(dateValue) {
+    const row = (availabilityState.blockedDates || []).find((entry) => entry && entry.date === dateValue);
+    if (!row) return '';
+    return row.label ? `This date is unavailable: ${row.label}` : 'This date is unavailable.';
+  }
+
   const bookingOverlay = document.getElementById('booking-overlay');
   const bookingForm = document.getElementById('booking-form');
   const bookingSuccess = document.getElementById('booking-success');
@@ -689,6 +859,12 @@
         guestCount: guestRaw === '' || guestRaw === null ? null : Number(guestRaw),
         notes: fd.get('notes') || '',
       };
+      const blockedMsg = getBlockedDateMessage(payload.preferredDate);
+      if (blockedMsg) {
+        bookingError.textContent = blockedMsg;
+        bookingError.hidden = false;
+        return;
+      }
       try {
         const res = await fetch(getReservationPostUrl(), {
           method: 'POST',
@@ -718,6 +894,8 @@
   }
 
   applyBookingFromApi();
+  loadRuntimeContent();
+  loadAvailability();
 
   (function initChefReel() {
     const section = document.getElementById('reel');
