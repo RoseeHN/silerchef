@@ -664,7 +664,7 @@ html.is-scrolled .site-header {
   }
 
   .whatsapp-fab {
-    right: max(0rem, env(safe-area-inset-right, 0px));
+    right: calc(env(safe-area-inset-right, 0px) - 1.45rem);
   }
 }
 
@@ -1690,7 +1690,7 @@ main {
 .whatsapp-fab {
   position: fixed;
   top: 50%;
-  right: max(0rem, env(safe-area-inset-right, 0px));
+  right: calc(env(safe-area-inset-right, 0px) - 1.45rem);
   bottom: auto;
   transform: translateY(-50%);
   z-index: 120;
@@ -1751,7 +1751,7 @@ main {
     position: fixed !important;
     top: auto !important;
     left: auto !important;
-    right: max(0.15rem, calc(env(safe-area-inset-right, 0px) + 0.05rem)) !important;
+    right: calc(env(safe-area-inset-right, 0px) - 0.95rem) !important;
     bottom: max(1rem, calc(env(safe-area-inset-bottom, 0px) + 0.85rem)) !important;
     transform: none !important;
     width: 3.45rem;
