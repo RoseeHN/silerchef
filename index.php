@@ -125,23 +125,17 @@ function route_api(string $path, string $method, Repository $repository, AdminAu
                 ]
             );
 
-            if (($wixResult['code'] ?? '') === 'missing_wix_config') {
-                json_response(
-                    [
-                        'error' => 'server_misconfigured',
-                        'detail' => 'Set WIX_META_SITE_ID and WIX_API_KEY (Contacts: Manage) on Railway.',
-                    ],
-                    503
-                );
-            }
-
             json_response(
                 [
-                    'error' => 'wix_error',
-                    'status' => $wixResult['status'] ?? 502,
-                    'detail' => $wixResult['detail'] ?? 'Wix request failed',
+                    'ok' => true,
+                    'reservationId' => $reservation['id'],
+                    'contactId' => null,
+                    'crmSync' => 'deferred',
+                    'warning' => ($wixResult['code'] ?? '') === 'missing_wix_config'
+                        ? 'Reservation saved. Add WIX_META_SITE_ID to resume CRM sync.'
+                        : 'Reservation saved. Wix CRM sync needs follow-up.',
                 ],
-                502
+                202
             );
         }
 
