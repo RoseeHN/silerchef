@@ -65,10 +65,10 @@ function serviceDefaults(slug, occasionLabel) {
 const DEFAULT_SITE_CONTENT = {
   site: {
     hero: {
-      headline: 'Global Flavors, Happy Tables, Unforgettable Moments',
-      tagline: 'Reno · Private dining · Bespoke menus',
+      headline: 'Private Chef Dining That Feels Like the Best Table in the City',
+      tagline: 'Reno · Tahoe · Bay Area · Luxury in-home experiences',
       lede:
-        'Exquisite world cuisines in the comfort of your home - Chef Siler curates and shapes each experience for your table.',
+        'For hosts who want more than dinner, Siler Chef designs globally inspired menus, refined plating, and an effortless service flow that turns home entertaining into a true occasion.',
     },
     quote: {
       text: 'Every menu is a conversation - between season, setting, and the people at your table.',

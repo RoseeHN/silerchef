@@ -400,6 +400,23 @@ final class Repository
         }
         $content['availability'] = normalize_availability($content['availability']);
 
+        $legacyHeroHeadline = 'Global Flavors, Happy Tables, Unforgettable Moments';
+        $legacyHeroTagline = 'Reno · Private dining · Bespoke menus';
+        $legacyHeroLede = 'Exquisite world cuisines in the comfort of your home - Chef Siler curates and shapes each experience for your table.';
+        $hero = isset($content['site']['hero']) && is_array($content['site']['hero'])
+            ? $content['site']['hero']
+            : [];
+        if (($hero['headline'] ?? '') === $legacyHeroHeadline) {
+            $content['site']['hero']['headline'] = 'Private Chef Dining That Feels Like the Best Table in the City';
+        }
+        if (($hero['tagline'] ?? '') === $legacyHeroTagline) {
+            $content['site']['hero']['tagline'] = 'Reno · Tahoe · Bay Area · Luxury in-home experiences';
+        }
+        if (($hero['lede'] ?? '') === $legacyHeroLede) {
+            $content['site']['hero']['lede'] =
+                'For hosts who want more than dinner, Siler Chef designs globally inspired menus, refined plating, and an effortless service flow that turns home entertaining into a true occasion.';
+        }
+
         $fallbackUrl = trim((string) ($content['site']['booking']['fallbackUrl'] ?? ''));
         $whatsAppUrl = trim((string) ($content['site']['contact']['whatsappHref'] ?? ''));
         if ($fallbackUrl === '' || str_contains($fallbackUrl, '/book-online')) {
