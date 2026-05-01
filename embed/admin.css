@@ -26,6 +26,8 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: var(--font-ui);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   color: var(--text);
   background:
     radial-gradient(circle at top, rgba(197, 160, 89, 0.12), transparent 28%),
@@ -217,6 +219,7 @@ textarea,
 select {
   width: 100%;
   padding: 0.85rem 0.95rem;
+  font-size: 1rem;
   color: var(--text);
   background: rgba(15, 13, 15, 0.92);
   border: 1px solid rgba(197, 160, 89, 0.22);
@@ -413,25 +416,66 @@ select:focus {
 
 @media (max-width: 720px) {
   .admin-shell {
-    padding: 1rem 0.9rem 2rem;
+    padding: 1rem 0.9rem calc(env(safe-area-inset-bottom, 0px) + 2rem);
   }
 
   .panel {
     padding: 1rem;
   }
 
-  .admin-tabs {
+  .admin-header {
+    gap: 0.85rem;
+  }
+
+  .panel-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .panel-head .primary-button,
+  .panel-head .ghost-button {
+    width: 100%;
+  }
+
+  .summary-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .summary-card {
+    min-width: 0;
+  }
+
+  .summary-card strong {
+    font-size: 1.55rem;
+  }
+
+  .admin-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    padding-bottom: 0.3rem;
+    margin-right: -0.2rem;
+    margin-left: -0.2rem;
   }
 
   .admin-tab {
-    width: 100%;
+    flex: 0 0 auto;
+    min-height: 2.9rem;
+    white-space: nowrap;
+    scroll-snap-align: start;
+  }
+
+  .admin-tabs::-webkit-scrollbar {
+    display: none;
   }
 }
 
 @media (max-width: 520px) {
-  .admin-tabs {
+  .summary-grid {
     grid-template-columns: 1fr;
   }
 
@@ -446,5 +490,19 @@ select:focus {
   .primary-button,
   .danger-button {
     width: 100%;
+  }
+
+  .reservation-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .reservation-actions select,
+  .reservation-actions .primary-button {
+    width: 100%;
+  }
+
+  .reservation-note {
+    min-height: 120px;
   }
 }
