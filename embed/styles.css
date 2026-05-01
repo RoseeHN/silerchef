@@ -1566,14 +1566,6 @@ main {
   outline-offset: 3px;
 }
 
-body.nav-drawer-open .whatsapp-fab,
-body.detail-open .whatsapp-fab,
-body.booking-open .whatsapp-fab {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(10px);
-}
-
 .social-tile:focus-visible {
   outline: 2px solid rgba(212, 188, 106, 0.85);
   outline-offset: 3px;

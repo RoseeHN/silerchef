@@ -3,6 +3,13 @@
 (function () {
   const STORAGE_KEY = 'silerchef_admin_token';
 
+  const state = {
+    bootstrap: null,
+    activeTab: 'homepage',
+    selectedCuisineSlug: '',
+    selectedServiceSlug: '',
+  };
+
   function getApiBase() {
     const base = window.__SILERCHEF_API_BASE__ || '';
     return base ? String(base).replace(/\/$/, '') : '';
@@ -11,6 +18,22 @@
   function apiUrl(path) {
     const base = getApiBase();
     return base ? base + path : path;
+  }
+
+  function byId(id) {
+    return document.getElementById(id);
+  }
+
+  function esc(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function clone(value) {
+    return JSON.parse(JSON.stringify(value));
   }
 
   function setMessage(el, text, isError) {
@@ -38,31 +61,7 @@
       ...(options && options.headers ? options.headers : {}),
     };
     if (token) headers.Authorization = `Bearer ${token}`;
-    const res = await fetch(apiUrl(path), {
-      ...(options || {}),
-      headers,
-    });
-    return res;
-  }
-
-  function blockedDatesToText(blockedDates) {
-    return (Array.isArray(blockedDates) ? blockedDates : [])
-      .map((row) => `${row.date}${row.label ? ' | ' + row.label : ''}`)
-      .join('\n');
-  }
-
-  function parseBlockedDates(text) {
-    return String(text || '')
-      .split('\n')
-      .map((line) => line.trim())
-      .filter(Boolean)
-      .map((line) => {
-        const [datePart, ...rest] = line.split('|');
-        return {
-          date: String(datePart || '').trim(),
-          label: rest.join('|').trim(),
-        };
-      });
+    return fetch(apiUrl(path), { ...(options || {}), headers });
   }
 
   function formatDateTime(isoText) {
@@ -72,75 +71,401 @@
     return dt.toLocaleString();
   }
 
-  const loginCard = document.getElementById('login-card');
-  const dashboard = document.getElementById('dashboard');
-  const logoutBtn = document.getElementById('logout-btn');
-  const loginForm = document.getElementById('login-form');
-  const loginError = document.getElementById('login-error');
-  const contentJson = document.getElementById('content-json');
-  const contentStatus = document.getElementById('content-status');
-  const availabilityNote = document.getElementById('availability-note');
-  const blockedDates = document.getElementById('blocked-dates');
-  const availabilityStatus = document.getElementById('availability-status');
-  const reservationsList = document.getElementById('reservations-list');
-  const reservationsEmpty = document.getElementById('reservations-empty');
-
-  let bootstrapData = null;
-
   function updateSummary() {
-    const availability = (bootstrapData && bootstrapData.availability) || { blockedDates: [] };
-    const reservations = (bootstrapData && bootstrapData.reservations) || [];
-    document.getElementById('summary-blocked').textContent = String((availability.blockedDates || []).length);
-    document.getElementById('summary-reservations').textContent = String(reservations.length);
-    document.getElementById('summary-pending').textContent = String(
+    const availability = state.bootstrap ? state.bootstrap.availability : { blockedDates: [] };
+    const reservations = state.bootstrap ? state.bootstrap.reservations : [];
+    byId('summary-blocked').textContent = String((availability.blockedDates || []).length);
+    byId('summary-reservations').textContent = String(reservations.length);
+    byId('summary-pending').textContent = String(
       reservations.filter((row) => row.status === 'pending').length
     );
   }
 
+  function setActiveTab(tabName) {
+    state.activeTab = tabName;
+    document.querySelectorAll('.admin-tab').forEach((btn) => {
+      btn.classList.toggle('is-active', btn.dataset.tab === tabName);
+    });
+    document.querySelectorAll('.tab-panel').forEach((panel) => {
+      panel.classList.toggle('is-active', panel.dataset.panel === tabName);
+    });
+  }
+
+  function getContent() {
+    return state.bootstrap ? state.bootstrap.content : null;
+  }
+
+  function getCuisineCard(slug) {
+    const content = getContent();
+    return content.cuisineCards.find((row) => row.slug === slug);
+  }
+
+  function getServiceCard(slug) {
+    const content = getContent();
+    return content.serviceCards.find((row) => row.slug === slug);
+  }
+
+  function renderHomepageFields() {
+    const site = getContent().site;
+    byId('homepage-fields').innerHTML = `
+      <label class="field">
+        <span>Hero headline</span>
+        <input id="hp-hero-headline" type="text" value="${esc(site.hero.headline)}" />
+      </label>
+      <label class="field">
+        <span>Hero short line</span>
+        <input id="hp-hero-tagline" type="text" value="${esc(site.hero.tagline)}" />
+      </label>
+      <label class="field field--full">
+        <span>Hero description</span>
+        <textarea id="hp-hero-lede" rows="4">${esc(site.hero.lede)}</textarea>
+      </label>
+
+      <label class="field field--full">
+        <span>Homepage quote</span>
+        <textarea id="hp-quote-text" rows="3">${esc(site.quote.text)}</textarea>
+      </label>
+      <label class="field">
+        <span>Quote author</span>
+        <input id="hp-quote-cite" type="text" value="${esc(site.quote.cite)}" />
+      </label>
+      <div class="field"></div>
+
+      <label class="field field--full">
+        <span>Cuisines section intro</span>
+        <textarea id="hp-cuisines-lede" rows="3">${esc(site.cuisinesSection.lede)}</textarea>
+      </label>
+      <label class="field">
+        <span>Cuisines notice title</span>
+        <input id="hp-cuisines-kicker" type="text" value="${esc(site.cuisinesSection.noticeKicker)}" />
+      </label>
+      <label class="field field--full">
+        <span>Cuisines notice text</span>
+        <textarea id="hp-cuisines-body" rows="3">${esc(site.cuisinesSection.noticeBody)}</textarea>
+      </label>
+
+      <label class="field field--full">
+        <span>Services section intro</span>
+        <textarea id="hp-services-lede" rows="3">${esc(site.servicesSection.lede)}</textarea>
+      </label>
+      <label class="field">
+        <span>Services notice title</span>
+        <input id="hp-services-kicker" type="text" value="${esc(site.servicesSection.noticeKicker)}" />
+      </label>
+      <label class="field field--full">
+        <span>Services notice text</span>
+        <textarea id="hp-services-body" rows="3">${esc(site.servicesSection.noticeBody)}</textarea>
+      </label>
+
+      <label class="field">
+        <span>Craft heading small title</span>
+        <input id="hp-craft-eyebrow" type="text" value="${esc(site.craft.eyebrow)}" />
+      </label>
+      <label class="field">
+        <span>Craft main title</span>
+        <input id="hp-craft-title" type="text" value="${esc(site.craft.title)}" />
+      </label>
+      <label class="field field--full">
+        <span>Craft paragraph 1</span>
+        <textarea id="hp-craft-body1" rows="4">${esc(site.craft.body1)}</textarea>
+      </label>
+      <label class="field field--full">
+        <span>Craft paragraph 2</span>
+        <textarea id="hp-craft-body2" rows="4">${esc(site.craft.body2)}</textarea>
+      </label>
+
+      <label class="field">
+        <span>Homepage CTA title</span>
+        <input id="hp-cta-headline" type="text" value="${esc(site.cta.headline)}" />
+      </label>
+      <label class="field field--full">
+        <span>Homepage CTA text</span>
+        <textarea id="hp-cta-summary" rows="3">${esc(site.cta.summary)}</textarea>
+      </label>
+
+      <label class="field">
+        <span>Booking popup title</span>
+        <input id="hp-booking-title" type="text" value="${esc(site.booking.title)}" />
+      </label>
+      <label class="field field--full">
+        <span>Booking popup text</span>
+        <textarea id="hp-booking-lede" rows="3">${esc(site.booking.lede)}</textarea>
+      </label>
+      <label class="field">
+        <span>Booking success title</span>
+        <input id="hp-booking-success-title" type="text" value="${esc(site.booking.successTitle)}" />
+      </label>
+      <label class="field field--full">
+        <span>Booking success text</span>
+        <textarea id="hp-booking-success-text" rows="3">${esc(site.booking.successText)}</textarea>
+      </label>
+      <label class="field field--full">
+        <span>Booking fallback link</span>
+        <input id="hp-booking-fallback-url" type="url" value="${esc(site.booking.fallbackUrl)}" />
+      </label>
+
+      <label class="field field--full">
+        <span>Menu detail note</span>
+        <textarea id="hp-detail-notice" rows="3">${esc(site.detailNotice)}</textarea>
+      </label>
+
+      <label class="field">
+        <span>Contact title</span>
+        <input id="hp-contact-title" type="text" value="${esc(site.contact.title)}" />
+      </label>
+      <label class="field field--full">
+        <span>Contact subtitle</span>
+        <textarea id="hp-contact-subtitle" rows="2">${esc(site.contact.subtitle)}</textarea>
+      </label>
+      <label class="field">
+        <span>Phone</span>
+        <input id="hp-contact-phone" type="text" value="${esc(site.contact.phone)}" />
+      </label>
+      <label class="field">
+        <span>Phone link</span>
+        <input id="hp-contact-phone-href" type="text" value="${esc(site.contact.phoneHref)}" />
+      </label>
+      <label class="field">
+        <span>Email</span>
+        <input id="hp-contact-email" type="text" value="${esc(site.contact.email)}" />
+      </label>
+      <label class="field">
+        <span>Email link</span>
+        <input id="hp-contact-email-href" type="text" value="${esc(site.contact.emailHref)}" />
+      </label>
+      <label class="field">
+        <span>Website text</span>
+        <input id="hp-contact-website" type="text" value="${esc(site.contact.website)}" />
+      </label>
+      <label class="field">
+        <span>Website link</span>
+        <input id="hp-contact-website-href" type="url" value="${esc(site.contact.websiteHref)}" />
+      </label>
+      <label class="field field--full">
+        <span>Location line</span>
+        <input id="hp-contact-location" type="text" value="${esc(site.contact.location)}" />
+      </label>
+      <label class="field">
+        <span>Instagram link</span>
+        <input id="hp-contact-instagram" type="url" value="${esc(site.contact.instagramHref)}" />
+      </label>
+      <label class="field">
+        <span>WhatsApp link</span>
+        <input id="hp-contact-whatsapp" type="url" value="${esc(site.contact.whatsappHref)}" />
+      </label>
+      <label class="field">
+        <span>Facebook link</span>
+        <input id="hp-contact-facebook" type="url" value="${esc(site.contact.facebookHref)}" />
+      </label>
+    `;
+  }
+
+  function blockEditorHtml(prefix, block, blockIndex) {
+    const itemsHtml = (block.items || [])
+      .map(
+        (item, itemIndex) => `
+          <div class="editor-item">
+            <h4>Dish ${itemIndex + 1}</h4>
+            <div class="form-layout">
+              <label class="field">
+                <span>Dish title</span>
+                <input type="text" id="${prefix}-block-${blockIndex}-item-${itemIndex}-name" value="${esc(item.name)}" />
+              </label>
+              <label class="field field--full">
+                <span>Description</span>
+                <textarea id="${prefix}-block-${blockIndex}-item-${itemIndex}-desc" rows="3">${esc(item.desc)}</textarea>
+              </label>
+            </div>
+          </div>
+        `
+      )
+      .join('');
+
+    return `
+      <section class="editor-block">
+        <div class="form-layout">
+          <label class="field">
+            <span>Block title</span>
+            <input type="text" id="${prefix}-block-${blockIndex}-title" value="${esc(block.title)}" />
+          </label>
+          <label class="field field--full">
+            <span>Image path</span>
+            <input type="text" id="${prefix}-block-${blockIndex}-image" value="${esc(block.image || '')}" />
+          </label>
+        </div>
+        <div class="editor-items">${itemsHtml}</div>
+      </section>
+    `;
+  }
+
+  function renderCuisineSelect() {
+    const select = byId('cuisine-select');
+    const content = getContent();
+    select.innerHTML = content.cuisineCards
+      .map((card) => `<option value="${esc(card.slug)}">${esc(card.title)}</option>`)
+      .join('');
+    if (!state.selectedCuisineSlug || !content.cuisineCards.some((card) => card.slug === state.selectedCuisineSlug)) {
+      state.selectedCuisineSlug = content.cuisineCards[0] ? content.cuisineCards[0].slug : '';
+    }
+    select.value = state.selectedCuisineSlug;
+  }
+
+  function renderMenuEditor() {
+    const slug = state.selectedCuisineSlug;
+    const card = getCuisineCard(slug);
+    const detail = getContent().cuisines[slug];
+    if (!card || !detail) return;
+    byId('menu-editor').innerHTML = `
+      <div class="editor-shell">
+        <section class="editor-card">
+          <h3>Card settings</h3>
+          <p class="editor-help">These fields control the cuisine tile visible on the website.</p>
+          <div class="form-layout">
+            <label class="field">
+              <span>Card title</span>
+              <input type="text" id="menu-card-title" value="${esc(card.title)}" />
+            </label>
+            <label class="field">
+              <span>Card number</span>
+              <input type="text" id="menu-card-no" value="${esc(card.no)}" />
+            </label>
+            <label class="field field--full">
+              <span>Card tagline</span>
+              <textarea id="menu-card-tagline" rows="2">${esc(card.tagline)}</textarea>
+            </label>
+            <label class="field field--full">
+              <span>Detail intro paragraph</span>
+              <textarea id="menu-intro" rows="4">${esc(detail.intro)}</textarea>
+            </label>
+          </div>
+        </section>
+
+        <section class="editor-card">
+          <h3>Sample menu blocks</h3>
+          <p class="editor-help">Each block is one sample menu set shown when the guest opens this cuisine.</p>
+          <div class="editor-blocks">
+            ${(detail.blocks || []).map((block, index) => blockEditorHtml('menu', block, index)).join('')}
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  function renderServiceSelect() {
+    const select = byId('service-select');
+    const content = getContent();
+    select.innerHTML = content.serviceCards
+      .map((card) => `<option value="${esc(card.slug)}">${esc(card.title)}</option>`)
+      .join('');
+    if (!state.selectedServiceSlug || !content.serviceCards.some((card) => card.slug === state.selectedServiceSlug)) {
+      state.selectedServiceSlug = content.serviceCards[0] ? content.serviceCards[0].slug : '';
+    }
+    select.value = state.selectedServiceSlug;
+  }
+
+  function renderServiceEditor() {
+    const slug = state.selectedServiceSlug;
+    const card = getServiceCard(slug);
+    const detail = getContent().services[slug];
+    if (!card || !detail) return;
+    byId('service-editor').innerHTML = `
+      <div class="editor-shell">
+        <section class="editor-card">
+          <h3>Card settings</h3>
+          <p class="editor-help">These fields control the service card visible on the website.</p>
+          <div class="form-layout">
+            <label class="field">
+              <span>Card title</span>
+              <input type="text" id="service-card-title" value="${esc(card.title)}" />
+            </label>
+            <label class="field">
+              <span>Card number</span>
+              <input type="text" id="service-card-no" value="${esc(card.no)}" />
+            </label>
+            <label class="field field--full">
+              <span>Card tagline</span>
+              <textarea id="service-card-tagline" rows="2">${esc(card.tagline)}</textarea>
+            </label>
+            <label class="field field--full">
+              <span>Detail intro paragraph</span>
+              <textarea id="service-intro" rows="4">${esc(detail.intro)}</textarea>
+            </label>
+          </div>
+        </section>
+
+        <section class="editor-card">
+          <h3>Detail sections</h3>
+          <p class="editor-help">These blocks appear inside the opened service detail view.</p>
+          <div class="editor-blocks">
+            ${(detail.blocks || []).map((block, index) => blockEditorHtml('service', block, index)).join('')}
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  function renderAvailabilityEditor() {
+    const rows = state.bootstrap.availability.blockedDates || [];
+    byId('availability-note').value = state.bootstrap.availability.note || '';
+    byId('blocked-dates-list').innerHTML = rows
+      .map(
+        (row, index) => `
+          <div class="row-card" data-row-index="${index}">
+            <div class="row-card__grid">
+              <label class="field">
+                <span>Date</span>
+                <input type="date" data-blocked-date value="${esc(row.date)}" />
+              </label>
+              <label class="field">
+                <span>Reason</span>
+                <input type="text" data-blocked-label value="${esc(row.label || '')}" placeholder="Private event, travel day..." />
+              </label>
+              <button class="danger-button" type="button" data-remove-blocked="${index}">Remove</button>
+            </div>
+          </div>
+        `
+      )
+      .join('');
+  }
+
   function renderReservations() {
-    const reservations = (bootstrapData && bootstrapData.reservations) || [];
-    reservationsList.innerHTML = '';
-    reservationsEmpty.hidden = reservations.length > 0;
+    const reservations = state.bootstrap.reservations || [];
+    const container = byId('reservations-list');
+    const empty = byId('reservations-empty');
+    container.innerHTML = '';
+    empty.hidden = reservations.length > 0;
     reservations.forEach((row) => {
       const card = document.createElement('article');
       card.className = 'reservation-card';
-
-      const bodyText = [
-        `Date: ${row.request && row.request.preferredDate ? row.request.preferredDate : '-'}`,
-        `Time: ${row.request && row.request.preferredTime ? row.request.preferredTime : '-'}`,
-        `Guests: ${row.request && row.request.guestCount != null ? row.request.guestCount : '-'}`,
-        row.request && row.request.notes ? `Notes: ${row.request.notes}` : '',
-      ]
-        .filter(Boolean)
-        .join('\n');
-
       card.innerHTML = `
         <div class="reservation-head">
           <div>
-            <h3 class="reservation-title">${row.customer.firstName} ${row.customer.lastName}</h3>
+            <h3 class="reservation-title">${esc(row.customer.firstName)} ${esc(row.customer.lastName)}</h3>
             <div class="reservation-meta">
-              <span>${row.customer.email}</span>
-              <span>${row.customer.phone || 'No phone'}</span>
-              <span>${formatDateTime(row.createdAt)}</span>
+              <span>${esc(row.customer.email)}</span>
+              <span>${esc(row.customer.phone || 'No phone')}</span>
+              <span>${esc(formatDateTime(row.createdAt))}</span>
             </div>
           </div>
-          <span class="reservation-chip">${row.status}</span>
+          <span class="reservation-chip">${esc(row.status)}</span>
         </div>
         <div class="reservation-grid">
           <div>
-            <p class="panel-kicker">Request</p>
-            <p class="reservation-body"></p>
+            <p class="panel-kicker">Request details</p>
+            <p class="reservation-body">Date: ${esc(row.request.preferredDate || '-')}\nTime: ${esc(row.request.preferredTime || '-')}\nGuests: ${esc(row.request.guestCount == null ? '-' : row.request.guestCount)}${row.request.notes ? `\nNotes: ${esc(row.request.notes)}` : ''}</p>
           </div>
           <div>
             <p class="panel-kicker">Wix sync</p>
-            <p class="reservation-body">${row.wixSync && row.wixSync.ok ? 'Synced to Wix CRM' : row.wixSync && row.wixSync.error ? row.wixSync.error : 'Pending'}</p>
+            <p class="reservation-body">${esc(
+              row.wixSync && row.wixSync.ok ? 'Synced to Wix CRM' : row.wixSync && row.wixSync.error ? row.wixSync.error : 'Pending'
+            )}</p>
           </div>
         </div>
       `;
-      card.querySelector('.reservation-body').textContent = bodyText;
 
       const actions = document.createElement('div');
       actions.className = 'reservation-actions';
+
       const statusSelect = document.createElement('select');
       ['pending', 'confirmed', 'completed', 'cancelled', 'blocked'].forEach((status) => {
         const option = document.createElement('option');
@@ -151,14 +476,15 @@
       });
 
       const noteInput = document.createElement('textarea');
+      noteInput.className = 'reservation-note';
       noteInput.rows = 3;
-      noteInput.placeholder = 'Internal note for this request';
+      noteInput.placeholder = 'Internal note for this reservation';
       noteInput.value = row.adminNote || '';
 
       const saveBtn = document.createElement('button');
       saveBtn.type = 'button';
       saveBtn.className = 'primary-button';
-      saveBtn.textContent = 'Save status';
+      saveBtn.textContent = 'Save reservation';
       saveBtn.addEventListener('click', async () => {
         saveBtn.disabled = true;
         try {
@@ -170,10 +496,10 @@
               adminNote: noteInput.value,
             }),
           });
-          if (!res.ok) throw new Error('Unable to save reservation');
-          const data = await res.json();
-          const idx = bootstrapData.reservations.findIndex((item) => item.id === row.id);
-          if (idx !== -1) bootstrapData.reservations[idx] = data.reservation;
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error(data.detail || data.error || 'Unable to save reservation');
+          const idx = state.bootstrap.reservations.findIndex((item) => item.id === row.id);
+          if (idx !== -1) state.bootstrap.reservations[idx] = data.reservation;
           renderReservations();
           updateSummary();
         } catch (err) {
@@ -187,16 +513,18 @@
       actions.appendChild(statusSelect);
       actions.appendChild(saveBtn);
       card.appendChild(actions);
-      reservationsList.appendChild(card);
+      container.appendChild(card);
     });
   }
 
-  function renderBootstrap() {
-    if (!bootstrapData) return;
-    contentJson.value = JSON.stringify(bootstrapData.content, null, 2);
-    availabilityNote.value = bootstrapData.availability.note || '';
-    blockedDates.value = blockedDatesToText(bootstrapData.availability.blockedDates || []);
+  function renderDashboard() {
     updateSummary();
+    renderHomepageFields();
+    renderCuisineSelect();
+    renderMenuEditor();
+    renderServiceSelect();
+    renderServiceEditor();
+    renderAvailabilityEditor();
     renderReservations();
   }
 
@@ -204,23 +532,152 @@
     const res = await apiFetch('/api/admin/bootstrap');
     if (res.status === 401) {
       setToken('');
-      dashboard.hidden = true;
-      logoutBtn.hidden = true;
-      loginCard.hidden = false;
+      byId('dashboard').hidden = true;
+      byId('logout-btn').hidden = true;
+      byId('login-card').hidden = false;
       return;
     }
     if (!res.ok) throw new Error('Unable to load admin data');
-    bootstrapData = await res.json();
-    loginCard.hidden = true;
-    dashboard.hidden = false;
-    logoutBtn.hidden = false;
-    renderBootstrap();
+    state.bootstrap = await res.json();
+    byId('login-card').hidden = true;
+    byId('dashboard').hidden = false;
+    byId('logout-btn').hidden = false;
+    renderDashboard();
+    setActiveTab(state.activeTab);
   }
 
-  loginForm.addEventListener('submit', async (event) => {
+  function collectHomepageContent() {
+    const next = clone(state.bootstrap.content);
+    next.site.hero.headline = byId('hp-hero-headline').value.trim();
+    next.site.hero.tagline = byId('hp-hero-tagline').value.trim();
+    next.site.hero.lede = byId('hp-hero-lede').value.trim();
+    next.site.quote.text = byId('hp-quote-text').value.trim();
+    next.site.quote.cite = byId('hp-quote-cite').value.trim();
+    next.site.cuisinesSection.lede = byId('hp-cuisines-lede').value.trim();
+    next.site.cuisinesSection.noticeKicker = byId('hp-cuisines-kicker').value.trim();
+    next.site.cuisinesSection.noticeBody = byId('hp-cuisines-body').value.trim();
+    next.site.servicesSection.lede = byId('hp-services-lede').value.trim();
+    next.site.servicesSection.noticeKicker = byId('hp-services-kicker').value.trim();
+    next.site.servicesSection.noticeBody = byId('hp-services-body').value.trim();
+    next.site.craft.eyebrow = byId('hp-craft-eyebrow').value.trim();
+    next.site.craft.title = byId('hp-craft-title').value.trim();
+    next.site.craft.body1 = byId('hp-craft-body1').value.trim();
+    next.site.craft.body2 = byId('hp-craft-body2').value.trim();
+    next.site.cta.headline = byId('hp-cta-headline').value.trim();
+    next.site.cta.summary = byId('hp-cta-summary').value.trim();
+    next.site.booking.title = byId('hp-booking-title').value.trim();
+    next.site.booking.lede = byId('hp-booking-lede').value.trim();
+    next.site.booking.successTitle = byId('hp-booking-success-title').value.trim();
+    next.site.booking.successText = byId('hp-booking-success-text').value.trim();
+    next.site.booking.fallbackUrl = byId('hp-booking-fallback-url').value.trim();
+    next.site.detailNotice = byId('hp-detail-notice').value.trim();
+    next.site.contact.title = byId('hp-contact-title').value.trim();
+    next.site.contact.subtitle = byId('hp-contact-subtitle').value.trim();
+    next.site.contact.phone = byId('hp-contact-phone').value.trim();
+    next.site.contact.phoneHref = byId('hp-contact-phone-href').value.trim();
+    next.site.contact.email = byId('hp-contact-email').value.trim();
+    next.site.contact.emailHref = byId('hp-contact-email-href').value.trim();
+    next.site.contact.website = byId('hp-contact-website').value.trim();
+    next.site.contact.websiteHref = byId('hp-contact-website-href').value.trim();
+    next.site.contact.location = byId('hp-contact-location').value.trim();
+    next.site.contact.instagramHref = byId('hp-contact-instagram').value.trim();
+    next.site.contact.whatsappHref = byId('hp-contact-whatsapp').value.trim();
+    next.site.contact.facebookHref = byId('hp-contact-facebook').value.trim();
+    return next;
+  }
+
+  function collectBlocks(prefix, baseBlocks) {
+    return baseBlocks.map((block, blockIndex) => ({
+      title: byId(`${prefix}-block-${blockIndex}-title`).value.trim(),
+      image: byId(`${prefix}-block-${blockIndex}-image`).value.trim(),
+      items: (block.items || []).map((item, itemIndex) => ({
+        name: byId(`${prefix}-block-${blockIndex}-item-${itemIndex}-name`).value.trim(),
+        desc: byId(`${prefix}-block-${blockIndex}-item-${itemIndex}-desc`).value.trim(),
+      })),
+    }));
+  }
+
+  function collectCuisineContent() {
+    const next = clone(state.bootstrap.content);
+    const slug = state.selectedCuisineSlug;
+    const card = next.cuisineCards.find((row) => row.slug === slug);
+    const detail = next.cuisines[slug];
+    card.title = byId('menu-card-title').value.trim();
+    card.no = byId('menu-card-no').value.trim();
+    card.tagline = byId('menu-card-tagline').value.trim();
+    detail.intro = byId('menu-intro').value.trim();
+    detail.blocks = collectBlocks('menu', detail.blocks);
+    return next;
+  }
+
+  function collectServiceContent() {
+    const next = clone(state.bootstrap.content);
+    const slug = state.selectedServiceSlug;
+    const card = next.serviceCards.find((row) => row.slug === slug);
+    const detail = next.services[slug];
+    card.title = byId('service-card-title').value.trim();
+    card.no = byId('service-card-no').value.trim();
+    card.tagline = byId('service-card-tagline').value.trim();
+    detail.intro = byId('service-intro').value.trim();
+    detail.blocks = collectBlocks('service', detail.blocks);
+    return next;
+  }
+
+  function collectAvailability() {
+    const blockedDates = Array.from(document.querySelectorAll('#blocked-dates-list .row-card')).map((row) => ({
+      date: row.querySelector('[data-blocked-date]').value,
+      label: row.querySelector('[data-blocked-label]').value.trim(),
+    }));
+    return {
+      note: byId('availability-note').value.trim(),
+      blockedDates: blockedDates.filter((row) => row.date),
+    };
+  }
+
+  async function saveContent(nextContent, statusId, successText) {
+    const statusEl = byId(statusId);
+    setMessage(statusEl, '', false);
+    try {
+      const res = await apiFetch('/api/admin/content', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nextContent),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.detail || data.error || 'Unable to save content');
+      state.bootstrap.content = data.content;
+      renderDashboard();
+      setActiveTab(state.activeTab);
+      setMessage(statusEl, successText, false);
+    } catch (err) {
+      setMessage(statusEl, err.message || 'Unable to save content', true);
+    }
+  }
+
+  async function saveAvailability() {
+    const statusEl = byId('availability-status');
+    setMessage(statusEl, '', false);
+    try {
+      const res = await apiFetch('/api/admin/availability', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(collectAvailability()),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.detail || data.error || 'Unable to save availability');
+      state.bootstrap.availability = data.availability;
+      renderAvailabilityEditor();
+      updateSummary();
+      setMessage(statusEl, 'Availability saved successfully.', false);
+    } catch (err) {
+      setMessage(statusEl, err.message || 'Unable to save availability', true);
+    }
+  }
+
+  byId('login-form').addEventListener('submit', async (event) => {
     event.preventDefault();
-    setMessage(loginError, '', true);
-    const form = new FormData(loginForm);
+    setMessage(byId('login-error'), '', true);
+    const form = new FormData(event.currentTarget);
     try {
       const res = await fetch(apiUrl('/api/admin/login'), {
         method: 'POST',
@@ -231,80 +688,75 @@
         }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(data.detail || data.error || 'Login failed');
-      }
+      if (!res.ok) throw new Error(data.detail || data.error || 'Login failed');
       setToken(data.token);
-      loginForm.reset();
+      event.currentTarget.reset();
       await loadBootstrap();
     } catch (err) {
-      setMessage(loginError, err.message || 'Login failed', true);
+      setMessage(byId('login-error'), err.message || 'Login failed', true);
     }
   });
 
-  document.getElementById('save-content-btn').addEventListener('click', async () => {
-    setMessage(contentStatus, '', false);
-    let parsed;
-    try {
-      parsed = JSON.parse(contentJson.value);
-    } catch {
-      setMessage(contentStatus, 'Content JSON is not valid.', true);
-      return;
-    }
-    try {
-      const res = await apiFetch('/api/admin/content', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(parsed),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.detail || data.error || 'Unable to save content');
-      bootstrapData.content = data.content;
-      contentJson.value = JSON.stringify(data.content, null, 2);
-      setMessage(contentStatus, 'Content saved successfully.', false);
-    } catch (err) {
-      setMessage(contentStatus, err.message || 'Unable to save content', true);
-    }
+  byId('save-homepage-btn').addEventListener('click', () => {
+    saveContent(collectHomepageContent(), 'homepage-status', 'Homepage content saved successfully.');
   });
 
-  document.getElementById('save-availability-btn').addEventListener('click', async () => {
-    setMessage(availabilityStatus, '', false);
-    try {
-      const res = await apiFetch('/api/admin/availability', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          note: availabilityNote.value,
-          blockedDates: parseBlockedDates(blockedDates.value),
-        }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.detail || data.error || 'Unable to save availability');
-      bootstrapData.availability = data.availability;
-      blockedDates.value = blockedDatesToText(data.availability.blockedDates || []);
-      setMessage(availabilityStatus, 'Availability saved successfully.', false);
-      updateSummary();
-    } catch (err) {
-      setMessage(availabilityStatus, err.message || 'Unable to save availability', true);
-    }
+  byId('save-menus-btn').addEventListener('click', () => {
+    saveContent(collectCuisineContent(), 'menus-status', 'Selected cuisine saved successfully.');
   });
 
-  document.getElementById('refresh-btn').addEventListener('click', async () => {
-    await loadBootstrap().catch((err) => alert(err.message || 'Unable to refresh'));
+  byId('save-services-btn').addEventListener('click', () => {
+    saveContent(collectServiceContent(), 'services-status', 'Selected service saved successfully.');
   });
 
-  logoutBtn.addEventListener('click', () => {
+  byId('save-availability-btn').addEventListener('click', () => {
+    saveAvailability();
+  });
+
+  byId('refresh-btn').addEventListener('click', async () => {
+    await loadBootstrap().catch((err) => alert(err.message || 'Unable to refresh data'));
+  });
+
+  byId('logout-btn').addEventListener('click', () => {
     setToken('');
-    bootstrapData = null;
-    dashboard.hidden = true;
-    logoutBtn.hidden = true;
-    loginCard.hidden = false;
+    state.bootstrap = null;
+    byId('dashboard').hidden = true;
+    byId('logout-btn').hidden = true;
+    byId('login-card').hidden = false;
+  });
+
+  document.querySelectorAll('.admin-tab').forEach((btn) => {
+    btn.addEventListener('click', () => setActiveTab(btn.dataset.tab));
+  });
+
+  byId('cuisine-select').addEventListener('change', (event) => {
+    state.selectedCuisineSlug = event.target.value;
+    renderMenuEditor();
+  });
+
+  byId('service-select').addEventListener('change', (event) => {
+    state.selectedServiceSlug = event.target.value;
+    renderServiceEditor();
+  });
+
+  byId('add-blocked-date-btn').addEventListener('click', () => {
+    if (!state.bootstrap) return;
+    state.bootstrap.availability.blockedDates.push({ date: '', label: '' });
+    renderAvailabilityEditor();
+  });
+
+  byId('blocked-dates-list').addEventListener('click', (event) => {
+    const btn = event.target.closest('[data-remove-blocked]');
+    if (!btn || !state.bootstrap) return;
+    const index = Number(btn.getAttribute('data-remove-blocked'));
+    state.bootstrap.availability.blockedDates.splice(index, 1);
+    renderAvailabilityEditor();
   });
 
   if (getToken()) {
     loadBootstrap().catch(() => {
       setToken('');
-      loginCard.hidden = false;
+      byId('login-card').hidden = false;
     });
   }
 })();
