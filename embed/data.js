@@ -1,14 +1,12 @@
 /**
  * Editable copy for detail panels (English).
- * Each cuisine / service has: intro + blocks (Starters, Hot appetizers, Mains, Desserts
- * OR Events, Training, Invitations-style columns for services).
+ * Each cuisine / service has: intro + blocks rendered inside the detail sheet.
  */
 (function (global) {
   function pad2(n) {
     return String(n).padStart(2, '0');
   }
 
-  /** One illustrative image per course block; paths resolve under each cuisine folder. */
   function cuisineBlockImage(slug, index1Based) {
     return 'images/cuisines/' + slug + '/gallery/' + pad2(index1Based) + '.jpg';
   }
@@ -17,71 +15,8 @@
     return 'images/services-and-occasions/' + slug + '/gallery/' + pad2(index1Based) + '.jpg';
   }
 
-  function cuisineDefaults(slug, themeLabel) {
-    return {
-      intro:
-        'Curated courses inspired by ' +
-        themeLabel +
-        '. Selections below are representative — Chef Siler tailors every menu to your occasion.',
-      blocks: [
-        {
-          title: 'Starters & Cold Appetizers',
-          image: cuisineBlockImage(slug, 1),
-          items: [
-            {
-              name: 'Seasonal crudités & artisan board',
-              desc: 'Market vegetables, aged cheese, house preserves, and herb oils.',
-            },
-            {
-              name: 'Chilled soup presentation',
-              desc: 'Silky texture, bright acidity, micro herbs — served as an elegant opener.',
-            },
-          ],
-        },
-        {
-          title: 'Hot Appetizers',
-          image: cuisineBlockImage(slug, 2),
-          items: [
-            {
-              name: 'Pass-around small plates',
-              desc: 'Perfectly timed bites — crisp, aromatic, and balanced for ' + themeLabel + '.',
-            },
-            {
-              name: 'Skillet & roast accents',
-              desc: 'Depth of flavor without heaviness; composed for the pace of your gathering.',
-            },
-          ],
-        },
-        {
-          title: 'Main Courses',
-          image: cuisineBlockImage(slug, 3),
-          items: [
-            {
-              name: 'Chef’s centerpiece plate',
-              desc: 'Proteins and accompaniments composed with precision — seasonal and refined.',
-            },
-            {
-              name: 'Vegetable-forward option',
-              desc: 'A complete plate celebrating texture, jus, and garnish at the same standard.',
-            },
-          ],
-        },
-        {
-          title: 'Desserts',
-          image: cuisineBlockImage(slug, 4),
-          items: [
-            {
-              name: 'Plated sweet finale',
-              desc: 'Balanced sweetness, temperature contrast, and a memorable last impression.',
-            },
-            {
-              name: 'Petits & sharing dessert',
-              desc: 'Optional closing course styled for your table and pacing.',
-            },
-          ],
-        },
-      ],
-    };
+  function item(name, desc) {
+    return { name, desc };
   }
 
   function serviceDefaults(slug, occasionLabel) {
@@ -95,71 +30,469 @@
           title: 'Events & Celebrations',
           image: serviceBlockImage(slug, 1),
           items: [
-            {
-              name: 'Timeline & flow',
-              desc: 'Arrival bites, seated courses or stations, and a clear rhythm for guests.',
-            },
-            {
-              name: 'Venue coordination notes',
-              desc: 'Buffet, plated, or hybrid — aligned with your space and guest count.',
-            },
+            item('Timeline & flow', 'Arrival bites, seated courses or stations, and a clear rhythm for guests.'),
+            item('Venue coordination notes', 'Buffet, plated, or hybrid - aligned with your space and guest count.'),
           ],
         },
         {
           title: 'Workshops & Culinary Training',
           image: serviceBlockImage(slug, 2),
           items: [
-            {
-              name: 'Hands-on sessions',
-              desc: 'Technique-focused modules — knife skills, sauces, plating — paced for your group.',
-            },
-            {
-              name: 'Demonstration format',
-              desc: 'Chef-led narrative with tasting flights and Q&A.',
-            },
+            item(
+              'Hands-on sessions',
+              'Technique-focused modules - knife skills, sauces, plating - paced for your group.'
+            ),
+            item('Demonstration format', 'Chef-led narrative with tasting flights and Q&A.'),
           ],
         },
         {
           title: 'Invitations & Private Gatherings',
           image: serviceBlockImage(slug, 3),
           items: [
-            {
-              name: 'Intimate dining format',
-              desc: 'Chef’s table energy with discreet service and conversational pacing.',
-            },
-            {
-              name: 'Welcome reception styling',
-              desc: 'Passed bites and beverage pairing cadence before the main experience.',
-            },
+            item('Intimate dining format', 'Chef’s table energy with discreet service and conversational pacing.'),
+            item(
+              'Welcome reception styling',
+              'Passed bites and beverage pairing cadence before the main experience.'
+            ),
           ],
         },
         {
           title: 'Signature Experiences',
           image: serviceBlockImage(slug, 4),
           items: [
-            {
-              name: 'Custom menu arc',
-              desc: 'Story-led courses reflecting your occasion from first bite to dessert.',
-            },
-            {
-              name: 'Add-on enhancements',
-              desc: 'Wine coordination notes, printed menus, and dietary accommodations.',
-            },
+            item('Custom menu arc', 'Story-led courses reflecting your occasion from first bite to dessert.'),
+            item('Add-on enhancements', 'Wine coordination notes, printed menus, and dietary accommodations.'),
           ],
         },
       ],
     };
   }
 
-  global.SC_SITE = {
-    cuisines: {
-      'american-cuisine': cuisineDefaults('american-cuisine', 'American cuisine'),
-      'french-cuisine': cuisineDefaults('french-cuisine', 'French cuisine'),
-      'greek-cuisine': cuisineDefaults('greek-cuisine', 'Greek cuisine'),
-      'italian-cuisine': cuisineDefaults('italian-cuisine', 'Italian cuisine'),
-      'middle-eastern-cuisine': cuisineDefaults('middle-eastern-cuisine', 'Middle Eastern cuisine'),
-      'turkish-cuisine': cuisineDefaults('turkish-cuisine', 'Turkish cuisine'),
+  const CUISINE_COPY = {
+    'american-cuisine': {
+      intro:
+        'Three illustrative American menu directions for Siler Chef. Menus can be refined to the client’s preferences or redesigned from scratch for the occasion.',
+      blocks: [
+        {
+          title: 'Set 1 · The Modern American Prime',
+          image: cuisineBlockImage('american-cuisine', 1),
+          items: [
+            item(
+              'Appetizer',
+              'Jumbo Lump Crab Cake - Pan-seared with a citrus-remoulade, pickled micro-fennel, and Old Bay coral tuile.'
+            ),
+            item(
+              'The Bakery',
+              'Maple-Glazed Parker House Rolls - Hand-kneaded, buttery milk rolls served with whipped sea-salt honey butter.'
+            ),
+            item(
+              'Intermezzo',
+              'Spiced Cranberry & Blood Orange Sorbet - A vibrant, tart palate cleanser to prepare for the richness of the steak.'
+            ),
+            item(
+              'Main Entree',
+              'Center-Cut Filet Mignon au Poivre - Dry-aged beef, cognac-peppercorn reduction, garlic-confit marble potatoes, and charred broccolini.'
+            ),
+            item(
+              'Grand Finale',
+              'Bourbon Vanilla Bean Ice Cream - Freshly churned, served over a warm smoked-apple Tatin with a salted caramel drizzle.'
+            ),
+          ],
+        },
+        {
+          title: 'Set 2 · The American Harvest',
+          image: cuisineBlockImage('american-cuisine', 2),
+          items: [
+            item(
+              'Appetizer',
+              'Butter-Poached Maine Lobster - Sweet corn veloute, tarragon oil, and crispy leeks.'
+            ),
+            item(
+              'The Bakery',
+              'Buttermilk & Chive Infused Biscuits - Hand-laminated artisanal biscuits served with whipped maple-bourbon butter.'
+            ),
+            item(
+              'Intermezzo',
+              'Honeyed Green Apple Sorbet - A crisp, garden-fresh palate cleanser with a touch of sweetness.'
+            ),
+            item(
+              'Main Entree',
+              'Pan-Seared Muscovy Duck Breast - Roasted parsnip puree, blackberry-balsamic reduction, and honey-glazed baby turnips.'
+            ),
+            item(
+              'Grand Finale',
+              'Warm Bourbon-Apple Galette - A rustic, hand-folded tart served with house-spun smoked vanilla bean gelato and a salted caramel drizzle.'
+            ),
+          ],
+        },
+        {
+          title: 'Set 3 · The Pacific Horizon',
+          image: cuisineBlockImage('american-cuisine', 3),
+          items: [
+            item(
+              'Appetizer',
+              'Pan-Seared Alaskan Halibut Cheeks - Served over a pea-mint puree, with crispy prosciutto shards and a lemon-caper emulsion.'
+            ),
+            item(
+              'The Bakery',
+              'Rosemary & Sea Salt Pretzel Buns - Artisanal, slow-kneaded soft pretzel rolls served with a sharp Vermont cheddar and craft ale dip.'
+            ),
+            item(
+              'Intermezzo',
+              'Wild Raspberry & Tarragon Sorbet - Small-batch botanical sorbet to refresh the senses before the main course.'
+            ),
+            item(
+              'Main Entree',
+              '48-Hour Braised Prime Short Ribs - Red wine reduction, silky parsnip mousseline, and honey-roasted heirloom carrots.'
+            ),
+            item(
+              'Grand Finale',
+              'Warm Georgia Peach & Pecan Cobbler - A buttery, hand-folded crust served with house-spun bourbon vanilla bean gelato and a dash of cinnamon dust.'
+            ),
+          ],
+        },
+      ],
     },
+    'italian-cuisine': {
+      intro:
+        'Three elevated Italian menu directions shaped around artisanal technique, regional warmth, and elegant pacing for private dining.',
+      blocks: [
+        {
+          title: 'Set 1 · La Dolce Vita',
+          image: cuisineBlockImage('italian-cuisine', 1),
+          items: [
+            item(
+              'Appetizer',
+              'Wild Mushroom Arancini - Crispy risotto spheres infused with black truffle, served over a silky parmesan fonduta.'
+            ),
+            item(
+              'The Bakery',
+              'Rosemary & Smoked Sea Salt Focaccia - 48-hour fermented high-hydration dough, served with aged balsamic and cold-pressed olive oil.'
+            ),
+            item(
+              'Intermezzo',
+              'Sicilian Lemon & Prosecco Sorbet - A sharp, bubbly, and refreshing citrus zest to lift the palate.'
+            ),
+            item(
+              'Main Entree',
+              'Braised Osso Buco over Saffron Risotto - Slow-cooked veal shank, Milanese-style risotto, and an aromatic gremolata.'
+            ),
+            item(
+              'Grand Finale',
+              'Toasted Hazelnut Gelato - Freshly churned Italian hazelnut gelato, served with a dark chocolate ganache and almond biscotti crumble.'
+            ),
+          ],
+        },
+        {
+          title: 'Set 2 · The Venetian Soiree',
+          image: cuisineBlockImage('italian-cuisine', 2),
+          items: [
+            item(
+              'Appetizer',
+              'Pan-Seared Diver Scallops - Cauliflower silk, crispy pancetta, and gremolata oil.'
+            ),
+            item(
+              'The Bakery',
+              'Artisanal Ciabatta with Roasted Garlic - High-hydration, hearth-baked bread served with Sicilian olive oil and sun-dried tomato tapenade.'
+            ),
+            item(
+              'Intermezzo',
+              'Blood Orange & Campari Sorbet - A sophisticated, bitter-sweet citrus zest to awaken the senses.'
+            ),
+            item(
+              'Main Entree',
+              'Truffle-Infused Wild Mushroom Pappardelle - Hand-cut pasta tossed in a light porcini cream with shaved 24-month Parmigiano-Reggiano.'
+            ),
+            item(
+              'Grand Finale',
+              'Dark Chocolate Flourless Torte - A dense, rich chocolate cake accompanied by silky mascarpone & espresso gelato and a hand-pulled espresso tuile.'
+            ),
+          ],
+        },
+        {
+          title: 'Set 3 · The Tuscan Hearth',
+          image: cuisineBlockImage('italian-cuisine', 3),
+          items: [
+            item(
+              'Appetizer',
+              'Vitello Tonnato Moderne - Shaved veal tenderloin, creamy caper-tuna emulsion, micro-arugula, and salt-cured egg yolk.'
+            ),
+            item(
+              'The Bakery',
+              'Stone-Baked Focaccia Barese - High-hydration, hand-stretched dough topped with cherry tomatoes, olives, and cold-pressed Puglia olive oil.'
+            ),
+            item(
+              'Intermezzo',
+              'Aperol & Ruby Grapefruit Sorbet - A sophisticated, slightly bitter-sweet citrus zest to prepare for the main event.'
+            ),
+            item(
+              'Main Entree',
+              'Herb-Roasted Veal Medallions - Porcini mushroom ragu, truffle-infused polenta, and garlic-sauteed kale.'
+            ),
+            item(
+              'Grand Finale',
+              'Pistachio Semifreddo - A frozen Italian mousse served with freshly churned Amarena cherry gelato and a toasted almond brittle.'
+            ),
+          ],
+        },
+      ],
+    },
+    'greek-cuisine': {
+      intro:
+        'Three Greek coastal menu directions built around clarity, herbs, citrus, and polished Aegean hospitality.',
+      blocks: [
+        {
+          title: 'Set 1 · The Aegean Odyssey',
+          image: cuisineBlockImage('greek-cuisine', 1),
+          items: [
+            item(
+              'Appetizer',
+              'Charred Aegean Octopus - Smoked over grapevine, served with fava puree, caper berries, and a lemon-oregano vinaigrette.'
+            ),
+            item(
+              'The Bakery',
+              'Sourdough Pita & Whipped Feta - Hand-stretched, stone-fired sourdough pita served with a spicy Tirokafteri dip and Kalamata olives.'
+            ),
+            item(
+              'Intermezzo',
+              'Watermelon & Ouzo Sorbet - A unique, refreshing sorbet with a subtle anise finish, echoing the spirit of the islands.'
+            ),
+            item(
+              'Main Entree',
+              'Herb-Crusted Rack of Lamb - Pistachio and mint crust, served with lemon-garlic roasted potatoes and a honey-red wine reduction.'
+            ),
+            item(
+              'Grand Finale',
+              'Greek Yogurt & Wild Honey Ice Cream - Tangy, creamy frozen yogurt churned in-house, topped with caramelized walnuts and thyme-infused honey.'
+            ),
+          ],
+        },
+        {
+          title: 'Set 2 · The Hellenic Coast',
+          image: cuisineBlockImage('greek-cuisine', 2),
+          items: [
+            item(
+              'Appetizer',
+              'Shrimp Saganaki Elevated - Tiger prawns in a rich tomato-ouzo broth, finished with barrel-aged feta pearls.'
+            ),
+            item(
+              'The Bakery',
+              'Sesame-Crusted Koulouri Rolls - Soft, braided Greek bread served with a whipped Kalamata olive butter.'
+            ),
+            item(
+              'Intermezzo',
+              'Lemon & Fresh Garden Mint Sorbet - An ultra-refreshing, botanical palate cleanser.'
+            ),
+            item(
+              'Main Entree',
+              'Salt-Crusted Mediterranean Sea Bass - Whole-baked and deboned, served with an extra virgin olive oil-lemon emulsion and wild-foraged greens.'
+            ),
+            item(
+              'Grand Finale',
+              'Honey-Orange Portokalopita - Traditional syrupy orange cake served with small-batch Greek yogurt & wild honey ice cream and toasted pistachio crumble.'
+            ),
+          ],
+        },
+        {
+          title: 'Set 3 · The Cretan Spirit',
+          image: cuisineBlockImage('greek-cuisine', 3),
+          items: [
+            item(
+              'Appetizer',
+              'Grilled Calamari Ink-Stained - Charred over open flame, served with a squid-ink risotto base and a citrus-ouzo glaze.'
+            ),
+            item(
+              'The Bakery',
+              'Semolina-Crusted Sourdough Loaf - Long-fermentation artisanal bread with a golden crust, served with whipped salted butter and sea fennel.'
+            ),
+            item(
+              'Intermezzo',
+              'Pomegranate & Fresh Mint Sorbet - House-spun vibrant crimson sorbet with a cool, refreshing herbal finish.'
+            ),
+            item(
+              'Main Entree',
+              'Pan-Roasted Mediterranean Sea Bream - Served with horta, lemon-oil emulsion, and roasted artichoke hearts.'
+            ),
+            item(
+              'Grand Finale',
+              'Deconstructed Baklava Cheesecake - Silky cream cheese mousse, honey-walnut crumble, and house-made cinnamon & thyme honey gelato.'
+            ),
+          ],
+        },
+      ],
+    },
+    'turkish-cuisine': {
+      intro:
+        'Three luxury Turkish menu directions that reinterpret Anatolian and Ottoman references with modern fine-dining structure.',
+      blocks: [
+        {
+          title: 'Set 1 · Ottoman Grandeur',
+          image: cuisineBlockImage('turkish-cuisine', 1),
+          items: [
+            item(
+              'Appetizer',
+              'Smoked Eggplant Hunkar Bites - Silky eggplant puree with aged kashar cheese, topped with slow-cooked pulled lamb and pomegranate arils.'
+            ),
+            item(
+              'The Bakery',
+              'Black Cumin Infused Pide Rolls - Traditional tirnak pidesi reimagined as artisanal rolls, served with cultured sheep’s milk butter and honeycomb.'
+            ),
+            item(
+              'Intermezzo',
+              'Pomegranate & Rosewater Sorbet - A floral and exotic crimson sorbet inspired by the gardens of Topkapi Palace.'
+            ),
+            item(
+              'Main Entree',
+              'Slow-Roasted Ishak Pasa Short Rib - 12-hour braised beef over a bed of creamy smoked artichoke hearts and a rich pan jus.'
+            ),
+            item(
+              'Grand Finale',
+              'Mastic & Pistachio Ice Cream - Elastic and aromatic mastic ice cream served with warm kabak tatlisi and a tahini-walnut brittle.'
+            ),
+          ],
+        },
+        {
+          title: 'Set 2 · The Sultan’s Table',
+          image: cuisineBlockImage('turkish-cuisine', 2),
+          items: [
+            item(
+              'Appetizer',
+              'Micro-Manti with Smoked Yogurt - Hand-rolled tiny dumplings served with burnt Aleppo-pepper butter and garlic-infused yogurt.'
+            ),
+            item(
+              'The Bakery',
+              'Truffle-Scented Artisanal Simit - Molasses-dipped sesame rings served with cultured sheep’s milk butter.'
+            ),
+            item(
+              'Intermezzo',
+              'Black Mulberry Sorbet - An intense berry sorbet with a sharp, sophisticated acidity.'
+            ),
+            item(
+              'Main Entree',
+              'Slow-Roasted Kuyu Kebabi Lamb Shank - 14-hour braised lamb served over a bed of buttery ic pilav with pine nuts and currants.'
+            ),
+            item(
+              'Grand Finale',
+              'Warm Caramelized Pumpkin Confit - Served with a tahini-walnut brittle and artisanal roasted walnut & mastic gelato for a perfect balance of temperatures.'
+            ),
+          ],
+        },
+        {
+          title: 'Set 3 · Anatolian Silk',
+          image: cuisineBlockImage('turkish-cuisine', 3),
+          items: [
+            item(
+              'Appetizer',
+              'Aegean Seabass Ceviche - Cured in lime and raki, served with pomegranate pearls, fresh dill, and extra virgin olive oil.'
+            ),
+            item(
+              'The Bakery',
+              'Stone-Fired Lavash Air Bread - Hand-rolled and puffed to perfection, served with a trio of artisanal mezze: truffle hummus, muhammara, and smoked yogurt.'
+            ),
+            item(
+              'Intermezzo',
+              'Quince & Clove Sorbet - A unique, aromatic, and sophisticated palate cleanser inspired by Ottoman palace gardens.'
+            ),
+            item(
+              'Main Entree',
+              'Alinazik Reimagined - Filet mignon tips served over a bed of wood-fire smoked eggplant mousse and burnt brown-pepper butter.'
+            ),
+            item(
+              'Grand Finale',
+              'Crispy Kadayif Nest - Golden hand-shredded phyllo served with warm roasted apricots and small-batch mastic-infused clotted cream gelato.'
+            ),
+          ],
+        },
+      ],
+    },
+    'middle-eastern-cuisine': {
+      intro:
+        'Three international fusion menu directions that blend borderless flavor references with precise private-chef execution.',
+      blocks: [
+        {
+          title: 'Set 1 · The Global Gastronome',
+          image: cuisineBlockImage('middle-eastern-cuisine', 1),
+          items: [
+            item(
+              'Appetizer',
+              'Ahi Tuna Sashimi & Avocado Silk - Togarashi-crusted tuna, ginger-soy emulsion, and wasabi-infused cucumber ribbons.'
+            ),
+            item(
+              'The Bakery',
+              'Hokkaido Milk Bread & Miso Butter - Ultra-soft Japanese-style rolls hand-kneaded to perfection, served with an umami-rich miso-infused butter.'
+            ),
+            item(
+              'Intermezzo',
+              'Yuzu & Fresh Ginger Sorbet - An electric, citrusy zing with a hint of ginger spice to reset the taste buds.'
+            ),
+            item(
+              'Main Entree',
+              'Miso-Glazed Chilean Sea Bass - Pan-seared and glazed with sweet white miso, served over forbidden black rice and a coconut-lemongrass reduction.'
+            ),
+            item(
+              'Grand Finale',
+              'Salted Caramel & Espresso Gelato - A rich, bold fusion of dark-roast espresso and buttery caramel, served with a sea-salt chocolate tuile.'
+            ),
+          ],
+        },
+        {
+          title: 'Set 2 · The Continental Fusion',
+          image: cuisineBlockImage('middle-eastern-cuisine', 2),
+          items: [
+            item(
+              'Appetizer',
+              'Braised Kurobuta Pork Belly - Miso-maple glaze, ginger-pickled daikon, and toasted furikake.'
+            ),
+            item(
+              'The Bakery',
+              'Sourdough French Baguette - Long-fermented, crispy-crust bread served with seaweed-infused cultured butter.'
+            ),
+            item(
+              'Intermezzo',
+              'Pineapple & Pink Peppercorn Sorbet - A tropical burst with a subtle, sophisticated spicy kick.'
+            ),
+            item(
+              'Main Entree',
+              'Butter-Poached Australian Lobster Tail - Saffron-coconut reduction, forbidden black rice, and wok-fired bok choy.'
+            ),
+            item(
+              'Grand Finale',
+              'White Chocolate & Passion Fruit Tart - A delicate pastry shell with tart curd, paired with freshly churned ginger-lime gelato and a coconut-lime tuile.'
+            ),
+          ],
+        },
+        {
+          title: 'Set 3 · The Silk Road Fusion',
+          image: cuisineBlockImage('middle-eastern-cuisine', 3),
+          items: [
+            item(
+              'Appetizer',
+              'Duck Confit Dumplings - Hand-folded skins filled with five-spice duck, served in a delicate lemongrass-ginger consomme.'
+            ),
+            item(
+              'The Bakery',
+              'Black Garlic Infused Sourdough Rolls - Slow-kneaded dark artisanal rolls served with a creamy salted miso-butter.'
+            ),
+            item(
+              'Intermezzo',
+              'Lychee & Lemongrass Sorbet - Freshly churned exotic sorbet with a bright, electric zing to reset the palate.'
+            ),
+            item(
+              'Main Entree',
+              'Korean-Style Glazed Lamb Chops - Charred over high heat with a gochujang-honey glaze, served with kimchi-fried forbidden rice and baby bok choy.'
+            ),
+            item(
+              'Grand Finale',
+              'Matcha & White Chocolate Fondant - A molten core of Japanese green tea chocolate, served with house-made toasted black sesame gelato and a ginger-snap crumble.'
+            ),
+          ],
+        },
+      ],
+    },
+  };
+
+  global.SC_SITE = {
+    cuisines: CUISINE_COPY,
     services: {
       'anniversary-celebrations': serviceDefaults('anniversary-celebrations', 'anniversary celebrations'),
       'birthday-events': serviceDefaults('birthday-events', 'birthday gatherings'),
