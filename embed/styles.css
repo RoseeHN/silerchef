@@ -664,8 +664,7 @@ html.is-scrolled .site-header {
   }
 
   .whatsapp-fab {
-    right: max(0.9rem, env(safe-area-inset-right, 0px));
-    bottom: max(0.9rem, calc(env(safe-area-inset-bottom, 0px) + 0.35rem));
+    right: max(0rem, env(safe-area-inset-right, 0px));
   }
 }
 
@@ -1691,23 +1690,20 @@ main {
 .whatsapp-fab {
   position: fixed;
   top: 50%;
-  right: max(0.45rem, calc(env(safe-area-inset-right, 0px) + 0.2rem));
+  right: max(0rem, env(safe-area-inset-right, 0px));
   bottom: auto;
   transform: translateY(-50%);
   z-index: 120;
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  min-height: 3.5rem;
-  padding: 0.72rem 1.12rem 0.72rem 0.82rem;
-  border-radius: 1.2rem;
+  justify-content: center;
+  width: 3.7rem;
+  height: 3.7rem;
+  padding: 0;
+  border-radius: 1.15rem;
   border: 1px solid rgba(255, 255, 255, 0.18);
   text-decoration: none;
   color: #0c120f;
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
   background: linear-gradient(155deg, #2fe573 0%, #25d366 42%, #128c7e 100%);
   box-shadow:
     0 12px 30px rgba(0, 0, 0, 0.42),
@@ -1755,13 +1751,13 @@ main {
     position: fixed !important;
     top: auto !important;
     left: auto !important;
-    right: max(0.7rem, calc(env(safe-area-inset-right, 0px) + 0.35rem)) !important;
+    right: max(0.15rem, calc(env(safe-area-inset-right, 0px) + 0.05rem)) !important;
     bottom: max(1rem, calc(env(safe-area-inset-bottom, 0px) + 0.85rem)) !important;
     transform: none !important;
-    min-height: 3.35rem;
-    padding: 0.8rem 1rem 0.8rem 0.84rem;
-    border-radius: 1.15rem;
-    max-width: calc(100vw - 1.4rem);
+    width: 3.45rem;
+    height: 3.45rem;
+    padding: 0;
+    border-radius: 999px;
     z-index: 140;
   }
 
@@ -3738,12 +3734,8 @@ html.booking-open {
 
 @media (max-width: 380px) {
   .whatsapp-fab {
-    padding-inline: 0.82rem;
-  }
-
-  .whatsapp-fab__label {
-    font-size: 0.62rem;
-    letter-spacing: 0.1em;
+    width: 3.2rem;
+    height: 3.2rem;
   }
 }
 

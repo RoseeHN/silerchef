@@ -43,6 +43,7 @@ if (str_starts_with($requestPath, '/api/')) {
     route_api($requestPath, $requestMethod, $repository, $auth);
 }
 
+redirect_legacy_embed_paths($requestPath, $requestUri, $requestMethod);
 serve_embed_file($requestPath, $embedDir);
 
 function route_api(string $path, string $method, Repository $repository, AdminAuth $auth): void
@@ -234,6 +235,28 @@ function build_frame_ancestors_csp(): string
     }
 
     return 'frame-ancestors ' . implode(' ', $parts);
+}
+
+function redirect_legacy_embed_paths(string $requestPath, string $requestUri, string $requestMethod): void
+{
+    if (!in_array($requestMethod, ['GET', 'HEAD'], true)) {
+        return;
+    }
+
+    $normalizedPath = match ($requestPath) {
+        '/index.html', '/index', '/index/' => '/',
+        '/admin.html', '/admin/' => '/admin',
+        default => null,
+    };
+
+    if ($normalizedPath === null || $normalizedPath === $requestPath) {
+        return;
+    }
+
+    $query = parse_url($requestUri, PHP_URL_QUERY);
+    $location = $normalizedPath . ($query !== null && $query !== '' ? '?' . $query : '');
+    header('Location: ' . $location, true, 301);
+    exit;
 }
 
 function serve_embed_file(string $requestPath, string|false $embedDir): never
