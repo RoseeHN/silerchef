@@ -132,9 +132,3 @@ function valid_email(string $email): bool
 {
     return (bool) filter_var($email, FILTER_VALIDATE_EMAIL);
 }
-
-function booking_env(string $key): ?string
-{
-    $value = env_string($key, '');
-    return $value !== '' ? $value : null;
-}

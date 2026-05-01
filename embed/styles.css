@@ -61,9 +61,8 @@ body {
 }
 
 /*
- * Wix iframe: tek dikey kaydırma — scroll kökü html.
- * İçerik .page içinde taşarsa documentElement.scrollHeight tam yüksekliği verir;
- * postMessage ile iframe bu yüksekliğe çekilince iç çubuk kalkar, yalnızca Wix sayfası kayar.
+ * Tek dikey kaydırma için scroll kökü html.
+ * İçerik .page içinde taşarsa documentElement.scrollHeight tam yüksekliği verir.
  * (.page üzerinde overflow-y kaydırmayı bırakmak scrollHeight’ı viewport’ta tutup çift çubuğa yol açıyordu.)
  */
 html.is-embed {
@@ -89,7 +88,7 @@ html.is-embed .page {
   padding-bottom: max(5rem, calc(env(safe-area-inset-bottom, 0px) + 4rem));
 }
 
-/* Wix / mobile WebKit: gradient “gold” text can render invisible (clip + no font) → looks like a black empty page */
+/* Mobile WebKit: gradient “gold” text can render invisible (clip + no font) → looks like a black empty page */
 html.is-embed .bg-vignette {
   opacity: 0.45;
   background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.35) 100%);
@@ -1959,7 +1958,7 @@ body.detail-open {
   font-weight: 500;
 }
 
-/* ——— Booking modal (in-flow reservations → Wix CRM via API) ——— */
+/* ——— Booking modal (native reservation flow) ——— */
 body.booking-open,
 html.booking-open {
   overflow: hidden;

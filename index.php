@@ -6,7 +6,6 @@ require_once __DIR__ . '/app/Support.php';
 require_once __DIR__ . '/app/Database.php';
 require_once __DIR__ . '/app/Repository.php';
 require_once __DIR__ . '/app/AdminAuth.php';
-require_once __DIR__ . '/app/WixContact.php';
 
 $database = new Database();
 $repository = new Repository($database);
@@ -48,11 +47,6 @@ serve_embed_file($requestPath, $embedDir);
 
 function route_api(string $path, string $method, Repository $repository, AdminAuth $auth): void
 {
-    if ($path === '/api/ping' && $method === 'GET') {
-        require_api_key();
-        json_response(['ok' => true, 'authenticated' => true]);
-    }
-
     if ($path === '/api/site-content' && $method === 'GET') {
         json_response($repository->getContent());
     }
@@ -67,9 +61,9 @@ function route_api(string $path, string $method, Repository $repository, AdminAu
         $cta = $content['site']['cta'] ?? [];
         json_response(
             [
-                'url' => $booking['fallbackUrl'] ?? booking_env('WIX_BOOKING_URL') ?? 'https://www.silerchef.com/book-online',
-                'headline' => $cta['headline'] ?? booking_env('WIX_BOOKING_HEADLINE'),
-                'summary' => $cta['summary'] ?? booking_env('WIX_BOOKING_SUMMARY'),
+                'url' => $booking['fallbackUrl'] ?? (($content['site']['contact']['whatsappHref'] ?? '') ?: '#contact'),
+                'headline' => $cta['headline'] ?? ($booking['title'] ?? 'Reserve your date'),
+                'summary' => $cta['summary'] ?? ($booking['lede'] ?? 'Tell us about your table and we will confirm from our reservation desk.'),
             ]
         );
     }
@@ -112,49 +106,11 @@ function route_api(string $path, string $method, Repository $repository, AdminAu
             ]
         );
 
-        $wixResult = WixContact::createFromReservation($payload);
-        if (!$wixResult['ok']) {
-            $repository->updateReservation(
-                (string) $reservation['id'],
-                [
-                    'wixSync' => [
-                        'ok' => false,
-                        'contactId' => null,
-                        'error' => $wixResult['detail'] ?? $wixResult['code'] ?? 'wix_sync_failed',
-                    ],
-                ]
-            );
-
-            json_response(
-                [
-                    'ok' => true,
-                    'reservationId' => $reservation['id'],
-                    'contactId' => null,
-                    'crmSync' => 'deferred',
-                    'warning' => ($wixResult['code'] ?? '') === 'missing_wix_config'
-                        ? 'Reservation saved. Add WIX_META_SITE_ID to resume CRM sync.'
-                        : 'Reservation saved. Wix CRM sync needs follow-up.',
-                ],
-                202
-            );
-        }
-
-        $repository->updateReservation(
-            (string) $reservation['id'],
-            [
-                'wixSync' => [
-                    'ok' => true,
-                    'contactId' => $wixResult['contactId'] ?? null,
-                    'error' => null,
-                ],
-            ]
-        );
-
         json_response(
             [
                 'ok' => true,
-                'contactId' => $wixResult['contactId'] ?? null,
                 'reservationId' => $reservation['id'],
+                'status' => 'pending',
             ]
         );
     }
@@ -217,25 +173,6 @@ function route_api(string $path, string $method, Repository $repository, AdminAu
     json_response(['error' => 'not_found'], 404);
 }
 
-function require_api_key(): void
-{
-    $apiKey = env_string('WIX_API_KEY', '');
-    if ($apiKey === '') {
-        json_response(['error' => 'server_misconfigured', 'detail' => 'WIX_API_KEY missing'], 500);
-    }
-
-    $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-    $headerKey = env_header('HTTP_X_API_KEY');
-    $bearer = '';
-    if (preg_match('/^Bearer\s+(.+)$/i', $authHeader, $matches)) {
-        $bearer = trim((string) ($matches[1] ?? ''));
-    }
-    $key = $bearer !== '' ? $bearer : $headerKey;
-    if ($key === '' || !hash_equals($apiKey, $key)) {
-        json_response(['error' => 'unauthorized'], 401);
-    }
-}
-
 function require_admin(AdminAuth $auth): array
 {
     $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
@@ -264,10 +201,11 @@ function apply_cors(): void
         return;
     }
 
-    $allowed = (bool) preg_match('/\.wix\.com$/i', $origin)
-        || (bool) preg_match('/\.wixsite\.com$/i', $origin)
-        || (bool) preg_match('/^https:\/\/(www\.)?silerchef\.com$/i', $origin)
+    $allowed = (bool) preg_match('/^https:\/\/(www\.)?silerchef\.com$/i', $origin)
         || (bool) preg_match('/^https:\/\/[a-z0-9][a-z0-9-]*\.up\.railway\.app$/i', $origin);
+    $allowed = $allowed
+        || (bool) preg_match('/^http:\/\/localhost(?::\d+)?$/i', $origin)
+        || (bool) preg_match('/^http:\/\/127\.0\.0\.1(?::\d+)?$/i', $origin);
 
     $extra = array_filter(
         array_map('trim', explode(',', env_string('ALLOWED_ORIGINS', '')))
@@ -287,11 +225,7 @@ function build_frame_ancestors_csp(): string
         "'self'",
         'https://silerchef.com',
         'https://www.silerchef.com',
-        'https://*.wix.com',
-        'https://*.editor.wix.com',
-        'https://*.wixsite.com',
-        'https://*.editorx.io',
-        'https://*.wixstudio.com',
+        'https://*.up.railway.app',
     ];
 
     $extra = array_filter(array_map('trim', explode(',', env_string('FRAME_ANCESTORS_EXTRA', ''))));

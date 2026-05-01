@@ -10,7 +10,7 @@ final class AdminAuth
 
     public function __construct()
     {
-        $this->secret = env_string('ADMIN_SECRET', env_string('WIX_API_KEY', ''));
+        $this->secret = env_string('ADMIN_SECRET', '');
     }
 
     public function hasSecret(): bool

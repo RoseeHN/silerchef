@@ -31,20 +31,12 @@ final class Repository
     {
         $raw = $this->getSetting('site_content');
         $content = is_array($raw) ? $raw : $this->loadSeedContent();
-        if (!isset($content['availability']) || !is_array($content['availability'])) {
-            $content['availability'] = ['note' => '', 'blockedDates' => []];
-        }
-        $content['availability'] = normalize_availability($content['availability']);
-        return $content;
+        return $this->normalizeContent($content);
     }
 
     public function saveContent(array $content): array
     {
-        $next = $content;
-        if (!isset($next['availability']) || !is_array($next['availability'])) {
-            $next['availability'] = ['note' => '', 'blockedDates' => []];
-        }
-        $next['availability'] = normalize_availability($next['availability']);
+        $next = $this->normalizeContent($content);
         $this->setSetting('site_content', $next);
         return $next;
     }
@@ -399,6 +391,22 @@ final class Repository
                 'notes' => (string) $row['notes'],
             ],
         ];
+    }
+
+    private function normalizeContent(array $content): array
+    {
+        if (!isset($content['availability']) || !is_array($content['availability'])) {
+            $content['availability'] = ['note' => '', 'blockedDates' => []];
+        }
+        $content['availability'] = normalize_availability($content['availability']);
+
+        $fallbackUrl = trim((string) ($content['site']['booking']['fallbackUrl'] ?? ''));
+        $whatsAppUrl = trim((string) ($content['site']['contact']['whatsappHref'] ?? ''));
+        if ($fallbackUrl === '' || str_contains($fallbackUrl, '/book-online')) {
+            $content['site']['booking']['fallbackUrl'] = $whatsAppUrl !== '' ? $whatsAppUrl : '#contact';
+        }
+
+        return $content;
     }
 
     private function uuid(): string

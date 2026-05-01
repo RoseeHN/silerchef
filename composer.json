@@ -4,7 +4,6 @@
   "type": "project",
   "require": {
     "php": "^8.2",
-    "ext-curl": "*",
     "ext-pdo": "*",
     "ext-pgsql": "*",
     "ext-pdo_pgsql": "*",

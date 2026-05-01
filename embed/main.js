@@ -877,9 +877,8 @@
         if (!res.ok) {
           const msg =
             (typeof data.detail === 'string' && data.detail) ||
-            (data.error === 'server_misconfigured' && 'Booking is not configured on the server yet.') ||
             (typeof data.error === 'string' && data.error) ||
-            'Something went wrong. Try again or use the calendar link below.';
+            'Something went wrong. Try again or message us on WhatsApp below.';
           bookingError.textContent = msg;
           bookingError.hidden = false;
           return;

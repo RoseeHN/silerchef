@@ -455,10 +455,8 @@
             <p class="reservation-body">Date: ${esc(row.request.preferredDate || '-')}\nTime: ${esc(row.request.preferredTime || '-')}\nGuests: ${esc(row.request.guestCount == null ? '-' : row.request.guestCount)}${row.request.notes ? `\nNotes: ${esc(row.request.notes)}` : ''}</p>
           </div>
           <div>
-            <p class="panel-kicker">Wix sync</p>
-            <p class="reservation-body">${esc(
-              row.wixSync && row.wixSync.ok ? 'Synced to Wix CRM' : row.wixSync && row.wixSync.error ? row.wixSync.error : 'Pending'
-            )}</p>
+            <p class="panel-kicker">Reservation workflow</p>
+            <p class="reservation-body">Managed inside the private Siler Chef reservation dashboard.\nReservation ID: ${esc(row.id || '-')}</p>
           </div>
         </div>
       `;
