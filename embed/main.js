@@ -68,6 +68,22 @@
   ];
 
   let availabilityState = { note: '', blockedDates: [] };
+  const ANALYTICS_SESSION_KEY = 'silerchef_session_id';
+
+  function getAnalyticsSessionId() {
+    try {
+      const existing = window.localStorage.getItem(ANALYTICS_SESSION_KEY);
+      if (existing) return existing;
+      const next =
+        typeof crypto !== 'undefined' && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `sc_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+      window.localStorage.setItem(ANALYTICS_SESSION_KEY, next);
+      return next;
+    } catch (_) {
+      return `sc_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    }
+  }
 
   function mergeDeep(base, override) {
     if (Array.isArray(base)) return Array.isArray(override) ? override : base;
@@ -414,6 +430,11 @@
     if (!overlay || !detailTitle || !detailIntro || !detailBlocks || !detailHero || !detailStrip) return;
     const baseFolder = kind === 'cuisine' ? 'images/cuisines' : 'images/services-and-occasions';
     const copy = getCopy(kind, slug);
+    trackEvent(kind === 'cuisine' ? 'cuisine_open' : 'service_open', {
+      slug,
+      title,
+      kind,
+    });
 
     detailTitle.textContent = title;
     detailIntro.textContent = copy && copy.intro ? copy.intro : '';
@@ -574,7 +595,13 @@
       if (e.target === nav) setMobileNavOpen(false);
     });
     nav.querySelectorAll('a').forEach((a) => {
-      a.addEventListener('click', () => setMobileNavOpen(false));
+      a.addEventListener('click', () => {
+        trackEvent('nav_click', {
+          label: (a.textContent || '').trim() || 'navigation',
+          target: a.getAttribute('href') || '',
+        });
+        setMobileNavOpen(false);
+      });
     });
   }
 
@@ -637,6 +664,46 @@
   function getAvailabilityUrl() {
     const b = getApiBaseUrl();
     return b ? b + '/api/availability' : '/api/availability';
+  }
+
+  function getAnalyticsEventUrl() {
+    const b = getApiBaseUrl();
+    return b ? b + '/api/analytics/events' : '/api/analytics/events';
+  }
+
+  function trackEvent(eventName, meta) {
+    if (!eventName) return;
+    const body = JSON.stringify({
+      event: eventName,
+      sessionId: getAnalyticsSessionId(),
+      path:
+        typeof window !== 'undefined' && window.location && window.location.pathname
+          ? window.location.pathname
+          : '/',
+      meta: meta && typeof meta === 'object' ? meta : {},
+    });
+    const url = getAnalyticsEventUrl();
+
+    try {
+      if (navigator.sendBeacon && typeof Blob !== 'undefined') {
+        const blob = new Blob([body], { type: 'application/json' });
+        navigator.sendBeacon(url, blob);
+        return;
+      }
+    } catch (_) {
+      /* ignore */
+    }
+
+    fetch(url, {
+      method: 'POST',
+      credentials: 'omit',
+      mode: 'cors',
+      keepalive: true,
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    }).catch(() => {
+      /* ignore */
+    });
   }
 
   function setNodeText(selector, value) {
@@ -833,6 +900,9 @@
   document.querySelectorAll('[data-booking-trigger]').forEach((el) => {
     el.addEventListener('click', (e) => {
       e.preventDefault();
+      trackEvent('booking_trigger', {
+        placement: (el.textContent || '').trim() || 'booking_cta',
+      });
       setBookingOpen(true);
     });
   });
@@ -885,6 +955,9 @@
         }
         bookingForm.hidden = true;
         if (bookingSuccess) bookingSuccess.hidden = false;
+        trackEvent('reservation_submit', {
+          placement: 'booking_form',
+        });
       } catch {
         bookingError.textContent = 'Network error. Check your connection and try again.';
         bookingError.hidden = false;
@@ -892,9 +965,81 @@
     });
   }
 
+  document.querySelectorAll('.social-tile--instagram').forEach((el) => {
+    el.addEventListener('click', () => {
+      trackEvent('social_click', {
+        network: 'instagram',
+        placement: 'contact_social',
+        label: 'Instagram',
+      });
+    });
+  });
+
+  document.querySelectorAll('.social-tile--facebook').forEach((el) => {
+    el.addEventListener('click', () => {
+      trackEvent('social_click', {
+        network: 'facebook',
+        placement: 'contact_social',
+        label: 'Facebook',
+      });
+    });
+  });
+
+  document.querySelectorAll('.social-tile--whatsapp').forEach((el) => {
+    el.addEventListener('click', () => {
+      trackEvent('whatsapp_click', {
+        placement: 'contact_social',
+        label: 'WhatsApp social tile',
+      });
+    });
+  });
+
+  document.querySelectorAll('.whatsapp-fab').forEach((el) => {
+    el.addEventListener('click', () => {
+      trackEvent('whatsapp_click', {
+        placement: 'floating_dock',
+        label: 'WhatsApp floating dock',
+      });
+    });
+  });
+
+  document.querySelectorAll('a[href^="tel:"]').forEach((el) => {
+    el.addEventListener('click', () => {
+      trackEvent('contact_click', {
+        placement: 'contact_panel',
+        target: 'phone',
+        label: 'Phone',
+      });
+    });
+  });
+
+  document.querySelectorAll('a[href^="mailto:"]').forEach((el) => {
+    el.addEventListener('click', () => {
+      trackEvent('contact_click', {
+        placement: 'contact_panel',
+        target: 'email',
+        label: 'Email',
+      });
+    });
+  });
+
+  const bookingFallbackLink = document.getElementById('booking-fallback-link');
+  if (bookingFallbackLink) {
+    bookingFallbackLink.addEventListener('click', () => {
+      trackEvent('whatsapp_click', {
+        placement: 'booking_fallback',
+        label: 'Booking fallback link',
+      });
+    });
+  }
+
   applyBookingFromApi();
   loadRuntimeContent();
   loadAvailability();
+  trackEvent('page_view', {
+    label: 'homepage',
+    placement: 'page_load',
+  });
 
   (function initChefReel() {
     const section = document.getElementById('reel');

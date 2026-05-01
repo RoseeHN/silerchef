@@ -69,6 +69,11 @@ function route_api(string $path, string $method, Repository $repository, AdminAu
         );
     }
 
+    if ($path === '/api/analytics/events' && $method === 'POST') {
+        $repository->trackSiteEvent(json_input());
+        json_response(['ok' => true]);
+    }
+
     if ($path === '/api/reservations' && $method === 'POST') {
         $payload = json_input();
         $firstName = trim((string) ($payload['firstName'] ?? ''));
@@ -140,6 +145,7 @@ function route_api(string $path, string $method, Repository $repository, AdminAu
                 'content' => $repository->getContent(),
                 'availability' => $repository->getAvailability(),
                 'reservations' => $repository->listReservations(),
+                'metrics' => $repository->analyticsSnapshot(current_request_context()),
             ]
         );
     }
@@ -235,6 +241,23 @@ function build_frame_ancestors_csp(): string
     }
 
     return 'frame-ancestors ' . implode(' ', $parts);
+}
+
+function current_request_context(): array
+{
+    $host = trim((string) ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? ''));
+    $host = preg_replace('/:\d+$/', '', $host) ?: '';
+
+    $scheme = trim((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''));
+    if ($scheme === '') {
+        $https = $_SERVER['HTTPS'] ?? '';
+        $scheme = (!empty($https) && strtolower((string) $https) !== 'off') ? 'https' : 'http';
+    }
+
+    return [
+        'host' => strtolower($host),
+        'scheme' => strtolower($scheme),
+    ];
 }
 
 function redirect_legacy_embed_paths(string $requestPath, string $requestUri, string $requestMethod): void

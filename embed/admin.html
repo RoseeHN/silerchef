@@ -61,6 +61,14 @@
               <span class="summary-label">Pending requests</span>
               <strong id="summary-pending">0</strong>
             </article>
+            <article class="panel summary-card">
+              <span class="summary-label">Page views</span>
+              <strong id="summary-pageviews">0</strong>
+            </article>
+            <article class="panel summary-card">
+              <span class="summary-label">WhatsApp clicks</span>
+              <strong id="summary-whatsapp">0</strong>
+            </article>
           </div>
 
           <nav class="admin-tabs" aria-label="Admin sections">
@@ -69,6 +77,7 @@
             <button class="admin-tab" type="button" data-tab="services">Services</button>
             <button class="admin-tab" type="button" data-tab="availability">Availability</button>
             <button class="admin-tab" type="button" data-tab="reservations">Reservations</button>
+            <button class="admin-tab" type="button" data-tab="analytics">Analytics &amp; SEO</button>
           </nav>
 
           <section class="tab-panel is-active" data-panel="homepage">
@@ -168,6 +177,20 @@
               <p class="panel-note">Review each request, add internal notes, and update the status.</p>
               <div id="reservations-empty" class="empty-state" hidden>No reservation requests yet.</div>
               <div id="reservations-list" class="reservations-list"></div>
+            </div>
+          </section>
+
+          <section class="tab-panel" data-panel="analytics">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Analytics &amp; SEO</p>
+                  <h2>Site activity and optimization snapshot</h2>
+                </div>
+                <button id="refresh-metrics-btn" class="ghost-button" type="button">Refresh metrics</button>
+              </div>
+              <p class="panel-note">Review visitor behavior, conversion signals, and technical readiness from one place.</p>
+              <div id="analytics-panel" class="analytics-shell"></div>
             </div>
           </section>
         </section>

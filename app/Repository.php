@@ -147,6 +147,176 @@ final class Repository
         return $this->findReservation($id);
     }
 
+    public function trackSiteEvent(array $payload): void
+    {
+        $eventName = trim((string) ($payload['event'] ?? ''));
+        if (!$this->isAllowedEventName($eventName)) {
+            return;
+        }
+
+        $sessionId = preg_replace('/[^a-zA-Z0-9_-]/', '', (string) ($payload['sessionId'] ?? ''));
+        $pagePath = trim((string) ($payload['path'] ?? '/'));
+        $meta = $this->normalizeEventMeta($payload['meta'] ?? []);
+        $createdAt = gmdate('c');
+
+        $stmt = $this->pdo->prepare(
+            'INSERT INTO site_events (
+                id, event_name, session_id, page_path, event_meta, created_at
+            ) VALUES (
+                :id, :event_name, :session_id, :page_path, :event_meta, :created_at
+            )'
+        );
+        $stmt->execute(
+            [
+                ':id' => $this->uuid(),
+                ':event_name' => $eventName,
+                ':session_id' => $sessionId !== '' ? mb_substr($sessionId, 0, 120) : 'anon',
+                ':page_path' => $pagePath !== '' ? mb_substr($pagePath, 0, 255) : '/',
+                ':event_meta' => json_encode($meta, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?: '{}',
+                ':created_at' => $createdAt,
+            ]
+        );
+    }
+
+    public function analyticsSnapshot(array $context = []): array
+    {
+        $content = $this->getContent();
+        $reservations = $this->listReservations();
+        $events = $this->listSiteEvents();
+
+        $counts = [];
+        $recentCounts = [];
+        $uniqueSessions = [];
+        $topCuisines = [];
+        $topServices = [];
+        $topClickTargets = [];
+        $lastEventAt = null;
+        $cutoff = strtotime('-7 days') ?: 0;
+
+        $cuisineTitles = [];
+        foreach (($content['cuisineCards'] ?? []) as $card) {
+            if (!empty($card['slug'])) {
+                $cuisineTitles[(string) $card['slug']] = (string) ($card['title'] ?? $card['slug']);
+            }
+        }
+
+        $serviceTitles = [];
+        foreach (($content['serviceCards'] ?? []) as $card) {
+            if (!empty($card['slug'])) {
+                $serviceTitles[(string) $card['slug']] = (string) ($card['title'] ?? $card['slug']);
+            }
+        }
+
+        foreach ($events as $event) {
+            $name = (string) ($event['event'] ?? '');
+            if ($name === '') {
+                continue;
+            }
+
+            $counts[$name] = ($counts[$name] ?? 0) + 1;
+            $sessionId = (string) ($event['sessionId'] ?? '');
+            if ($sessionId !== '') {
+                $uniqueSessions[$sessionId] = true;
+            }
+
+            $createdAt = (string) ($event['createdAt'] ?? '');
+            if ($createdAt !== '' && ($lastEventAt === null || strcmp($createdAt, $lastEventAt) > 0)) {
+                $lastEventAt = $createdAt;
+            }
+
+            $ts = strtotime($createdAt);
+            if ($ts !== false && $ts >= $cutoff) {
+                $recentCounts[$name] = ($recentCounts[$name] ?? 0) + 1;
+            }
+
+            $meta = is_array($event['meta'] ?? null) ? $event['meta'] : [];
+            if ($name === 'cuisine_open') {
+                $slug = (string) ($meta['slug'] ?? '');
+                if ($slug !== '') {
+                    $topCuisines[$slug] = ($topCuisines[$slug] ?? 0) + 1;
+                }
+            }
+            if ($name === 'service_open') {
+                $slug = (string) ($meta['slug'] ?? '');
+                if ($slug !== '') {
+                    $topServices[$slug] = ($topServices[$slug] ?? 0) + 1;
+                }
+            }
+            if (in_array($name, ['booking_trigger', 'whatsapp_click', 'contact_click', 'social_click', 'nav_click'], true)) {
+                $label = trim((string) ($meta['label'] ?? $meta['placement'] ?? $meta['network'] ?? $meta['target'] ?? $name));
+                if ($label !== '') {
+                    $topClickTargets[$label] = ($topClickTargets[$label] ?? 0) + 1;
+                }
+            }
+        }
+
+        $statusCounts = [
+            'pending' => 0,
+            'confirmed' => 0,
+            'completed' => 0,
+            'cancelled' => 0,
+            'blocked' => 0,
+        ];
+        $lastReservationAt = null;
+        foreach ($reservations as $reservation) {
+            $status = (string) ($reservation['status'] ?? 'pending');
+            if (!isset($statusCounts[$status])) {
+                $statusCounts[$status] = 0;
+            }
+            $statusCounts[$status]++;
+            $createdAt = (string) ($reservation['createdAt'] ?? '');
+            if ($createdAt !== '' && ($lastReservationAt === null || strcmp($createdAt, $lastReservationAt) > 0)) {
+                $lastReservationAt = $createdAt;
+            }
+        }
+
+        $pageViews = (int) ($counts['page_view'] ?? 0);
+        $bookingOpens = (int) ($counts['booking_trigger'] ?? 0);
+        $reservationSubmits = (int) ($counts['reservation_submit'] ?? 0);
+        $whatsappClicks = (int) ($counts['whatsapp_click'] ?? 0);
+
+        return [
+            'overview' => [
+                'pageViews' => $pageViews,
+                'uniqueSessions' => count($uniqueSessions),
+                'bookingOpens' => $bookingOpens,
+                'reservationSubmits' => $reservationSubmits,
+                'whatsappClicks' => $whatsappClicks,
+                'contactClicks' => (int) ($counts['contact_click'] ?? 0),
+                'socialClicks' => (int) ($counts['social_click'] ?? 0),
+                'navClicks' => (int) ($counts['nav_click'] ?? 0),
+                'cuisineOpens' => (int) ($counts['cuisine_open'] ?? 0),
+                'serviceOpens' => (int) ($counts['service_open'] ?? 0),
+                'totalReservations' => count($reservations),
+                'pendingReservations' => (int) ($statusCounts['pending'] ?? 0),
+                'confirmedReservations' => (int) ($statusCounts['confirmed'] ?? 0),
+                'completedReservations' => (int) ($statusCounts['completed'] ?? 0),
+                'cancelledReservations' => (int) ($statusCounts['cancelled'] ?? 0),
+                'blockedReservations' => (int) ($statusCounts['blocked'] ?? 0),
+                'bookingOpenRate' => $pageViews > 0 ? round(($bookingOpens / $pageViews) * 100, 1) : 0,
+                'reservationConversionRate' => $pageViews > 0 ? round(($reservationSubmits / $pageViews) * 100, 1) : 0,
+                'bookingToReservationRate' => $bookingOpens > 0 ? round(($reservationSubmits / $bookingOpens) * 100, 1) : 0,
+                'whatsappShare' => $pageViews > 0 ? round(($whatsappClicks / $pageViews) * 100, 1) : 0,
+                'trackedEvents' => count($events),
+            ],
+            'topContent' => [
+                'cuisines' => $this->topSlugCounts($topCuisines, $cuisineTitles),
+                'services' => $this->topSlugCounts($topServices, $serviceTitles),
+                'clickTargets' => $this->topLabelCounts($topClickTargets),
+            ],
+            'recentActivity' => [
+                'lastEventAt' => $lastEventAt,
+                'lastReservationAt' => $lastReservationAt,
+                'pageViewsLast7Days' => (int) ($recentCounts['page_view'] ?? 0),
+                'bookingOpensLast7Days' => (int) ($recentCounts['booking_trigger'] ?? 0),
+                'reservationSubmitsLast7Days' => (int) ($recentCounts['reservation_submit'] ?? 0),
+                'whatsappClicksLast7Days' => (int) ($recentCounts['whatsapp_click'] ?? 0),
+            ],
+            'statuses' => $statusCounts,
+            'optimization' => $this->buildOptimizationSnapshot($content, $context),
+        ];
+    }
+
     public function validateAdminCredentials(string $username, string $password): bool
     {
         $stmt = $this->pdo->prepare('SELECT password_hash FROM admins WHERE username = :username LIMIT 1');
@@ -199,6 +369,19 @@ final class Repository
                 updated_at TEXT NULL
             )'
         );
+
+        $this->pdo->exec(
+            'CREATE TABLE IF NOT EXISTS site_events (
+                id TEXT PRIMARY KEY,
+                event_name TEXT NOT NULL,
+                session_id TEXT NOT NULL,
+                page_path TEXT NOT NULL,
+                event_meta TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )'
+        );
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_site_events_created_at ON site_events(created_at)');
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_site_events_name ON site_events(event_name)');
     }
 
     private function seedContentIfMissing(): void
@@ -365,6 +548,30 @@ final class Repository
         return is_array($row) ? $this->hydrateReservation($row) : null;
     }
 
+    private function listSiteEvents(): array
+    {
+        $stmt = $this->pdo->query(
+            'SELECT event_name, session_id, page_path, event_meta, created_at
+             FROM site_events
+             ORDER BY created_at DESC'
+        );
+        $rows = $stmt->fetchAll();
+
+        return array_map(
+            function (array $row): array {
+                $meta = json_decode((string) ($row['event_meta'] ?? '{}'), true);
+                return [
+                    'event' => (string) ($row['event_name'] ?? ''),
+                    'sessionId' => (string) ($row['session_id'] ?? ''),
+                    'path' => (string) ($row['page_path'] ?? '/'),
+                    'meta' => is_array($meta) ? $meta : [],
+                    'createdAt' => (string) ($row['created_at'] ?? ''),
+                ];
+            },
+            $rows
+        );
+    }
+
     private function hydrateReservation(array $row): array
     {
         return [
@@ -389,6 +596,140 @@ final class Repository
                 'preferredTime' => (string) $row['preferred_time'],
                 'guestCount' => $row['guest_count'] !== null ? (int) $row['guest_count'] : null,
                 'notes' => (string) $row['notes'],
+            ],
+        ];
+    }
+
+    private function isAllowedEventName(string $eventName): bool
+    {
+        static $allowed = [
+            'page_view' => true,
+            'booking_trigger' => true,
+            'reservation_submit' => true,
+            'whatsapp_click' => true,
+            'contact_click' => true,
+            'social_click' => true,
+            'nav_click' => true,
+            'cuisine_open' => true,
+            'service_open' => true,
+        ];
+
+        return isset($allowed[$eventName]);
+    }
+
+    private function normalizeEventMeta(mixed $meta): array
+    {
+        if (!is_array($meta)) {
+            return [];
+        }
+
+        $allowedKeys = ['slug', 'title', 'label', 'placement', 'network', 'target', 'kind'];
+        $out = [];
+        foreach ($allowedKeys as $key) {
+            if (!array_key_exists($key, $meta)) {
+                continue;
+            }
+            $value = trim((string) $meta[$key]);
+            if ($value === '') {
+                continue;
+            }
+            $out[$key] = mb_substr($value, 0, 160);
+        }
+
+        return $out;
+    }
+
+    private function topSlugCounts(array $counts, array $titles): array
+    {
+        arsort($counts);
+        $out = [];
+        foreach (array_slice($counts, 0, 5, true) as $slug => $count) {
+            $out[] = [
+                'slug' => (string) $slug,
+                'title' => (string) ($titles[$slug] ?? $slug),
+                'count' => (int) $count,
+            ];
+        }
+        return $out;
+    }
+
+    private function topLabelCounts(array $counts): array
+    {
+        arsort($counts);
+        $out = [];
+        foreach (array_slice($counts, 0, 6, true) as $label => $count) {
+            $out[] = [
+                'label' => (string) $label,
+                'count' => (int) $count,
+            ];
+        }
+        return $out;
+    }
+
+    private function buildOptimizationSnapshot(array $content, array $context): array
+    {
+        $publicHtml = @file_get_contents(dirname(__DIR__) . '/embed/index.html') ?: '';
+        $adminHtml = @file_get_contents(dirname(__DIR__) . '/embed/admin.html') ?: '';
+
+        $canonical = '';
+        if (preg_match('/<link\s+rel="canonical"\s+href="([^"]+)"/i', $publicHtml, $matches)) {
+            $canonical = trim((string) ($matches[1] ?? ''));
+        }
+
+        $host = trim((string) ($context['host'] ?? ''));
+        $scheme = strtolower(trim((string) ($context['scheme'] ?? 'https')));
+        $bookingFallback = trim((string) ($content['site']['booking']['fallbackUrl'] ?? ''));
+        $isCustomDomain = (bool) preg_match('/(^|\.)silerchef\.com$/i', $host);
+        $customDomainConfigured = $canonical === 'https://www.silerchef.com/';
+        $hasStructuredData = str_contains($publicHtml, 'application/ld+json');
+        $adminNoindex = (bool) preg_match('/meta\s+name="robots"\s+content="noindex/i', $adminHtml);
+        $publicIndexable = (bool) preg_match('/meta\s+name="robots"\s+content="index,\s*follow/i', $publicHtml);
+
+        return [
+            'host' => $host,
+            'scheme' => $scheme,
+            'checks' => [
+                [
+                    'label' => 'Custom domain',
+                    'status' => ($isCustomDomain || $customDomainConfigured) ? 'ok' : 'warn',
+                    'detail' => $isCustomDomain
+                        ? 'Public traffic is resolving under silerchef.com.'
+                        : ($customDomainConfigured
+                            ? 'Canonical targeting is already set to www.silerchef.com. Admin may still be opened from the Railway host.'
+                            : ($host !== '' ? 'Current admin host is ' . $host . '. Public domain should resolve to silerchef.com.' : 'Custom domain host could not be detected.')),
+                ],
+                [
+                    'label' => 'HTTPS delivery',
+                    'status' => $scheme === 'https' ? 'ok' : 'warn',
+                    'detail' => $scheme === 'https' ? 'Secure HTTPS delivery is active.' : 'HTTPS should be enforced for SEO and trust.',
+                ],
+                [
+                    'label' => 'Canonical URL',
+                    'status' => $canonical === 'https://www.silerchef.com/' ? 'ok' : 'warn',
+                    'detail' => $canonical !== '' ? $canonical : 'Canonical tag missing from the public page.',
+                ],
+                [
+                    'label' => 'Clean URLs',
+                    'status' => 'ok',
+                    'detail' => 'Legacy /index.html and /admin.html routes redirect to / and /admin with permanent redirects.',
+                ],
+                [
+                    'label' => 'Structured data',
+                    'status' => $hasStructuredData ? 'ok' : 'warn',
+                    'detail' => $hasStructuredData ? 'Schema markup is present for WebSite, LocalBusiness, and Service.' : 'Structured data could not be detected.',
+                ],
+                [
+                    'label' => 'Search engine controls',
+                    'status' => ($publicIndexable && $adminNoindex) ? 'ok' : 'warn',
+                    'detail' => ($publicIndexable && $adminNoindex)
+                        ? 'Public page is indexable while the admin panel stays out of search results.'
+                        : 'Review robots directives for public and admin pages.',
+                ],
+                [
+                    'label' => 'Native reservation flow',
+                    'status' => str_contains($bookingFallback, 'wa.me') || str_contains($bookingFallback, '#contact') ? 'ok' : 'warn',
+                    'detail' => 'Reservations are managed in the PHP dashboard and database, with WhatsApp as the quick-contact fallback.',
+                ],
             ],
         ];
     }

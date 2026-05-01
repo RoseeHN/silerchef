@@ -71,14 +71,26 @@
     return dt.toLocaleString();
   }
 
+  function formatCount(value) {
+    return new Intl.NumberFormat('en-US').format(Number(value || 0));
+  }
+
+  function formatPercent(value) {
+    return `${Number(value || 0).toFixed(1)}%`;
+  }
+
   function updateSummary() {
     const availability = state.bootstrap ? state.bootstrap.availability : { blockedDates: [] };
     const reservations = state.bootstrap ? state.bootstrap.reservations : [];
+    const metrics = state.bootstrap ? state.bootstrap.metrics || {} : {};
+    const overview = metrics.overview || {};
     byId('summary-blocked').textContent = String((availability.blockedDates || []).length);
     byId('summary-reservations').textContent = String(reservations.length);
     byId('summary-pending').textContent = String(
       reservations.filter((row) => row.status === 'pending').length
     );
+    byId('summary-pageviews').textContent = formatCount(overview.pageViews || 0);
+    byId('summary-whatsapp').textContent = formatCount(overview.whatsappClicks || 0);
   }
 
   function setActiveTab(tabName) {
@@ -515,6 +527,184 @@
     });
   }
 
+  function renderAnalytics() {
+    const metrics = (state.bootstrap && state.bootstrap.metrics) || {};
+    const overview = metrics.overview || {};
+    const topContent = metrics.topContent || {};
+    const recentActivity = metrics.recentActivity || {};
+    const optimization = metrics.optimization || {};
+    const statuses = metrics.statuses || {};
+    const panel = byId('analytics-panel');
+    if (!panel) return;
+
+    const cuisineRows = (topContent.cuisines || []).length
+      ? topContent.cuisines
+          .map(
+            (row) => `
+              <div class="analytics-list__row">
+                <span>${esc(row.title)}</span>
+                <strong>${formatCount(row.count)}</strong>
+              </div>
+            `
+          )
+          .join('')
+      : '<p class="empty-state">No cuisine opens tracked yet.</p>';
+
+    const serviceRows = (topContent.services || []).length
+      ? topContent.services
+          .map(
+            (row) => `
+              <div class="analytics-list__row">
+                <span>${esc(row.title)}</span>
+                <strong>${formatCount(row.count)}</strong>
+              </div>
+            `
+          )
+          .join('')
+      : '<p class="empty-state">No service opens tracked yet.</p>';
+
+    const clickRows = (topContent.clickTargets || []).length
+      ? topContent.clickTargets
+          .map(
+            (row) => `
+              <div class="analytics-list__row">
+                <span>${esc(row.label)}</span>
+                <strong>${formatCount(row.count)}</strong>
+              </div>
+            `
+          )
+          .join('')
+      : '<p class="empty-state">No click targets tracked yet.</p>';
+
+    const checkRows = (optimization.checks || [])
+      .map(
+        (check) => `
+          <article class="seo-check seo-check--${esc(check.status || 'info')}">
+            <div class="seo-check__head">
+              <strong>${esc(check.label)}</strong>
+              <span class="seo-check__badge">${esc((check.status || 'info').toUpperCase())}</span>
+            </div>
+            <p>${esc(check.detail || '')}</p>
+          </article>
+        `
+      )
+      .join('');
+
+    panel.innerHTML = `
+      <div class="analytics-kpis">
+        <article class="panel summary-card">
+          <span class="summary-label">Page views</span>
+          <strong>${formatCount(overview.pageViews)}</strong>
+          <small class="summary-sub">Unique sessions: ${formatCount(overview.uniqueSessions)}</small>
+        </article>
+        <article class="panel summary-card">
+          <span class="summary-label">Booking opens</span>
+          <strong>${formatCount(overview.bookingOpens)}</strong>
+          <small class="summary-sub">Open rate: ${formatPercent(overview.bookingOpenRate)}</small>
+        </article>
+        <article class="panel summary-card">
+          <span class="summary-label">Reservation submits</span>
+          <strong>${formatCount(overview.reservationSubmits)}</strong>
+          <small class="summary-sub">Page conversion: ${formatPercent(overview.reservationConversionRate)}</small>
+        </article>
+        <article class="panel summary-card">
+          <span class="summary-label">WhatsApp clicks</span>
+          <strong>${formatCount(overview.whatsappClicks)}</strong>
+          <small class="summary-sub">Share of page views: ${formatPercent(overview.whatsappShare)}</small>
+        </article>
+        <article class="panel summary-card">
+          <span class="summary-label">Cuisine opens</span>
+          <strong>${formatCount(overview.cuisineOpens)}</strong>
+          <small class="summary-sub">Service opens: ${formatCount(overview.serviceOpens)}</small>
+        </article>
+        <article class="panel summary-card">
+          <span class="summary-label">Tracked events</span>
+          <strong>${formatCount(overview.trackedEvents)}</strong>
+          <small class="summary-sub">Navigation clicks: ${formatCount(overview.navClicks)}</small>
+        </article>
+      </div>
+
+      <div class="analytics-columns">
+        <section class="panel analytics-block">
+          <div class="panel-head panel-head--tight">
+            <div>
+              <p class="panel-kicker">Conversion funnel</p>
+              <h3>Guest intent to reservation flow</h3>
+            </div>
+          </div>
+          <div class="analytics-funnel">
+            <div class="analytics-list__row"><span>Booking to reservation rate</span><strong>${formatPercent(overview.bookingToReservationRate)}</strong></div>
+            <div class="analytics-list__row"><span>Contact clicks</span><strong>${formatCount(overview.contactClicks)}</strong></div>
+            <div class="analytics-list__row"><span>Social clicks</span><strong>${formatCount(overview.socialClicks)}</strong></div>
+            <div class="analytics-list__row"><span>Last tracked event</span><strong>${esc(formatDateTime(recentActivity.lastEventAt))}</strong></div>
+            <div class="analytics-list__row"><span>Last reservation request</span><strong>${esc(formatDateTime(recentActivity.lastReservationAt))}</strong></div>
+            <div class="analytics-list__row"><span>Page views in last 7 days</span><strong>${formatCount(recentActivity.pageViewsLast7Days)}</strong></div>
+            <div class="analytics-list__row"><span>Booking opens in last 7 days</span><strong>${formatCount(recentActivity.bookingOpensLast7Days)}</strong></div>
+            <div class="analytics-list__row"><span>Reservation submits in last 7 days</span><strong>${formatCount(recentActivity.reservationSubmitsLast7Days)}</strong></div>
+          </div>
+        </section>
+
+        <section class="panel analytics-block">
+          <div class="panel-head panel-head--tight">
+            <div>
+              <p class="panel-kicker">Reservation pipeline</p>
+              <h3>Status distribution</h3>
+            </div>
+          </div>
+          <div class="analytics-funnel">
+            <div class="analytics-list__row"><span>Pending</span><strong>${formatCount(statuses.pending)}</strong></div>
+            <div class="analytics-list__row"><span>Confirmed</span><strong>${formatCount(statuses.confirmed)}</strong></div>
+            <div class="analytics-list__row"><span>Completed</span><strong>${formatCount(statuses.completed)}</strong></div>
+            <div class="analytics-list__row"><span>Cancelled</span><strong>${formatCount(statuses.cancelled)}</strong></div>
+            <div class="analytics-list__row"><span>Blocked</span><strong>${formatCount(statuses.blocked)}</strong></div>
+          </div>
+        </section>
+      </div>
+
+      <div class="analytics-columns analytics-columns--triple">
+        <section class="panel analytics-block">
+          <div class="panel-head panel-head--tight">
+            <div>
+              <p class="panel-kicker">Popular menus</p>
+              <h3>Most opened cuisines</h3>
+            </div>
+          </div>
+          <div class="analytics-list">${cuisineRows}</div>
+        </section>
+
+        <section class="panel analytics-block">
+          <div class="panel-head panel-head--tight">
+            <div>
+              <p class="panel-kicker">Popular occasions</p>
+              <h3>Most opened services</h3>
+            </div>
+          </div>
+          <div class="analytics-list">${serviceRows}</div>
+        </section>
+
+        <section class="panel analytics-block">
+          <div class="panel-head panel-head--tight">
+            <div>
+              <p class="panel-kicker">Click heat</p>
+              <h3>Strongest targets</h3>
+            </div>
+          </div>
+          <div class="analytics-list">${clickRows}</div>
+        </section>
+      </div>
+
+      <section class="panel analytics-block">
+        <div class="panel-head panel-head--tight">
+          <div>
+            <p class="panel-kicker">Optimization snapshot</p>
+            <h3>SEO and technical readiness</h3>
+          </div>
+        </div>
+        <div class="seo-checks">${checkRows}</div>
+      </section>
+    `;
+  }
+
   function renderDashboard() {
     updateSummary();
     renderHomepageFields();
@@ -524,6 +714,7 @@
     renderServiceEditor();
     renderAvailabilityEditor();
     renderReservations();
+    renderAnalytics();
   }
 
   async function loadBootstrap() {
@@ -713,6 +904,10 @@
 
   byId('refresh-btn').addEventListener('click', async () => {
     await loadBootstrap().catch((err) => alert(err.message || 'Unable to refresh data'));
+  });
+
+  byId('refresh-metrics-btn').addEventListener('click', async () => {
+    await loadBootstrap().catch((err) => alert(err.message || 'Unable to refresh metrics'));
   });
 
   byId('logout-btn').addEventListener('click', () => {

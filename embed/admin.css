@@ -407,7 +407,126 @@ select:focus {
   border-radius: 14px;
 }
 
+.summary-sub {
+  color: var(--text-muted);
+  font-size: 0.86rem;
+}
+
+.analytics-shell,
+.analytics-kpis,
+.analytics-columns,
+.analytics-funnel,
+.analytics-list,
+.seo-checks,
+.seo-check {
+  display: grid;
+  gap: 1rem;
+}
+
+.analytics-kpis {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.analytics-columns {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.analytics-columns--triple {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.analytics-block {
+  align-content: start;
+}
+
+.panel-head--tight {
+  align-items: start;
+}
+
+.analytics-list__row,
+.analytics-funnel .analytics-list__row {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.82rem 0.95rem;
+  border-radius: 14px;
+  border: 1px solid rgba(197, 160, 89, 0.14);
+  background: rgba(15, 13, 15, 0.48);
+}
+
+.analytics-list__row span {
+  color: var(--text-muted);
+}
+
+.analytics-list__row strong {
+  color: var(--gold-1);
+  text-align: right;
+}
+
+.seo-checks {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.seo-check {
+  padding: 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(197, 160, 89, 0.14);
+  background: rgba(15, 13, 15, 0.48);
+}
+
+.seo-check__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.seo-check__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.8rem;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.seo-check p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.seo-check--ok {
+  border-color: rgba(168, 211, 160, 0.28);
+}
+
+.seo-check--ok .seo-check__badge {
+  color: #102013;
+  background: rgba(168, 211, 160, 0.9);
+}
+
+.seo-check--warn {
+  border-color: rgba(212, 188, 106, 0.3);
+}
+
+.seo-check--warn .seo-check__badge {
+  color: #21180a;
+  background: rgba(212, 188, 106, 0.9);
+}
+
+.seo-check--info .seo-check__badge {
+  color: #141214;
+  background: rgba(243, 234, 209, 0.88);
+}
+
 @media (max-width: 960px) {
+  .analytics-columns,
+  .analytics-columns--triple,
+  .seo-checks,
   .form-layout,
   .row-card__grid {
     grid-template-columns: 1fr;
