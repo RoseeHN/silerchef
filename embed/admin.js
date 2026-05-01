@@ -79,6 +79,12 @@
     return `${Number(value || 0).toFixed(1)}%`;
   }
 
+  function normalizePhoneForWhatsApp(value) {
+    const digits = String(value || '').replace(/\D+/g, '');
+    if (!digits) return '';
+    return digits.startsWith('00') ? digits.slice(2) : digits;
+  }
+
   function updateSummary() {
     const availability = state.bootstrap ? state.bootstrap.availability : { blockedDates: [] };
     const reservations = state.bootstrap ? state.bootstrap.reservations : [];
@@ -214,6 +220,18 @@
       <label class="field field--full">
         <span>Booking fallback link</span>
         <input id="hp-booking-fallback-url" type="url" value="${esc(site.booking.fallbackUrl)}" />
+      </label>
+      <label class="field">
+        <span>Reservation alert email</span>
+        <input id="hp-booking-notification-email" type="email" value="${esc(site.booking.notificationEmail || '')}" placeholder="reservations@silerchef.com" />
+      </label>
+      <label class="field">
+        <span>Team WhatsApp shortcut</span>
+        <input id="hp-booking-team-whatsapp" type="url" value="${esc(site.booking.teamWhatsAppHref || '')}" placeholder="https://wa.me/17753896677" />
+      </label>
+      <label class="field field--full">
+        <span>Optional notification webhook</span>
+        <input id="hp-booking-webhook-url" type="url" value="${esc(site.booking.notificationWebhookUrl || '')}" placeholder="Optional: Make, Zapier, Slack, or custom endpoint" />
       </label>
 
       <label class="field field--full">
@@ -444,9 +462,20 @@
     const reservations = state.bootstrap.reservations || [];
     const container = byId('reservations-list');
     const empty = byId('reservations-empty');
+    renderReservationRoutingNote();
     container.innerHTML = '';
     empty.hidden = reservations.length > 0;
     reservations.forEach((row) => {
+      const requestLines = [
+        `Date: ${esc(row.request.preferredDate || '-')}`,
+        `Time: ${esc(row.request.preferredTime || '-')}`,
+        `Guests: ${esc(row.request.guestCount == null ? '-' : row.request.guestCount)}`,
+        `ZIP code: ${esc(row.request.zipCode || '-')}`,
+        `Preferred follow-up: ${esc(formatPreferredContact(row.request.preferredContact || 'any'))}`,
+      ];
+      if (row.request.notes) requestLines.push(`Notes: ${esc(row.request.notes)}`);
+
+      const notificationSummary = summarizeReservationNotifications(row.notifications || {});
       const card = document.createElement('article');
       card.className = 'reservation-card';
       card.innerHTML = `
@@ -464,14 +493,61 @@
         <div class="reservation-grid">
           <div>
             <p class="panel-kicker">Request details</p>
-            <p class="reservation-body">Date: ${esc(row.request.preferredDate || '-')}\nTime: ${esc(row.request.preferredTime || '-')}\nGuests: ${esc(row.request.guestCount == null ? '-' : row.request.guestCount)}${row.request.notes ? `\nNotes: ${esc(row.request.notes)}` : ''}</p>
+            <p class="reservation-body">${requestLines.join('\n')}</p>
           </div>
           <div>
             <p class="panel-kicker">Reservation workflow</p>
-            <p class="reservation-body">Managed inside the private Siler Chef reservation dashboard.\nReservation ID: ${esc(row.id || '-')}</p>
+            <p class="reservation-body">Managed inside the private Siler Chef reservation dashboard.\nReservation ID: ${esc(row.id || '-')}\nFollow-up happens from this panel by phone, email, or WhatsApp.\nAlerts: ${esc(notificationSummary)}</p>
           </div>
         </div>
       `;
+
+      const contactRow = document.createElement('div');
+      contactRow.className = 'reservation-contact';
+
+      const contactHead = document.createElement('p');
+      contactHead.className = 'panel-kicker';
+      contactHead.textContent = 'Guest follow-up';
+      contactRow.appendChild(contactHead);
+
+      const quickActions = document.createElement('div');
+      quickActions.className = 'reservation-contact-actions';
+
+      if (row.customer.email) {
+        const emailLink = document.createElement('a');
+        emailLink.className = 'ghost-link reservation-quick-link';
+        emailLink.href = `mailto:${row.customer.email}`;
+        emailLink.textContent = 'Email guest';
+        quickActions.appendChild(emailLink);
+      }
+
+      if (row.customer.phone) {
+        const callLink = document.createElement('a');
+        callLink.className = 'ghost-link reservation-quick-link';
+        callLink.href = `tel:${row.customer.phone}`;
+        callLink.textContent = 'Call guest';
+        quickActions.appendChild(callLink);
+
+        const waDigits = normalizePhoneForWhatsApp(row.customer.phone);
+        if (waDigits) {
+          const waLink = document.createElement('a');
+          waLink.className = 'ghost-link reservation-quick-link';
+          waLink.href = `https://wa.me/${waDigits}`;
+          waLink.target = '_blank';
+          waLink.rel = 'noopener noreferrer';
+          waLink.textContent = 'WhatsApp guest';
+          quickActions.appendChild(waLink);
+        }
+      }
+
+      const contactHelp = document.createElement('p');
+      contactHelp.className = 'reservation-helper';
+      contactHelp.textContent =
+        'Each request is saved in the database and appears here immediately. Use the shortcuts above to reach the guest, then save your internal note and status.';
+
+      contactRow.appendChild(quickActions);
+      contactRow.appendChild(contactHelp);
+      card.appendChild(contactRow);
 
       const actions = document.createElement('div');
       actions.className = 'reservation-actions';
@@ -525,6 +601,51 @@
       card.appendChild(actions);
       container.appendChild(card);
     });
+  }
+
+  function summarizeReservationNotifications(notifications) {
+    if (!notifications || typeof notifications !== 'object') return 'Dashboard only';
+    const parts = [];
+    const emailStatus = notifications.email && notifications.email.status;
+    const webhookStatus = notifications.webhook && notifications.webhook.status;
+    const teamStatus = notifications.teamWhatsApp && notifications.teamWhatsApp.status;
+    if (emailStatus && emailStatus !== 'skipped') parts.push(`Email ${emailStatus}`);
+    if (webhookStatus && webhookStatus !== 'skipped') parts.push(`Webhook ${webhookStatus}`);
+    if (teamStatus === 'configured') parts.push('WhatsApp shortcut ready');
+    return parts.length ? parts.join(' · ') : 'Dashboard only';
+  }
+
+  function formatPreferredContact(value) {
+    const key = String(value || 'any').toLowerCase();
+    const labels = {
+      any: 'Any method',
+      phone: 'Phone call',
+      email: 'Email',
+      whatsapp: 'WhatsApp',
+      text: 'Text message',
+    };
+    return labels[key] || 'Any method';
+  }
+
+  function renderReservationRoutingNote() {
+    const note = byId('reservation-routing-note');
+    if (!note) return;
+    const content = state.bootstrap && state.bootstrap.content;
+    const booking = content && content.site ? content.site.booking || {} : {};
+    const routes = [];
+    if (booking.notificationEmail) routes.push(`Email alerts: ${booking.notificationEmail}`);
+    if (booking.teamWhatsAppHref) routes.push('Team WhatsApp shortcut configured');
+    if (booking.notificationWebhookUrl) routes.push('Webhook alerts configured');
+
+    note.hidden = false;
+    note.innerHTML = `
+      <p class="panel-kicker">Active routing</p>
+      <p>${esc(
+        routes.length
+          ? `Every request is stored here first. Mirror routes currently enabled: ${routes.join(' · ')}.`
+          : 'Every request is stored here first. Add an email inbox, WhatsApp shortcut, or webhook from the Homepage tab when you are ready.'
+      )}</p>
+    `;
   }
 
   function renderAnalytics() {
@@ -759,6 +880,9 @@
     next.site.booking.successTitle = byId('hp-booking-success-title').value.trim();
     next.site.booking.successText = byId('hp-booking-success-text').value.trim();
     next.site.booking.fallbackUrl = byId('hp-booking-fallback-url').value.trim();
+    next.site.booking.notificationEmail = byId('hp-booking-notification-email').value.trim();
+    next.site.booking.teamWhatsAppHref = byId('hp-booking-team-whatsapp').value.trim();
+    next.site.booking.notificationWebhookUrl = byId('hp-booking-webhook-url').value.trim();
     next.site.detailNotice = byId('hp-detail-notice').value.trim();
     next.site.contact.title = byId('hp-contact-title').value.trim();
     next.site.contact.subtitle = byId('hp-contact-subtitle').value.trim();

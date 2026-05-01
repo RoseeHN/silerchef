@@ -15,7 +15,7 @@
       "noticeBody": "Each cuisine opens into three sample menu sets. Every course can be adjusted to your preferences, dietary needs, or redesigned from scratch."
     },
     "servicesSection": {
-      "lede": "Corporate milestones, workshops, family tables, and intimate celebrations - open any card for experience pillars and a full image strip.",
+      "lede": "Corporate milestones, private lessons, family tables, and intimate celebrations - open any card for planning notes, sample flow, and a full image strip.",
       "noticeKicker": "Sample outlines only",
       "noticeBody": "What you see is a starting point - timing, courses, and flow adapt to your event."
     },
@@ -31,24 +31,27 @@
     },
     "stats": {
       "cuisinePortfolios": "5",
-      "occasionArchetypes": "5",
+      "occasionArchetypes": "6",
       "chefExperience": "1"
     },
     "cta": {
       "headline": "Hold your night on the calendar",
-      "summary": "Choose a time, tell us about your occasion, and we’ll follow up with menu direction."
+      "summary": "Choose a time, tell us about your occasion, and your request will land in the reservation desk for follow-up by phone, email, or WhatsApp."
     },
     "booking": {
       "title": "Reserve your date",
-      "lede": "Tell us about your table - we’ll confirm and shape the menu from here.",
+      "lede": "Tell us about your table - your request goes straight into the Siler Chef reservation desk, then we follow up by phone, email, or WhatsApp.",
       "successTitle": "Thank you - your request is in.",
-      "successText": "We’ll follow up shortly to confirm timing and menu direction.",
-      "fallbackUrl": "https://wa.me/17753896677"
+      "successText": "Your request is now in the Siler Chef dashboard. We’ll follow up shortly by phone, email, or WhatsApp to confirm details.",
+      "fallbackUrl": "https://wa.me/17753896677",
+      "notificationEmail": "silerchef@gmail.com",
+      "teamWhatsAppHref": "https://wa.me/17753896677",
+      "notificationWebhookUrl": ""
     },
     "detailNotice": "These are sample menu directions and service outlines - every event can be tailored to your brief, guest list, and dietary needs.",
     "contact": {
       "title": "Contact",
-      "subtitle": "Chef Siler · Reno, Nevada - call, message, or follow.",
+      "subtitle": "Chef Siler · Reno, Nevada - serving Reno, Lake Tahoe, and the Bay Area.",
       "phone": "+1 (775) 389-6677",
       "phoneHref": "tel:+17753896677",
       "email": "silerchef@gmail.com",
@@ -123,6 +126,12 @@
       "title": "Special Occasion Dining",
       "no": "05",
       "tagline": "Intimate arcs - proposals, reunions, chef’s-table focus."
+    },
+    {
+      "slug": "chef-education",
+      "title": "Private Lessons & Education",
+      "no": "06",
+      "tagline": "Chef-led lessons, workshops, and culinary coaching tailored to your group."
     }
   ],
   "cuisines": {
@@ -843,6 +852,67 @@
             {
               "name": "Add-on enhancements",
               "desc": "Wine coordination notes, printed menus, and dietary accommodations."
+            }
+          ]
+        }
+      ]
+    },
+    "chef-education": {
+      "intro": "A placeholder education section reserved for Chef Fikret’s upcoming workshop and lesson formats. This space is ready for his teaching philosophy, class flow, and signature topics.",
+      "blocks": [
+        {
+          "title": "Program overview",
+          "image": "images/services-and-occasions/chef-education/gallery/01.jpg",
+          "items": [
+            {
+              "name": "Core concept",
+              "desc": "Space reserved for Chef Fikret to introduce the education experience."
+            },
+            {
+              "name": "Ideal audience",
+              "desc": "Add whether this section is built for home cooks, private groups, team events, or executive clients."
+            }
+          ]
+        },
+        {
+          "title": "Format options",
+          "image": "images/services-and-occasions/chef-education/gallery/02.jpg",
+          "items": [
+            {
+              "name": "Hands-on class",
+              "desc": "Placeholder for class length, participation level, station setup, and the guest experience."
+            },
+            {
+              "name": "Demonstration session",
+              "desc": "Placeholder for tasting flow, Q&A structure, and how the chef presents the lesson live."
+            }
+          ]
+        },
+        {
+          "title": "Topics & curriculum",
+          "image": "images/services-and-occasions/chef-education/gallery/03.jpg",
+          "items": [
+            {
+              "name": "Signature subjects",
+              "desc": "Reserve this block for techniques, menus, plating topics, or specialty cuisines Chef Fikret wants to teach."
+            },
+            {
+              "name": "Customization",
+              "desc": "Add how sessions can adapt to experience level, dietary focus, private events, or corporate goals."
+            }
+          ]
+        },
+        {
+          "title": "Materials & next steps",
+          "image": "images/services-and-occasions/chef-education/gallery/04.jpg",
+          "items": [
+            {
+              "name": "What’s included",
+              "desc": "Placeholder for prep lists, ingredient sourcing, printed notes, tasting components, or take-home references."
+            },
+            {
+              "name": "Booking the session",
+              "desc": "Use this area to explain lead time, group size, service area, and any kitchen requirements."
             }
           ]
         }

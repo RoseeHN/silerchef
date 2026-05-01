@@ -105,18 +105,22 @@ function route_api(string $path, string $method, Repository $repository, AdminAu
                 'lastName' => $lastName,
                 'email' => $email,
                 'phone' => trim((string) ($payload['phone'] ?? '')),
+                'zipCode' => normalize_zip_code((string) ($payload['zipCode'] ?? '')),
                 'preferredDate' => $preferredDate,
                 'preferredTime' => trim((string) ($payload['preferredTime'] ?? '')),
+                'preferredContact' => normalize_preferred_contact((string) ($payload['preferredContact'] ?? '')),
                 'guestCount' => is_numeric($payload['guestCount'] ?? null) ? (int) $payload['guestCount'] : null,
                 'notes' => trim((string) ($payload['notes'] ?? '')),
             ]
         );
+        $alerts = $repository->dispatchReservationNotifications($reservation);
 
         json_response(
             [
                 'ok' => true,
                 'reservationId' => $reservation['id'],
                 'status' => 'pending',
+                'alerts' => $alerts,
             ]
         );
     }

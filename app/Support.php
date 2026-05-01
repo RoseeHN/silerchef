@@ -132,3 +132,24 @@ function valid_email(string $email): bool
 {
     return (bool) filter_var($email, FILTER_VALIDATE_EMAIL);
 }
+
+function normalize_zip_code(string $zipCode): string
+{
+    $value = strtoupper(trim($zipCode));
+    $value = preg_replace('/[^A-Z0-9 -]/', '', $value) ?? '';
+    return mb_substr(trim($value), 0, 20);
+}
+
+function normalize_preferred_contact(string $preferredContact): string
+{
+    $value = strtolower(trim($preferredContact));
+    $allowed = [
+        'any' => true,
+        'phone' => true,
+        'email' => true,
+        'whatsapp' => true,
+        'text' => true,
+    ];
+
+    return isset($allowed[$value]) ? $value : 'any';
+}

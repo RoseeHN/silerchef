@@ -65,6 +65,12 @@
       no: '05',
       tagline: 'Intimate arcs — proposals, reunions, chef’s-table focus.',
     },
+    {
+      slug: 'chef-education',
+      title: 'Private Lessons & Education',
+      no: '06',
+      tagline: 'Chef-led lessons, workshops, and culinary coaching tailored to your group.',
+    },
   ];
 
   let availabilityState = { note: '', blockedDates: [] };
@@ -129,25 +135,36 @@
     return out;
   }
 
+  async function collectNumberedImages(basePath) {
+    const found = [];
+    let misses = 0;
+    for (let i = 1; i <= 40; i++) {
+      const candidate = `${basePath}/${pad2(i)}.jpg`;
+      const hit = await probeImage(candidate);
+      if (hit) {
+        found.push(hit);
+        misses = 0;
+      } else {
+        misses += 1;
+        if ((found.length === 0 && misses >= 4) || (found.length > 0 && misses >= 6)) {
+          break;
+        }
+      }
+    }
+    return found;
+  }
+
   async function collectGalleryUrls(baseFolder, slug) {
     const base = `${baseFolder}/${slug}`;
     const found = [];
     const hero = await probeImage(`${base}/hero.jpg`);
     if (hero) found.push(hero);
 
-    const gallerySlots = [];
-    for (let i = 1; i <= 99; i++) {
-      gallerySlots.push(`${base}/gallery/${pad2(i)}.jpg`);
-    }
-    const fromGallery = await probeAll(gallerySlots);
+    const fromGallery = await collectNumberedImages(`${base}/gallery`);
     fromGallery.forEach((u) => found.push(u));
 
     if (found.length <= (hero ? 1 : 0)) {
-      const legacy = [];
-      for (let i = 1; i <= 99; i++) {
-        legacy.push(`${base}/${pad2(i)}.jpg`);
-      }
-      const fromLegacy = await probeAll(legacy);
+      const fromLegacy = await collectNumberedImages(base);
       fromLegacy.forEach((u) => found.push(u));
     }
 
@@ -239,6 +256,8 @@
   let stripAutoplayTimer = null;
   let stripMarqueeRaf = null;
   let dockInteractionCleanup = null;
+  let lockedScrollY = 0;
+  let activeModalLock = '';
 
   function clearAutoplayTimer() {
     if (stripAutoplayTimer) {
@@ -280,6 +299,7 @@
   function setupCarousel(heroEl, stripEl, urls) {
     resetCarouselTimers();
 
+    const heroWrap = heroEl.parentElement;
     heroEl.removeAttribute('src');
     stripEl.innerHTML = '';
     const prevBtn = document.querySelector('.detail-strip-prev');
@@ -296,7 +316,10 @@
     if (!urls.length) {
       heroEl.alt = '';
       heroEl.style.display = 'none';
-      heroEl.parentElement.classList.add('is-empty');
+      if (heroWrap) {
+        heroWrap.classList.add('is-empty');
+        heroWrap.style.removeProperty('--detail-hero-bg');
+      }
       if (dock) dock.hidden = true;
       return;
     }
@@ -304,7 +327,9 @@
     if (dock) dock.hidden = false;
 
     heroEl.style.display = '';
-    heroEl.parentElement.classList.remove('is-empty');
+    if (heroWrap) {
+      heroWrap.classList.remove('is-empty');
+    }
     heroEl.decoding = 'async';
     if ('fetchPriority' in heroEl) {
       heroEl.fetchPriority = 'high';
@@ -317,6 +342,10 @@
       currentIdx = ((idx % n) + n) % n;
       heroEl.src = urls[currentIdx];
       heroEl.alt = 'Gallery image ' + (currentIdx + 1);
+      if (heroWrap) {
+        const bgUrl = urls[currentIdx].replace(/(["'()\\])/g, '\\$1');
+        heroWrap.style.setProperty('--detail-hero-bg', `url("${bgUrl}")`);
+      }
       const thumbs = stripEl.querySelectorAll('.detail-thumb');
       thumbs.forEach((t, i) => {
         t.classList.toggle('is-active', i === currentIdx);
@@ -369,8 +398,8 @@
       clearAutoplayTimer();
       if (urls.length <= 1 || prefersReduced) return;
       stripAutoplayTimer = window.setInterval(() => {
-        goToIndex(currentIdx + 1, false);
-      }, 5200);
+        goToIndex(currentIdx + 1, true);
+      }, 4200);
     }
 
     function startStripMarquee() {
@@ -395,6 +424,9 @@
       stripMarqueeRaf = requestAnimationFrame(tick);
     }
 
+    scheduleAutoplay();
+    startStripMarquee();
+
     if (dock && urls.length > 1 && !prefersReduced) {
       const pause = () => {
         clearAutoplayTimer();
@@ -414,17 +446,40 @@
         dock.removeEventListener('focusin', pause);
         dock.removeEventListener('focusout', resume);
       };
-      resume();
     }
   }
 
   const overlay = document.getElementById('detail-overlay');
+  const detailKicker = document.getElementById('detail-kicker');
   const detailTitle = document.getElementById('detail-title');
   const detailIntro = document.getElementById('detail-intro');
   const detailBlocks = document.getElementById('detail-blocks');
   const detailHero = document.getElementById('detail-hero-img');
   const detailStrip = document.getElementById('detail-strip');
   const detailClose = document.querySelector('.detail-close');
+
+  function lockViewport(owner) {
+    if (activeModalLock === owner) return;
+    if (!activeModalLock) {
+      lockedScrollY =
+        typeof window.scrollY === 'number'
+          ? window.scrollY
+          : window.pageYOffset || document.documentElement.scrollTop || 0;
+      document.documentElement.classList.add('scroll-locked');
+      document.body.classList.add('scroll-locked');
+      document.body.style.top = `-${lockedScrollY}px`;
+    }
+    activeModalLock = owner;
+  }
+
+  function unlockViewport(owner) {
+    if (activeModalLock && activeModalLock !== owner) return;
+    activeModalLock = '';
+    document.documentElement.classList.remove('scroll-locked');
+    document.body.classList.remove('scroll-locked');
+    document.body.style.top = '';
+    window.scrollTo(0, lockedScrollY);
+  }
 
   function openDetail(kind, slug, title) {
     if (!overlay || !detailTitle || !detailIntro || !detailBlocks || !detailHero || !detailStrip) return;
@@ -436,17 +491,29 @@
       kind,
     });
 
+    if (detailKicker) {
+      detailKicker.textContent = kind === 'service' ? 'Service format' : 'Cuisine portfolio';
+    }
     detailTitle.textContent = title;
     detailIntro.textContent = copy && copy.intro ? copy.intro : '';
     detailIntro.hidden = !(copy && copy.intro);
 
     renderBlocks(detailBlocks, copy);
 
-    setupCarousel(detailHero, detailStrip, []);
+    const warmUrls = [];
+    if (copy && Array.isArray(copy.blocks)) {
+      copy.blocks.forEach((block) => {
+        if (block && typeof block.image === 'string' && block.image && !warmUrls.includes(block.image)) {
+          warmUrls.push(block.image);
+        }
+      });
+    }
+    setupCarousel(detailHero, detailStrip, warmUrls.slice(0, 4));
 
     overlay.hidden = false;
     overlay.setAttribute('aria-hidden', 'false');
     document.body.classList.add('detail-open');
+    lockViewport('detail');
 
     const sheetInner = overlay.querySelector('.detail-sheet-inner');
     if (sheetInner) sheetInner.scrollTop = 0;
@@ -470,6 +537,7 @@
     overlay.hidden = true;
     overlay.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('detail-open');
+    unlockViewport('detail');
   }
 
   function mountHub(containerId, items, kind, baseFolder, options) {
@@ -861,17 +929,24 @@
     document.body.classList.toggle('booking-open', open);
     document.documentElement.classList.toggle('booking-open', open);
     if (open) {
-      bookingOverlay.scrollTop = 0;
+      lockViewport('booking');
       setMobileNavOpen(false);
+      const bookingBody = bookingOverlay.querySelector('.booking-panel__body');
+      if (bookingBody) bookingBody.scrollTop = 0;
       const first = bookingForm && bookingForm.querySelector('input[name="firstName"]');
       if (first) requestAnimationFrame(() => first.focus());
     } else if (bookingForm && bookingSuccess && bookingError) {
+      unlockViewport('booking');
       bookingForm.reset();
       bookingForm.hidden = false;
       bookingForm.querySelector('input[name="guestCount"]').value = '2';
+      const preferredContact = bookingForm.querySelector('select[name="preferredContact"]');
+      if (preferredContact) preferredContact.value = 'any';
       bookingSuccess.hidden = true;
       bookingError.hidden = true;
       bookingError.textContent = '';
+    } else {
+      unlockViewport('booking');
     }
   }
 
@@ -924,8 +999,10 @@
         lastName: fd.get('lastName'),
         email: fd.get('email'),
         phone: fd.get('phone') || '',
+        zipCode: fd.get('zipCode') || '',
         preferredDate: fd.get('preferredDate') || '',
         preferredTime: fd.get('preferredTime') || '',
+        preferredContact: fd.get('preferredContact') || 'any',
         guestCount: guestRaw === '' || guestRaw === null ? null : Number(guestRaw),
         notes: fd.get('notes') || '',
       };
@@ -1050,7 +1127,7 @@
     const capStill = section && section.querySelector('.cinematic-caption__still');
     if (!section || !video) return;
 
-    const videoUrl = new URL('images/video/chef-reel.mp4', window.location.href).href;
+    const videoUrl = new URL('images/video/chef-reel.mov', window.location.href).href;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     function applyStillMode() {

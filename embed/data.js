@@ -68,6 +68,69 @@
     };
   }
 
+  function educationServiceCopy() {
+    const slug = 'chef-education';
+    return {
+      intro:
+        'A placeholder education section reserved for Chef Fikret’s upcoming workshop and lesson formats. This space is ready for his teaching philosophy, class flow, and signature topics.',
+      blocks: [
+        {
+          title: 'Program overview',
+          image: serviceBlockImage(slug, 1),
+          items: [
+            item('Core concept', 'Space reserved for Chef Fikret to introduce the education experience.'),
+            item(
+              'Ideal audience',
+              'Add whether this section is built for home cooks, private groups, team events, or executive clients.'
+            ),
+          ],
+        },
+        {
+          title: 'Format options',
+          image: serviceBlockImage(slug, 2),
+          items: [
+            item(
+              'Hands-on class',
+              'Placeholder for class length, participation level, station setup, and the guest experience.'
+            ),
+            item(
+              'Demonstration session',
+              'Placeholder for tasting flow, Q&A structure, and how the chef presents the lesson live.'
+            ),
+          ],
+        },
+        {
+          title: 'Topics & curriculum',
+          image: serviceBlockImage(slug, 3),
+          items: [
+            item(
+              'Signature subjects',
+              'Reserve this block for techniques, menus, plating topics, or specialty cuisines Chef Fikret wants to teach.'
+            ),
+            item(
+              'Customization',
+              'Add how sessions can adapt to experience level, dietary focus, private events, or corporate goals.'
+            ),
+          ],
+        },
+        {
+          title: 'Materials & next steps',
+          image: serviceBlockImage(slug, 4),
+          items: [
+            item(
+              'What’s included',
+              'Placeholder for prep lists, ingredient sourcing, printed notes, tasting components, or take-home references.'
+            ),
+            item(
+              'Booking the session',
+              'Use this area to explain lead time, group size, service area, and any kitchen requirements.'
+            ),
+          ],
+        },
+      ],
+    };
+  }
+
   const CUISINE_COPY = {
     'american-cuisine': {
       intro:
@@ -499,6 +562,7 @@
       'family-dinners': serviceDefaults('family-dinners', 'family dinners'),
       'special-events': serviceDefaults('special-events', 'special events'),
       'special-occasion-dining': serviceDefaults('special-occasion-dining', 'special-occasion dining'),
+      'chef-education': educationServiceCopy(),
     },
   };
 })(typeof window !== 'undefined' ? window : globalThis);

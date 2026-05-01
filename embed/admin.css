@@ -397,8 +397,43 @@ select:focus {
   white-space: pre-wrap;
 }
 
+.reservation-contact {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.reservation-contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.reservation-quick-link {
+  min-height: 2.75rem;
+}
+
+.reservation-helper {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
 .reservation-note {
   min-height: 92px;
+}
+
+.routing-card {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.95rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(197, 160, 89, 0.18);
+  background: linear-gradient(160deg, rgba(197, 160, 89, 0.11), rgba(24, 21, 23, 0.94) 34%, rgba(12, 11, 12, 0.98));
+}
+
+.routing-card p {
+  margin: 0;
 }
 
 .empty-state {

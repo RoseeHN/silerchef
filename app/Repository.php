@@ -22,6 +22,7 @@ final class Repository
     public function ensureReady(): void
     {
         $this->createSchema();
+        $this->ensureReservationColumns();
         $this->seedContentIfMissing();
         $this->seedReservationsIfMissing();
         $this->syncAdminFromEnvironment();
@@ -70,11 +71,11 @@ final class Repository
         $createdAt = gmdate('c');
         $stmt = $this->pdo->prepare(
             'INSERT INTO reservations (
-                id, first_name, last_name, email, phone, preferred_date, preferred_time, guest_count, notes,
-                status, admin_note, wix_sync_ok, wix_contact_id, wix_sync_error, created_at, updated_at
+                id, first_name, last_name, email, phone, zip_code, preferred_date, preferred_time, preferred_contact, guest_count, notes,
+                status, admin_note, notification_log, wix_sync_ok, wix_contact_id, wix_sync_error, created_at, updated_at
             ) VALUES (
-                :id, :first_name, :last_name, :email, :phone, :preferred_date, :preferred_time, :guest_count, :notes,
-                :status, :admin_note, :wix_sync_ok, :wix_contact_id, :wix_sync_error, :created_at, :updated_at
+                :id, :first_name, :last_name, :email, :phone, :zip_code, :preferred_date, :preferred_time, :preferred_contact, :guest_count, :notes,
+                :status, :admin_note, :notification_log, :wix_sync_ok, :wix_contact_id, :wix_sync_error, :created_at, :updated_at
             )'
         );
         $stmt->execute(
@@ -84,12 +85,15 @@ final class Repository
                 ':last_name' => $payload['lastName'],
                 ':email' => $payload['email'],
                 ':phone' => $payload['phone'] ?? '',
+                ':zip_code' => normalize_zip_code((string) ($payload['zipCode'] ?? '')),
                 ':preferred_date' => $payload['preferredDate'] ?? '',
                 ':preferred_time' => $payload['preferredTime'] ?? '',
+                ':preferred_contact' => normalize_preferred_contact((string) ($payload['preferredContact'] ?? '')),
                 ':guest_count' => $payload['guestCount'],
                 ':notes' => $payload['notes'] ?? '',
                 ':status' => 'pending',
                 ':admin_note' => '',
+                ':notification_log' => '{}',
                 ':wix_sync_ok' => 0,
                 ':wix_contact_id' => null,
                 ':wix_sync_error' => null,
@@ -99,6 +103,56 @@ final class Repository
         );
 
         return $this->findReservation($id) ?? [];
+    }
+
+    public function dispatchReservationNotifications(array $reservation): array
+    {
+        $content = $this->getContent();
+        $booking = is_array($content['site']['booking'] ?? null) ? $content['site']['booking'] : [];
+        $contact = is_array($content['site']['contact'] ?? null) ? $content['site']['contact'] : [];
+        $config = [
+            'email' => trim((string) ($booking['notificationEmail'] ?? ($contact['email'] ?? ''))),
+            'teamWhatsAppHref' => trim((string) ($booking['teamWhatsAppHref'] ?? ($contact['whatsappHref'] ?? ''))),
+            'webhookUrl' => trim((string) ($booking['notificationWebhookUrl'] ?? '')),
+        ];
+
+        $alerts = [
+            'dashboard' => [
+                'status' => 'saved',
+                'detail' => 'Saved to the private Siler Chef reservation dashboard.',
+            ],
+            'email' => [
+                'status' => $config['email'] !== '' ? 'queued' : 'skipped',
+                'target' => $config['email'] !== '' ? $config['email'] : null,
+                'detail' => $config['email'] !== ''
+                    ? 'Attempting delivery to the configured reservation email.'
+                    : 'No reservation email destination is configured yet.',
+            ],
+            'teamWhatsApp' => [
+                'status' => $config['teamWhatsAppHref'] !== '' ? 'configured' : 'unconfigured',
+                'target' => $config['teamWhatsAppHref'] !== '' ? $config['teamWhatsAppHref'] : null,
+                'detail' => $config['teamWhatsAppHref'] !== ''
+                    ? 'Team WhatsApp shortcut is ready inside the admin panel.'
+                    : 'No team WhatsApp route is configured yet.',
+            ],
+            'webhook' => [
+                'status' => $config['webhookUrl'] !== '' ? 'queued' : 'skipped',
+                'target' => $config['webhookUrl'] !== '' ? $config['webhookUrl'] : null,
+                'detail' => $config['webhookUrl'] !== ''
+                    ? 'Attempting webhook delivery for extra notification routing.'
+                    : 'No webhook route is configured.',
+            ],
+        ];
+
+        if ($config['email'] !== '') {
+            $alerts['email'] = $this->sendReservationEmailAlert($config['email'], $reservation);
+        }
+        if ($config['webhookUrl'] !== '') {
+            $alerts['webhook'] = $this->sendReservationWebhookAlert($config['webhookUrl'], $reservation);
+        }
+
+        $this->storeReservationNotificationLog((string) ($reservation['id'] ?? ''), $alerts);
+        return $alerts;
     }
 
     public function updateReservation(string $id, array $patch): ?array
@@ -356,12 +410,15 @@ final class Repository
                 last_name TEXT NOT NULL,
                 email TEXT NOT NULL,
                 phone TEXT NOT NULL,
+                zip_code TEXT NOT NULL DEFAULT \'\',
                 preferred_date TEXT NOT NULL,
                 preferred_time TEXT NOT NULL,
+                preferred_contact TEXT NOT NULL DEFAULT \'any\',
                 guest_count INTEGER NULL,
                 notes TEXT NOT NULL,
                 status TEXT NOT NULL,
                 admin_note TEXT NOT NULL,
+                notification_log TEXT NOT NULL DEFAULT \'{}\',
                 wix_sync_ok INTEGER NOT NULL DEFAULT 0,
                 wix_contact_id TEXT NULL,
                 wix_sync_error TEXT NULL,
@@ -382,6 +439,218 @@ final class Repository
         );
         $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_site_events_created_at ON site_events(created_at)');
         $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_site_events_name ON site_events(event_name)');
+    }
+
+    private function ensureReservationColumns(): void
+    {
+        $this->ensureColumn('reservations', 'zip_code', "TEXT NOT NULL DEFAULT ''");
+        $this->ensureColumn('reservations', 'preferred_contact', "TEXT NOT NULL DEFAULT 'any'");
+        $this->ensureColumn('reservations', 'notification_log', "TEXT NOT NULL DEFAULT '{}'");
+    }
+
+    private function ensureColumn(string $table, string $column, string $definition): void
+    {
+        if ($this->columnExists($table, $column)) {
+            return;
+        }
+
+        $this->pdo->exec(sprintf('ALTER TABLE %s ADD COLUMN %s %s', $table, $column, $definition));
+    }
+
+    private function columnExists(string $table, string $column): bool
+    {
+        if ($this->driver === 'pgsql') {
+            $stmt = $this->pdo->prepare(
+                'SELECT 1
+                   FROM information_schema.columns
+                  WHERE table_schema = current_schema()
+                    AND table_name = :table
+                    AND column_name = :column
+                  LIMIT 1'
+            );
+            $stmt->execute([
+                ':table' => $table,
+                ':column' => $column,
+            ]);
+            return (bool) $stmt->fetchColumn();
+        }
+
+        $stmt = $this->pdo->query(sprintf('PRAGMA table_info(%s)', $table));
+        foreach ($stmt->fetchAll() as $row) {
+            if ((string) ($row['name'] ?? '') === $column) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function storeReservationNotificationLog(string $id, array $alerts): void
+    {
+        if ($id === '') {
+            return;
+        }
+
+        $stmt = $this->pdo->prepare(
+            'UPDATE reservations
+                SET notification_log = :notification_log,
+                    updated_at = :updated_at
+              WHERE id = :id'
+        );
+        $stmt->execute([
+            ':notification_log' => json_encode($alerts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?: '{}',
+            ':updated_at' => gmdate('c'),
+            ':id' => $id,
+        ]);
+    }
+
+    private function sendReservationEmailAlert(string $to, array $reservation): array
+    {
+        $subject = sprintf(
+            'New Siler Chef reservation request · %s',
+            $this->formatReservationQuickSummary($reservation)
+        );
+        $body = $this->buildReservationAlertText($reservation);
+        $replyTo = trim((string) ($reservation['customer']['email'] ?? ''));
+        $from = env_string('NOTIFICATION_FROM_EMAIL', 'no-reply@silerchef.com');
+        $headers = [
+            'MIME-Version: 1.0',
+            'Content-Type: text/plain; charset=UTF-8',
+            'From: Siler Chef <' . $from . '>',
+        ];
+        if ($replyTo !== '' && valid_email($replyTo)) {
+            $headers[] = 'Reply-To: ' . $replyTo;
+        }
+
+        $sent = function_exists('mail') ? @mail($to, $subject, $body, implode("\r\n", $headers)) : false;
+        return [
+            'status' => $sent ? 'sent' : 'failed',
+            'target' => $to,
+            'detail' => $sent
+                ? 'Reservation alert sent to the configured inbox.'
+                : 'Email alert could not be delivered from this server yet. Keep using the admin dashboard and add a mail transport if needed.',
+        ];
+    }
+
+    private function sendReservationWebhookAlert(string $url, array $reservation): array
+    {
+        $payload = $this->buildReservationAlertPayload($reservation);
+        [$ok, $statusCode, $detail] = $this->postJson($url, $payload);
+
+        return [
+            'status' => $ok ? 'sent' : 'failed',
+            'target' => $url,
+            'detail' => $ok
+                ? 'Webhook alert delivered successfully.'
+                : ($detail !== '' ? $detail : ('Webhook alert failed' . ($statusCode > 0 ? ' (HTTP ' . $statusCode . ')' : '') . '.')),
+        ];
+    }
+
+    private function postJson(string $url, array $payload): array
+    {
+        $body = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        if (!is_string($body)) {
+            return [false, 0, 'Webhook payload could not be encoded.'];
+        }
+
+        if (function_exists('curl_init')) {
+            $ch = curl_init($url);
+            curl_setopt_array(
+                $ch,
+                [
+                    CURLOPT_POST => true,
+                    CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                    CURLOPT_POSTFIELDS => $body,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_CONNECTTIMEOUT => 4,
+                    CURLOPT_TIMEOUT => 8,
+                    CURLOPT_HEADER => false,
+                ]
+            );
+            $response = curl_exec($ch);
+            $err = curl_error($ch);
+            $statusCode = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+            curl_close($ch);
+            if ($response === false) {
+                return [false, $statusCode, $err !== '' ? $err : 'Unable to reach the webhook endpoint.'];
+            }
+            return [$statusCode >= 200 && $statusCode < 300, $statusCode, ''];
+        }
+
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'POST',
+                'header' => "Content-Type: application/json\r\n",
+                'content' => $body,
+                'timeout' => 8,
+                'ignore_errors' => true,
+            ],
+        ]);
+        $response = @file_get_contents($url, false, $context);
+        $statusLine = is_array($http_response_header ?? null) ? ((string) ($http_response_header[0] ?? '')) : '';
+        $statusCode = preg_match('/\s(\d{3})\s/', $statusLine, $matches) ? (int) $matches[1] : 0;
+        if ($response === false) {
+            return [false, $statusCode, 'Unable to reach the webhook endpoint.'];
+        }
+
+        return [$statusCode >= 200 && $statusCode < 300, $statusCode, ''];
+    }
+
+    private function buildReservationAlertPayload(array $reservation): array
+    {
+        return [
+            'type' => 'reservation.created',
+            'reservation' => $reservation,
+            'summary' => $this->formatReservationQuickSummary($reservation),
+            'generatedAt' => gmdate('c'),
+        ];
+    }
+
+    private function buildReservationAlertText(array $reservation): string
+    {
+        $customer = is_array($reservation['customer'] ?? null) ? $reservation['customer'] : [];
+        $request = is_array($reservation['request'] ?? null) ? $reservation['request'] : [];
+
+        $lines = [
+            'A new reservation request has been created on silerchef.com.',
+            '',
+            'Reservation ID: ' . (string) ($reservation['id'] ?? '-'),
+            'Created at: ' . (string) ($reservation['createdAt'] ?? gmdate('c')),
+            '',
+            'Guest: ' . trim(((string) ($customer['firstName'] ?? '')) . ' ' . ((string) ($customer['lastName'] ?? ''))),
+            'Email: ' . (string) ($customer['email'] ?? '-'),
+            'Phone: ' . ((string) ($customer['phone'] ?? '') !== '' ? (string) $customer['phone'] : '-'),
+            'ZIP code: ' . ((string) ($request['zipCode'] ?? '') !== '' ? (string) $request['zipCode'] : '-'),
+            'Preferred contact: ' . ucfirst((string) ($request['preferredContact'] ?? 'any')),
+            '',
+            'Preferred date: ' . ((string) ($request['preferredDate'] ?? '') !== '' ? (string) $request['preferredDate'] : '-'),
+            'Preferred time: ' . ((string) ($request['preferredTime'] ?? '') !== '' ? (string) $request['preferredTime'] : '-'),
+            'Guests: ' . ((string) ($request['guestCount'] ?? '') !== '' ? (string) $request['guestCount'] : '-'),
+            '',
+            'Notes:',
+            ((string) ($request['notes'] ?? '') !== '' ? (string) $request['notes'] : '-'),
+            '',
+            'Open the Siler Chef admin panel to review and follow up.',
+        ];
+
+        return implode("\n", $lines);
+    }
+
+    private function formatReservationQuickSummary(array $reservation): string
+    {
+        $customer = is_array($reservation['customer'] ?? null) ? $reservation['customer'] : [];
+        $request = is_array($reservation['request'] ?? null) ? $reservation['request'] : [];
+        $name = trim(((string) ($customer['firstName'] ?? '')) . ' ' . ((string) ($customer['lastName'] ?? '')));
+        $date = trim((string) ($request['preferredDate'] ?? ''));
+        $guests = $request['guestCount'] ?? null;
+
+        $parts = array_filter([
+            $name !== '' ? $name : 'Guest request',
+            $date !== '' ? $date : null,
+            $guests !== null && $guests !== '' ? (string) $guests . ' guests' : null,
+        ]);
+
+        return implode(' · ', $parts);
     }
 
     private function seedContentIfMissing(): void
@@ -411,11 +680,11 @@ final class Repository
             }
             $stmt = $this->pdo->prepare(
                 'INSERT INTO reservations (
-                    id, first_name, last_name, email, phone, preferred_date, preferred_time, guest_count, notes,
-                    status, admin_note, wix_sync_ok, wix_contact_id, wix_sync_error, created_at, updated_at
+                    id, first_name, last_name, email, phone, zip_code, preferred_date, preferred_time, preferred_contact, guest_count, notes,
+                    status, admin_note, notification_log, wix_sync_ok, wix_contact_id, wix_sync_error, created_at, updated_at
                 ) VALUES (
-                    :id, :first_name, :last_name, :email, :phone, :preferred_date, :preferred_time, :guest_count, :notes,
-                    :status, :admin_note, :wix_sync_ok, :wix_contact_id, :wix_sync_error, :created_at, :updated_at
+                    :id, :first_name, :last_name, :email, :phone, :zip_code, :preferred_date, :preferred_time, :preferred_contact, :guest_count, :notes,
+                    :status, :admin_note, :notification_log, :wix_sync_ok, :wix_contact_id, :wix_sync_error, :created_at, :updated_at
                 )'
             );
             $stmt->execute(
@@ -425,12 +694,15 @@ final class Repository
                     ':last_name' => (string) ($reservation['customer']['lastName'] ?? ''),
                     ':email' => (string) ($reservation['customer']['email'] ?? ''),
                     ':phone' => (string) ($reservation['customer']['phone'] ?? ''),
+                    ':zip_code' => normalize_zip_code((string) ($reservation['request']['zipCode'] ?? '')),
                     ':preferred_date' => (string) ($reservation['request']['preferredDate'] ?? ''),
                     ':preferred_time' => (string) ($reservation['request']['preferredTime'] ?? ''),
+                    ':preferred_contact' => normalize_preferred_contact((string) ($reservation['request']['preferredContact'] ?? '')),
                     ':guest_count' => $reservation['request']['guestCount'] ?? null,
                     ':notes' => (string) ($reservation['request']['notes'] ?? ''),
                     ':status' => normalize_reservation_status((string) ($reservation['status'] ?? 'pending')),
                     ':admin_note' => (string) ($reservation['adminNote'] ?? ''),
+                    ':notification_log' => json_encode($reservation['notifications'] ?? new stdClass(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?: '{}',
                     ':wix_sync_ok' => !empty($reservation['wixSync']['ok']) ? 1 : 0,
                     ':wix_contact_id' => $reservation['wixSync']['contactId'] ?? null,
                     ':wix_sync_error' => $reservation['wixSync']['error'] ?? null,
@@ -580,6 +852,9 @@ final class Repository
             'updatedAt' => $row['updated_at'] !== null ? (string) $row['updated_at'] : null,
             'status' => (string) $row['status'],
             'adminNote' => (string) $row['admin_note'],
+            'notifications' => is_array(json_decode((string) ($row['notification_log'] ?? '{}'), true))
+                ? json_decode((string) ($row['notification_log'] ?? '{}'), true)
+                : [],
             'wixSync' => [
                 'ok' => (bool) $row['wix_sync_ok'],
                 'contactId' => $row['wix_contact_id'] !== null ? (string) $row['wix_contact_id'] : null,
@@ -592,8 +867,10 @@ final class Repository
                 'phone' => (string) $row['phone'],
             ],
             'request' => [
+                'zipCode' => (string) ($row['zip_code'] ?? ''),
                 'preferredDate' => (string) $row['preferred_date'],
                 'preferredTime' => (string) $row['preferred_time'],
+                'preferredContact' => normalize_preferred_contact((string) ($row['preferred_contact'] ?? 'any')),
                 'guestCount' => $row['guest_count'] !== null ? (int) $row['guest_count'] : null,
                 'notes' => (string) $row['notes'],
             ],
@@ -684,6 +961,19 @@ final class Repository
         $hasStructuredData = str_contains($publicHtml, 'application/ld+json');
         $adminNoindex = (bool) preg_match('/meta\s+name="robots"\s+content="noindex/i', $adminHtml);
         $publicIndexable = (bool) preg_match('/meta\s+name="robots"\s+content="index,\s*follow/i', $publicHtml);
+        $localSeoSource = implode(
+            ' ',
+            array_filter([
+                (string) ($content['site']['hero']['tagline'] ?? ''),
+                (string) ($content['site']['hero']['lede'] ?? ''),
+                (string) ($content['site']['cta']['summary'] ?? ''),
+                (string) ($content['site']['contact']['subtitle'] ?? ''),
+                $publicHtml,
+            ])
+        );
+        $hasLocalAreaSignals = preg_match('/reno/i', $localSeoSource)
+            && preg_match('/tahoe/i', $localSeoSource)
+            && preg_match('/bay area/i', $localSeoSource);
 
         return [
             'host' => $host,
@@ -719,6 +1009,13 @@ final class Repository
                     'detail' => $hasStructuredData ? 'Schema markup is present for WebSite, LocalBusiness, and Service.' : 'Structured data could not be detected.',
                 ],
                 [
+                    'label' => 'Local market SEO copy',
+                    'status' => $hasLocalAreaSignals ? 'ok' : 'warn',
+                    'detail' => $hasLocalAreaSignals
+                        ? 'Visible copy references Reno, Lake Tahoe, and the Bay Area for local search relevance.'
+                        : 'Add visible service-area copy for Reno, Lake Tahoe, and the Bay Area.',
+                ],
+                [
                     'label' => 'Search engine controls',
                     'status' => ($publicIndexable && $adminNoindex) ? 'ok' : 'warn',
                     'detail' => ($publicIndexable && $adminNoindex)
@@ -740,10 +1037,49 @@ final class Repository
             $content['availability'] = ['note' => '', 'blockedDates' => []];
         }
         $content['availability'] = normalize_availability($content['availability']);
+        $seed = $this->loadSeedContent();
+        $content['site'] = deep_merge(
+            is_array($seed['site'] ?? null) ? $seed['site'] : [],
+            is_array($content['site'] ?? null) ? $content['site'] : []
+        );
+
+        if (!isset($content['serviceCards']) || !is_array($content['serviceCards'])) {
+            $content['serviceCards'] = [];
+        }
+        $serviceCardSlugs = [];
+        foreach ($content['serviceCards'] as $card) {
+            if (!empty($card['slug'])) {
+                $serviceCardSlugs[(string) $card['slug']] = true;
+            }
+        }
+        foreach (($seed['serviceCards'] ?? []) as $card) {
+            if (!is_array($card) || empty($card['slug'])) {
+                continue;
+            }
+            $slug = (string) $card['slug'];
+            if (!isset($serviceCardSlugs[$slug])) {
+                $content['serviceCards'][] = $card;
+                $serviceCardSlugs[$slug] = true;
+            }
+        }
+
+        if (!isset($content['services']) || !is_array($content['services'])) {
+            $content['services'] = [];
+        }
+        foreach (($seed['services'] ?? []) as $slug => $definition) {
+            if (!isset($content['services'][$slug]) || !is_array($content['services'][$slug])) {
+                $content['services'][$slug] = $definition;
+            }
+        }
 
         $legacyHeroHeadline = 'Global Flavors, Happy Tables, Unforgettable Moments';
         $legacyHeroTagline = 'Reno · Private dining · Bespoke menus';
         $legacyHeroLede = 'Exquisite world cuisines in the comfort of your home - Chef Siler curates and shapes each experience for your table.';
+        $legacyServicesLede = 'Corporate milestones, workshops, family tables, and intimate celebrations - open any card for experience pillars and a full image strip.';
+        $legacyCtaSummary = 'Choose a time, tell us about your occasion, and we’ll follow up with menu direction.';
+        $legacyBookingLede = 'Tell us about your table - we’ll confirm and shape the menu from here.';
+        $legacyBookingSuccess = 'We’ll follow up shortly to confirm timing and menu direction.';
+        $legacyContactSubtitle = 'Chef Siler · Reno, Nevada - call, message, or follow.';
         $hero = isset($content['site']['hero']) && is_array($content['site']['hero'])
             ? $content['site']['hero']
             : [];
@@ -757,12 +1093,44 @@ final class Repository
             $content['site']['hero']['lede'] =
                 'For hosts who want more than dinner, Siler Chef designs globally inspired menus, refined plating, and an effortless service flow that turns home entertaining into a true occasion.';
         }
+        if (($content['site']['servicesSection']['lede'] ?? '') === $legacyServicesLede) {
+            $content['site']['servicesSection']['lede'] =
+                'Corporate milestones, private lessons, family tables, and intimate celebrations - open any card for planning notes, sample flow, and a full image strip.';
+        }
+        if (($content['site']['cta']['summary'] ?? '') === $legacyCtaSummary) {
+            $content['site']['cta']['summary'] =
+                'Choose a time, tell us about your occasion, and your request will land in the reservation desk for follow-up by phone, email, or WhatsApp.';
+        }
+        if (($content['site']['booking']['lede'] ?? '') === $legacyBookingLede) {
+            $content['site']['booking']['lede'] =
+                'Tell us about your table - your request goes straight into the Siler Chef reservation desk, then we follow up by phone, email, or WhatsApp.';
+        }
+        if (($content['site']['booking']['successText'] ?? '') === $legacyBookingSuccess) {
+            $content['site']['booking']['successText'] =
+                'Your request is now in the Siler Chef dashboard. We’ll follow up shortly by phone, email, or WhatsApp to confirm details.';
+        }
+        if (($content['site']['contact']['subtitle'] ?? '') === $legacyContactSubtitle) {
+            $content['site']['contact']['subtitle'] =
+                'Chef Siler · Reno, Nevada - serving Reno, Lake Tahoe, and the Bay Area.';
+        }
+
+        $occasionStat = (string) ($content['site']['stats']['occasionArchetypes'] ?? '');
+        if ($occasionStat === '' || $occasionStat === '5') {
+            $content['site']['stats']['occasionArchetypes'] = (string) count($content['serviceCards']);
+        }
 
         $fallbackUrl = trim((string) ($content['site']['booking']['fallbackUrl'] ?? ''));
         $whatsAppUrl = trim((string) ($content['site']['contact']['whatsappHref'] ?? ''));
         if ($fallbackUrl === '' || str_contains($fallbackUrl, '/book-online')) {
             $content['site']['booking']['fallbackUrl'] = $whatsAppUrl !== '' ? $whatsAppUrl : '#contact';
         }
+        if (trim((string) ($content['site']['booking']['notificationEmail'] ?? '')) === '') {
+            $content['site']['booking']['notificationEmail'] = trim((string) ($content['site']['contact']['email'] ?? ''));
+        }
+        if (trim((string) ($content['site']['booking']['teamWhatsAppHref'] ?? '')) === '') {
+            $content['site']['booking']['teamWhatsAppHref'] = $whatsAppUrl;
+        }
+        $content['site']['booking']['notificationWebhookUrl'] = trim((string) ($content['site']['booking']['notificationWebhookUrl'] ?? ''));
 
         return $content;
     }
