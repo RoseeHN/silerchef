@@ -647,11 +647,9 @@ html.is-scrolled .site-header {
     padding: 0.72rem 1rem;
   }
 
-  /* Sağ üst: menü + header üstünde kalsın; hamburger’e çarpmasın (sağdan boşluk) */
   .whatsapp-fab {
-    top: max(0.55rem, env(safe-area-inset-top, 0px));
-    bottom: auto;
-    right: max(4.75rem, calc(env(safe-area-inset-right, 0px) + 3.5rem));
+    right: max(0.9rem, env(safe-area-inset-right, 0px));
+    bottom: max(0.9rem, calc(env(safe-area-inset-bottom, 0px) + 0.35rem));
   }
 }
 
@@ -1556,6 +1554,14 @@ main {
 .whatsapp-fab:focus-visible {
   outline: 2px solid rgba(243, 248, 245, 0.95);
   outline-offset: 3px;
+}
+
+body.nav-drawer-open .whatsapp-fab,
+body.detail-open .whatsapp-fab,
+body.booking-open .whatsapp-fab {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
 }
 
 .social-tile:focus-visible {
