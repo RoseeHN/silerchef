@@ -8,6 +8,8 @@
     activeTab: 'homepage',
     selectedCuisineSlug: '',
     selectedServiceSlug: '',
+    reservationSearch: '',
+    reservationStatusFilter: 'all',
   };
 
   function getApiBase() {
@@ -36,11 +38,46 @@
     return JSON.parse(JSON.stringify(value));
   }
 
+  function lower(value) {
+    return String(value == null ? '' : value).trim().toLowerCase();
+  }
+
+  function isPlaceholderCopy(value) {
+    const text = lower(value);
+    return (
+      text.includes('placeholder') ||
+      text.includes('space reserved') ||
+      text.includes('reserve this block') ||
+      text.includes('ready for chef fikret') ||
+      text.includes('upcoming workshop') ||
+      text.includes('use this area to') ||
+      text.includes('add how') ||
+      text.includes('add whether')
+    );
+  }
+
+  function formatRouteLabel(value) {
+    return value ? 'Configured' : 'Not set';
+  }
+
   function setMessage(el, text, isError) {
     if (!el) return;
     el.hidden = !text;
     el.textContent = text || '';
     el.className = isError ? 'error' : 'status';
+  }
+
+  function setAdminMode(mode) {
+    document.body.classList.remove('admin-authenticated', 'admin-logged-out', 'admin-auth-pending');
+    if (mode === 'authenticated') {
+      document.body.classList.add('admin-authenticated');
+      return;
+    }
+    if (mode === 'pending') {
+      document.body.classList.add('admin-auth-pending');
+      return;
+    }
+    document.body.classList.add('admin-logged-out');
   }
 
   function getToken() {
@@ -62,6 +99,31 @@
     };
     if (token) headers.Authorization = `Bearer ${token}`;
     return fetch(apiUrl(path), { ...(options || {}), headers });
+  }
+
+  function showLoggedOutView() {
+    byId('admin-stage').hidden = false;
+    byId('login-card').hidden = false;
+    byId('dashboard').hidden = true;
+    byId('logout-btn').hidden = true;
+    if (byId('sidebar-logout-btn')) byId('sidebar-logout-btn').hidden = true;
+    setAdminMode('logged-out');
+  }
+
+  function showPendingView() {
+    byId('admin-stage').hidden = true;
+    byId('dashboard').hidden = true;
+    byId('logout-btn').hidden = true;
+    if (byId('sidebar-logout-btn')) byId('sidebar-logout-btn').hidden = true;
+    setAdminMode('pending');
+  }
+
+  function showAuthenticatedView() {
+    byId('admin-stage').hidden = true;
+    byId('dashboard').hidden = false;
+    byId('logout-btn').hidden = true;
+    if (byId('sidebar-logout-btn')) byId('sidebar-logout-btn').hidden = false;
+    setAdminMode('authenticated');
   }
 
   function formatDateTime(isoText) {
@@ -99,10 +161,122 @@
     byId('summary-whatsapp').textContent = formatCount(overview.whatsappClicks || 0);
   }
 
+  function getTopRow(rows) {
+    return Array.isArray(rows) && rows.length ? rows[0] : null;
+  }
+
+  function buildWebsiteSectionHref(hash) {
+    const content = getContent();
+    const base = content && content.site && content.site.contact ? content.site.contact.websiteHref : '';
+    return `${base || '/'}${hash || ''}`;
+  }
+
+  function renderDashboardInsights() {
+    if (!state.bootstrap) return;
+    const content = getContent();
+    const booking = content.site.booking || {};
+    const metrics = state.bootstrap.metrics || {};
+    const overview = metrics.overview || {};
+    const recentActivity = metrics.recentActivity || {};
+    const topCuisine = getTopRow((metrics.topContent || {}).cuisines || []);
+    const topService = getTopRow((metrics.topContent || {}).services || []);
+    const reservations = state.bootstrap.reservations || [];
+    const blockedDates = state.bootstrap.availability ? state.bootstrap.availability.blockedDates || [] : [];
+    const education = content.services['chef-education'] || { intro: '', blocks: [] };
+    const educationPlaceholder =
+      isPlaceholderCopy(education.intro) ||
+      (education.blocks || []).some((block) =>
+        isPlaceholderCopy(block.title) || (block.items || []).some((item) => isPlaceholderCopy(item.desc) || isPlaceholderCopy(item.name))
+      );
+
+    const actionCard = byId('action-center-card');
+    const routingCard = byId('routing-overview-card');
+    const contentCard = byId('content-health-card');
+    const trafficCard = byId('traffic-insight-card');
+
+    if (actionCard) {
+      const actionLines = [];
+      if (!reservations.length) actionLines.push('No reservation requests yet');
+      if (!overview.bookingOpens && overview.pageViews > 0) actionLines.push('Guests are viewing the site but not opening the booking form');
+      if (educationPlaceholder) actionLines.push('Education section still reads like a draft');
+      if (!actionLines.length) actionLines.push('Reservation flow, scheduling, and content are all live');
+
+      actionCard.innerHTML = `
+        <p class="panel-kicker">Action center</p>
+        <h3>What needs attention next</h3>
+        <div class="utility-meta">
+          <span class="utility-pill">${esc(`${reservations.length} request${reservations.length === 1 ? '' : 's'}`)}</span>
+          <span class="utility-pill">${esc(`${blockedDates.length} blocked date${blockedDates.length === 1 ? '' : 's'}`)}</span>
+        </div>
+        <ul class="utility-list">
+          ${actionLines.map((line) => `<li>${esc(line)}</li>`).join('')}
+        </ul>
+        <div class="utility-actions">
+          <button class="ghost-button utility-link" type="button" data-jump-reservations>Review desk</button>
+          <a class="ghost-link utility-link" href="${esc(buildWebsiteSectionHref('#contact'))}" target="_blank" rel="noopener noreferrer">Open website</a>
+        </div>
+      `;
+    }
+
+    if (routingCard) {
+      routingCard.innerHTML = `
+        <p class="panel-kicker">Routing</p>
+        <h3>Where reservation requests land</h3>
+        <div class="utility-specs">
+          <div class="utility-spec"><span>Email alerts</span><strong>${esc(booking.notificationEmail || 'Dashboard only')}</strong></div>
+          <div class="utility-spec"><span>Team WhatsApp</span><strong>${esc(formatRouteLabel(booking.teamWhatsAppHref))}</strong></div>
+          <div class="utility-spec"><span>Webhook</span><strong>${esc(formatRouteLabel(booking.notificationWebhookUrl))}</strong></div>
+          <div class="utility-spec"><span>Fallback CTA</span><strong>${esc(booking.fallbackUrl ? 'WhatsApp ready' : 'Missing')}</strong></div>
+        </div>
+        <p class="utility-note">Requests are always saved to the dashboard first, then mirrored to any extra routes you configure here.</p>
+      `;
+    }
+
+    if (contentCard) {
+      const healthLines = [];
+      if (educationPlaceholder) healthLines.push('Private Lessons & Education still contains placeholder copy.');
+      if (!content.site.contact.instagramHref) healthLines.push('Instagram link is missing.');
+      if (!content.site.contact.facebookHref) healthLines.push('Facebook link is missing.');
+      if (!booking.notificationEmail) healthLines.push('Reservation email route is not configured.');
+      if (!healthLines.length) healthLines.push('Contact details, booking routes, and visible content look complete.');
+
+      contentCard.innerHTML = `
+        <p class="panel-kicker">Content health</p>
+        <h3>Live copy and section readiness</h3>
+        <ul class="utility-list">
+          ${healthLines.map((line) => `<li>${esc(line)}</li>`).join('')}
+        </ul>
+        <div class="utility-meta">
+          <span class="utility-pill">${esc(`${content.cuisineCards.length} cuisines live`)}</span>
+          <span class="utility-pill">${esc(`${content.serviceCards.length} services live`)}</span>
+        </div>
+      `;
+    }
+
+    if (trafficCard) {
+      const insights = [];
+      if (topCuisine) insights.push(`Top cuisine interest: ${topCuisine.title} (${formatCount(topCuisine.count)} opens)`);
+      if (topService) insights.push(`Top service interest: ${topService.title} (${formatCount(topService.count)} opens)`);
+      if (overview.pageViews > 0 && !overview.bookingOpens) insights.push('Booking popup still has 0 opens, so the main CTA likely needs more emphasis.');
+      if (overview.whatsappClicks > 0) insights.push(`WhatsApp is being used (${formatCount(overview.whatsappClicks)} click${overview.whatsappClicks === 1 ? '' : 's'}).`);
+
+      trafficCard.innerHTML = `
+        <p class="panel-kicker">Traffic insight</p>
+        <h3>What visitor behavior is saying</h3>
+        <ul class="utility-list">
+          ${insights.map((line) => `<li>${esc(line)}</li>`).join('')}
+        </ul>
+        <p class="utility-note">Last tracked event: ${esc(formatDateTime(recentActivity.lastEventAt))}</p>
+      `;
+    }
+  }
+
   function setActiveTab(tabName) {
     state.activeTab = tabName;
     document.querySelectorAll('.admin-tab').forEach((btn) => {
-      btn.classList.toggle('is-active', btn.dataset.tab === tabName);
+      const isActive = btn.dataset.tab === tabName;
+      btn.classList.toggle('is-active', isActive);
+      btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
     });
     document.querySelectorAll('.tab-panel').forEach((panel) => {
       panel.classList.toggle('is-active', panel.dataset.panel === tabName);
@@ -345,6 +519,7 @@
     const card = getCuisineCard(slug);
     const detail = getContent().cuisines[slug];
     if (!card || !detail) return;
+    renderMenuPreview(card, detail);
     byId('menu-editor').innerHTML = `
       <div class="editor-shell">
         <section class="editor-card">
@@ -381,6 +556,33 @@
     `;
   }
 
+  function renderMenuPreview(card, detail) {
+    const preview = byId('menu-preview');
+    if (!preview) return;
+    const blocks = detail.blocks || [];
+    const hero = blocks[0] || {};
+    preview.innerHTML = `
+      <article class="editor-preview-card">
+        <div class="editor-preview-card__media">
+          ${hero.image ? `<img src="${esc(hero.image)}" alt="${esc(card.title)} preview image" loading="lazy" />` : '<div class="editor-preview-card__placeholder">No image selected</div>'}
+        </div>
+        <div class="editor-preview-card__body">
+          <p class="panel-kicker">Live preview</p>
+          <h3>${esc(card.no)} · ${esc(card.title)}</h3>
+          <p class="editor-preview-card__tagline">${esc(card.tagline)}</p>
+          <div class="utility-meta">
+            <span class="utility-pill">${esc(`${blocks.length} sample set${blocks.length === 1 ? '' : 's'}`)}</span>
+            <span class="utility-pill">${esc(`${(hero.items || []).length} dishes in first set`)}</span>
+          </div>
+          <p class="utility-note">${esc(detail.intro)}</p>
+          <div class="utility-actions">
+            <a class="ghost-link utility-link" href="${esc(buildWebsiteSectionHref('#cuisines'))}" target="_blank" rel="noopener noreferrer">Open public section</a>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
   function renderServiceSelect() {
     const select = byId('service-select');
     const content = getContent();
@@ -398,6 +600,7 @@
     const card = getServiceCard(slug);
     const detail = getContent().services[slug];
     if (!card || !detail) return;
+    renderServicePreview(card, detail, slug);
     byId('service-editor').innerHTML = `
       <div class="editor-shell">
         <section class="editor-card">
@@ -434,6 +637,43 @@
     `;
   }
 
+  function renderServicePreview(card, detail, slug) {
+    const preview = byId('service-preview');
+    if (!preview) return;
+    const blocks = detail.blocks || [];
+    const hero = blocks[0] || {};
+    const needsDraftWarning =
+      slug === 'chef-education' &&
+      (isPlaceholderCopy(detail.intro) ||
+        blocks.some((block) => isPlaceholderCopy(block.title) || (block.items || []).some((item) => isPlaceholderCopy(item.desc) || isPlaceholderCopy(item.name))));
+
+    preview.innerHTML = `
+      <article class="editor-preview-card">
+        <div class="editor-preview-card__media">
+          ${hero.image ? `<img src="${esc(hero.image)}" alt="${esc(card.title)} preview image" loading="lazy" />` : '<div class="editor-preview-card__placeholder">No image selected</div>'}
+        </div>
+        <div class="editor-preview-card__body">
+          <p class="panel-kicker">Live preview</p>
+          <h3>${esc(card.no)} · ${esc(card.title)}</h3>
+          <p class="editor-preview-card__tagline">${esc(card.tagline)}</p>
+          <div class="utility-meta">
+            <span class="utility-pill">${esc(`${blocks.length} detail block${blocks.length === 1 ? '' : 's'}`)}</span>
+            <span class="utility-pill ${needsDraftWarning ? 'utility-pill--warn' : ''}">${needsDraftWarning ? 'Draft copy still present' : 'Ready for guests'}</span>
+          </div>
+          <p class="utility-note">${esc(detail.intro)}</p>
+          ${
+            needsDraftWarning
+              ? '<p class="editor-draft-note">This section still contains placeholder education copy. Replacing it with Chef Fikret\'s real curriculum will make this area feel production-ready.</p>'
+              : ''
+          }
+          <div class="utility-actions">
+            <a class="ghost-link utility-link" href="${esc(buildWebsiteSectionHref('#services'))}" target="_blank" rel="noopener noreferrer">Open public section</a>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
   function renderAvailabilityEditor() {
     const rows = state.bootstrap.availability.blockedDates || [];
     byId('availability-note').value = state.bootstrap.availability.note || '';
@@ -458,13 +698,81 @@
       .join('');
   }
 
+  function getReservationCounts(rows) {
+    return ['pending', 'confirmed', 'completed', 'cancelled', 'blocked'].map((status) => ({
+      status,
+      count: rows.filter((row) => row.status === status).length,
+    }));
+  }
+
+  function getFilteredReservations() {
+    const reservations = (state.bootstrap && state.bootstrap.reservations) || [];
+    const query = lower(state.reservationSearch);
+    const status = state.reservationStatusFilter;
+    return reservations
+      .slice()
+      .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))
+      .filter((row) => {
+        if (status !== 'all' && row.status !== status) return false;
+        if (!query) return true;
+        const haystack = [
+          row.customer && row.customer.firstName,
+          row.customer && row.customer.lastName,
+          row.customer && row.customer.email,
+          row.customer && row.customer.phone,
+          row.request && row.request.zipCode,
+          row.request && row.request.notes,
+          row.adminNote,
+        ]
+          .join(' ')
+          .toLowerCase();
+        return haystack.includes(query);
+      });
+  }
+
+  function renderReservationMiniStats(rows) {
+    const shell = byId('reservation-mini-stats');
+    if (!shell) return;
+    const counts = getReservationCounts((state.bootstrap && state.bootstrap.reservations) || []);
+    const filteredCount = rows.length;
+    shell.innerHTML = `
+      <span class="utility-pill">${esc(`${filteredCount} visible`)}</span>
+      ${counts
+        .map(
+          (entry) =>
+            `<span class="utility-pill ${state.reservationStatusFilter === entry.status ? 'utility-pill--active' : ''}">${esc(
+              `${entry.status}: ${entry.count}`
+            )}</span>`
+        )
+        .join('')}
+    `;
+  }
+
   function renderReservations() {
-    const reservations = state.bootstrap.reservations || [];
+    const reservations = getFilteredReservations();
     const container = byId('reservations-list');
     const empty = byId('reservations-empty');
     renderReservationRoutingNote();
+    renderReservationMiniStats(reservations);
     container.innerHTML = '';
     empty.hidden = reservations.length > 0;
+    if (empty) {
+      if ((state.bootstrap.reservations || []).length === 0) {
+        empty.innerHTML = `
+          <strong>No reservation requests yet.</strong>
+          <p>The desk is live and ready. Until the first request lands, the most valuable next step is pushing guests toward the booking popup or the WhatsApp route.</p>
+          <div class="utility-actions">
+            <a class="ghost-link utility-link" href="${esc(buildWebsiteSectionHref('#contact'))}" target="_blank" rel="noopener noreferrer">Open public contact area</a>
+            <button class="ghost-button utility-link" type="button" data-jump-homepage>Review booking routing</button>
+          </div>
+        `;
+      } else {
+        empty.innerHTML = `
+          <strong>No reservations match these filters.</strong>
+          <p>Try a different status or clear the guest search to see all requests again.</p>
+        `;
+      }
+    }
     reservations.forEach((row) => {
       const requestLines = [
         `Date: ${esc(row.request.preferredDate || '-')}`,
@@ -828,6 +1136,7 @@
 
   function renderDashboard() {
     updateSummary();
+    renderDashboardInsights();
     renderHomepageFields();
     renderCuisineSelect();
     renderMenuEditor();
@@ -838,20 +1147,27 @@
     renderAnalytics();
   }
 
+  function syncGlobalLinks() {
+    const content = getContent();
+    if (!content || !content.site || !content.site.contact) return;
+    const href = content.site.contact.websiteHref || '/';
+    ['open-website-link', 'sidebar-open-website-link'].forEach((id) => {
+      const link = byId(id);
+      if (link) link.href = href;
+    });
+  }
+
   async function loadBootstrap() {
     const res = await apiFetch('/api/admin/bootstrap');
     if (res.status === 401) {
       setToken('');
-      byId('dashboard').hidden = true;
-      byId('logout-btn').hidden = true;
-      byId('login-card').hidden = false;
+      showLoggedOutView();
       return;
     }
     if (!res.ok) throw new Error('Unable to load admin data');
     state.bootstrap = await res.json();
-    byId('login-card').hidden = true;
-    byId('dashboard').hidden = false;
-    byId('logout-btn').hidden = false;
+    showAuthenticatedView();
+    syncGlobalLinks();
     renderDashboard();
     setActiveTab(state.activeTab);
   }
@@ -990,7 +1306,8 @@
   byId('login-form').addEventListener('submit', async (event) => {
     event.preventDefault();
     setMessage(byId('login-error'), '', true);
-    const form = new FormData(event.currentTarget);
+    const formEl = event.currentTarget;
+    const form = new FormData(formEl);
     try {
       const res = await fetch(apiUrl('/api/admin/login'), {
         method: 'POST',
@@ -1003,7 +1320,7 @@
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.detail || data.error || 'Login failed');
       setToken(data.token);
-      event.currentTarget.reset();
+      formEl.reset();
       await loadBootstrap();
     } catch (err) {
       setMessage(byId('login-error'), err.message || 'Login failed', true);
@@ -1034,13 +1351,16 @@
     await loadBootstrap().catch((err) => alert(err.message || 'Unable to refresh metrics'));
   });
 
-  byId('logout-btn').addEventListener('click', () => {
+  function handleLogout() {
     setToken('');
     state.bootstrap = null;
-    byId('dashboard').hidden = true;
-    byId('logout-btn').hidden = true;
-    byId('login-card').hidden = false;
-  });
+    showLoggedOutView();
+  }
+
+  byId('logout-btn').addEventListener('click', handleLogout);
+  if (byId('sidebar-logout-btn')) {
+    byId('sidebar-logout-btn').addEventListener('click', handleLogout);
+  }
 
   document.querySelectorAll('.admin-tab').forEach((btn) => {
     btn.addEventListener('click', () => setActiveTab(btn.dataset.tab));
@@ -1054,6 +1374,16 @@
   byId('service-select').addEventListener('change', (event) => {
     state.selectedServiceSlug = event.target.value;
     renderServiceEditor();
+  });
+
+  byId('reservation-search').addEventListener('input', (event) => {
+    state.reservationSearch = event.target.value || '';
+    renderReservations();
+  });
+
+  byId('reservation-status-filter').addEventListener('change', (event) => {
+    state.reservationStatusFilter = event.target.value || 'all';
+    renderReservations();
   });
 
   byId('add-blocked-date-btn').addEventListener('click', () => {
@@ -1070,10 +1400,28 @@
     renderAvailabilityEditor();
   });
 
+  document.addEventListener('click', (event) => {
+    const jumpBtn = event.target.closest('[data-jump-homepage]');
+    if (jumpBtn) {
+      setActiveTab('homepage');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    const reservationsBtn = event.target.closest('[data-jump-reservations]');
+    if (reservationsBtn) {
+      setActiveTab('reservations');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+
   if (getToken()) {
+    showPendingView();
     loadBootstrap().catch(() => {
       setToken('');
-      byId('login-card').hidden = false;
+      showLoggedOutView();
     });
+  } else {
+    showLoggedOutView();
   }
 })();

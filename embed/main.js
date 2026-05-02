@@ -567,7 +567,7 @@
       img.decoding = 'async';
       img.src = `${baseFolder}/${item.slug}/thumb.jpg`;
       if (premium) {
-        img.sizes = '(max-width: 640px) 100vw, (max-width: 1400px) 50vw, 700px';
+        img.sizes = '(max-width: 640px) 100vw, (max-width: 1100px) 50vw, (max-width: 1500px) 33vw, 460px';
         img.width = 800;
         img.height = 600;
       } else {

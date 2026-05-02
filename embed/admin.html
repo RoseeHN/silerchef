@@ -16,71 +16,162 @@
     <link rel="stylesheet" href="admin.css" />
   </head>
   <body>
+    <div class="admin-noise admin-noise--one" aria-hidden="true"></div>
+    <div class="admin-noise admin-noise--two" aria-hidden="true"></div>
     <div class="admin-shell">
-      <header class="admin-header">
-        <div>
+      <header class="admin-header" data-auth-view="logged-out">
+        <div class="admin-brand">
           <p class="admin-kicker">Siler Chef</p>
           <h1>Admin Dashboard</h1>
-          <p class="admin-sub">Built for non-technical use: edit texts, menus, blocked dates, and reservations from clear forms.</p>
+          <p class="admin-sub">A refined control room for reservations, menus, blocked dates, and guest follow-up.</p>
         </div>
         <div class="admin-actions">
-          <a class="ghost-link" href="/" target="_blank" rel="noopener noreferrer">Open website</a>
+          <a id="open-website-link" class="ghost-link" href="/" target="_blank" rel="noopener noreferrer">Open website</a>
           <button id="logout-btn" class="ghost-button" type="button" hidden>Log out</button>
         </div>
       </header>
 
       <main class="admin-main">
-        <section id="login-card" class="panel panel--login">
-          <h2>Secure access</h2>
-          <p>Sign in with the Siler Chef admin account to manage reservations and content.</p>
-          <form id="login-form" class="stack-form">
-            <label>
-              <span>Username</span>
-              <input id="login-username" name="username" type="text" autocomplete="username" required />
-            </label>
-            <label>
-              <span>Password</span>
-              <input id="login-password" name="password" type="password" autocomplete="current-password" required />
-            </label>
-            <p id="login-error" class="error" hidden></p>
-            <button class="primary-button" type="submit">Enter dashboard</button>
-          </form>
+        <section id="admin-stage" class="admin-stage">
+          <section id="login-card" class="panel panel--login">
+            <div class="login-card__head">
+              <p class="panel-kicker">Secure access</p>
+              <h2>Enter the private Siler Chef desk</h2>
+              <p class="panel-note">Sign in to manage reservations, website copy, blocked dates, and follow-up channels without touching code.</p>
+            </div>
+            <form id="login-form" class="stack-form">
+              <label>
+                <span>Username</span>
+                <input id="login-username" name="username" type="text" autocomplete="username" required />
+              </label>
+              <label>
+                <span>Password</span>
+                <input id="login-password" name="password" type="password" autocomplete="current-password" required />
+              </label>
+              <p id="login-error" class="error" hidden></p>
+              <button class="primary-button" type="submit">Enter dashboard</button>
+            </form>
+          </section>
+
+          <aside class="panel panel--spotlight">
+            <div class="spotlight-card">
+              <p class="panel-kicker">What this panel controls</p>
+              <h2>One place for the entire guest journey</h2>
+              <p class="panel-note">From the first reservation request to the final follow-up, this panel is built to feel operational, clear, and client-ready.</p>
+            </div>
+            <div class="spotlight-grid" aria-label="Admin highlights">
+              <article class="spotlight-metric">
+                <span class="spotlight-metric__label">Reservations</span>
+                <strong>Dashboard-first flow</strong>
+                <p>Requests land here before follow-up by phone, email, or WhatsApp.</p>
+              </article>
+              <article class="spotlight-metric">
+                <span class="spotlight-metric__label">Availability</span>
+                <strong>Close dates in seconds</strong>
+                <p>Blocked dates stop new requests automatically and keep the schedule clean.</p>
+              </article>
+              <article class="spotlight-metric">
+                <span class="spotlight-metric__label">Content</span>
+                <strong>Edit without coding</strong>
+                <p>Menus, service copy, contact details, and booking messages stay easy to update.</p>
+              </article>
+            </div>
+            <div class="spotlight-note">
+              <span class="spotlight-note__line"></span>
+              <p>Designed for real hospitality operations, not for developers only.</p>
+            </div>
+          </aside>
         </section>
 
-        <section id="dashboard" hidden>
-          <div class="summary-grid">
-            <article class="panel summary-card">
-              <span class="summary-label">Blocked dates</span>
-              <strong id="summary-blocked">0</strong>
-            </article>
-            <article class="panel summary-card">
-              <span class="summary-label">Reservations</span>
-              <strong id="summary-reservations">0</strong>
-            </article>
-            <article class="panel summary-card">
-              <span class="summary-label">Pending requests</span>
-              <strong id="summary-pending">0</strong>
-            </article>
-            <article class="panel summary-card">
-              <span class="summary-label">Page views</span>
-              <strong id="summary-pageviews">0</strong>
-            </article>
-            <article class="panel summary-card">
-              <span class="summary-label">WhatsApp clicks</span>
-              <strong id="summary-whatsapp">0</strong>
-            </article>
-          </div>
+        <section id="dashboard" class="dashboard-shell" hidden>
+          <aside class="dashboard-sidebar panel" aria-label="Admin navigation">
+            <div class="sidebar-brand">
+              <p class="admin-kicker">Siler Chef</p>
+              <h2>Control Room</h2>
+              <p class="panel-note">One calm workspace for bookings, menus, blocked dates, and live site updates.</p>
+            </div>
 
-          <nav class="admin-tabs" aria-label="Admin sections">
-            <button class="admin-tab is-active" type="button" data-tab="homepage">Homepage</button>
-            <button class="admin-tab" type="button" data-tab="menus">Menus</button>
-            <button class="admin-tab" type="button" data-tab="services">Services</button>
-            <button class="admin-tab" type="button" data-tab="availability">Availability</button>
-            <button class="admin-tab" type="button" data-tab="reservations">Reservations</button>
-            <button class="admin-tab" type="button" data-tab="analytics">Analytics &amp; SEO</button>
-          </nav>
+            <div class="sidebar-snapshot">
+              <article class="sidebar-stat">
+                <span class="summary-label">Blocked dates</span>
+                <strong id="summary-blocked">0</strong>
+              </article>
+              <article class="sidebar-stat">
+                <span class="summary-label">Reservations</span>
+                <strong id="summary-reservations">0</strong>
+              </article>
+              <article class="sidebar-stat">
+                <span class="summary-label">Pending</span>
+                <strong id="summary-pending">0</strong>
+              </article>
+              <article class="sidebar-stat">
+                <span class="summary-label">Page views</span>
+                <strong id="summary-pageviews">0</strong>
+              </article>
+              <article class="sidebar-stat">
+                <span class="summary-label">WhatsApp</span>
+                <strong id="summary-whatsapp">0</strong>
+              </article>
+            </div>
 
-          <section class="tab-panel is-active" data-panel="homepage">
+            <nav class="sidebar-nav" aria-label="Admin sections">
+              <button class="admin-tab is-active" type="button" data-tab="homepage">
+                <span class="admin-tab__title">Homepage</span>
+                <span class="admin-tab__meta">Hero, booking, contact</span>
+              </button>
+              <button class="admin-tab" type="button" data-tab="menus">
+                <span class="admin-tab__title">Menus</span>
+                <span class="admin-tab__meta">Cuisine cards and sample sets</span>
+              </button>
+              <button class="admin-tab" type="button" data-tab="services">
+                <span class="admin-tab__title">Services</span>
+                <span class="admin-tab__meta">Occasions and education</span>
+              </button>
+              <button class="admin-tab" type="button" data-tab="availability">
+                <span class="admin-tab__title">Availability</span>
+                <span class="admin-tab__meta">Blocked dates and notes</span>
+              </button>
+              <button class="admin-tab" type="button" data-tab="reservations">
+                <span class="admin-tab__title">Reservations</span>
+                <span class="admin-tab__meta">Guest requests and follow-up</span>
+              </button>
+              <button class="admin-tab" type="button" data-tab="analytics">
+                <span class="admin-tab__title">Analytics &amp; SEO</span>
+                <span class="admin-tab__meta">Traffic and optimization</span>
+              </button>
+            </nav>
+
+            <div class="sidebar-actions">
+              <a id="sidebar-open-website-link" class="ghost-link sidebar-action" href="/" target="_blank" rel="noopener noreferrer">Open website</a>
+              <button id="sidebar-logout-btn" class="ghost-button sidebar-action" type="button">Log out</button>
+            </div>
+          </aside>
+
+          <div class="dashboard-content">
+            <section class="panel panel--overview">
+              <div class="overview-hero">
+                <div>
+                  <p class="panel-kicker">Operations overview</p>
+                  <h2>Everything important, without the clutter</h2>
+                  <p class="panel-note">Track demand, update the website, manage blocked dates, and handle reservation follow-up from a single polished workspace.</p>
+                </div>
+                <div class="overview-badges" aria-label="Dashboard capabilities">
+                  <span class="overview-badge">Reservations</span>
+                  <span class="overview-badge">Availability</span>
+                  <span class="overview-badge">Menus</span>
+                  <span class="overview-badge">Analytics</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="dashboard-utility-grid" aria-label="Operational insights">
+              <article id="action-center-card" class="panel utility-card"></article>
+              <article id="routing-overview-card" class="panel utility-card"></article>
+              <article id="content-health-card" class="panel utility-card"></article>
+              <article id="traffic-insight-card" class="panel utility-card"></article>
+            </section>
+
+            <section class="tab-panel is-active" data-panel="homepage">
             <div class="panel">
               <div class="panel-head">
                 <div>
@@ -93,9 +184,9 @@
               <p id="homepage-status" class="status" hidden></p>
               <div id="homepage-fields" class="form-layout"></div>
             </div>
-          </section>
+            </section>
 
-          <section class="tab-panel" data-panel="menus">
+            <section class="tab-panel" data-panel="menus">
             <div class="panel">
               <div class="panel-head">
                 <div>
@@ -112,11 +203,12 @@
                   <select id="cuisine-select"></select>
                 </label>
               </div>
+              <div id="menu-preview" class="editor-preview-shell"></div>
               <div id="menu-editor"></div>
             </div>
-          </section>
+            </section>
 
-          <section class="tab-panel" data-panel="services">
+            <section class="tab-panel" data-panel="services">
             <div class="panel">
               <div class="panel-head">
                 <div>
@@ -133,11 +225,12 @@
                   <select id="service-select"></select>
                 </label>
               </div>
+              <div id="service-preview" class="editor-preview-shell"></div>
               <div id="service-editor"></div>
             </div>
-          </section>
+            </section>
 
-          <section class="tab-panel" data-panel="availability">
+            <section class="tab-panel" data-panel="availability">
             <div class="panel">
               <div class="panel-head">
                 <div>
@@ -163,9 +256,9 @@
               </div>
               <div id="blocked-dates-list" class="rows-stack"></div>
             </div>
-          </section>
+            </section>
 
-          <section class="tab-panel" data-panel="reservations">
+            <section class="tab-panel" data-panel="reservations">
             <div class="panel">
               <div class="panel-head">
                 <div>
@@ -175,13 +268,31 @@
                 <button id="refresh-btn" class="ghost-button" type="button">Refresh</button>
               </div>
               <p class="panel-note">Every new request lands here first. Review it, contact the guest by phone, email, or WhatsApp, then add notes and update the status.</p>
+              <div class="reservation-toolbar">
+                <label class="field reservation-toolbar__search">
+                  <span>Search guest</span>
+                  <input id="reservation-search" type="search" placeholder="Name, email, phone, ZIP..." />
+                </label>
+                <label class="field reservation-toolbar__filter">
+                  <span>Status</span>
+                  <select id="reservation-status-filter">
+                    <option value="all">All statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                    <option value="blocked">Blocked</option>
+                  </select>
+                </label>
+              </div>
+              <div id="reservation-mini-stats" class="reservation-mini-stats" aria-label="Reservation overview"></div>
               <div id="reservation-routing-note" class="routing-card" hidden></div>
-              <div id="reservations-empty" class="empty-state" hidden>No reservation requests yet.</div>
+              <div id="reservations-empty" class="empty-state empty-state--rich" hidden></div>
               <div id="reservations-list" class="reservations-list"></div>
             </div>
-          </section>
+            </section>
 
-          <section class="tab-panel" data-panel="analytics">
+            <section class="tab-panel" data-panel="analytics">
             <div class="panel">
               <div class="panel-head">
                 <div>
@@ -193,11 +304,21 @@
               <p class="panel-note">Review visitor behavior, conversion signals, and technical readiness from one place.</p>
               <div id="analytics-panel" class="analytics-shell"></div>
             </div>
+            </section>
           </section>
+          </div>
         </section>
       </main>
     </div>
 
+    <script>
+      if (!window.__SILERCHEF_API_BASE__) {
+        const host = window.location.hostname;
+        if (host === '127.0.0.1' || host === 'localhost') {
+          window.__SILERCHEF_API_BASE__ = 'https://www.silerchef.com';
+        }
+      }
+    </script>
     <script src="admin.js" defer></script>
   </body>
 </html>

@@ -318,8 +318,24 @@ function serve_embed_file(string $requestPath, string|false $embedDir): never
 
     http_response_code(200);
     header('Content-Type: ' . $mime);
+    if (str_ends_with($candidate, '/index.html')) {
+        echo inject_google_site_verification((string) file_get_contents($candidate));
+        exit;
+    }
+
     readfile($candidate);
     exit;
+}
+
+function inject_google_site_verification(string $html): string
+{
+    $token = trim(env_string('GOOGLE_SITE_VERIFICATION', ''));
+    if ($token === '' || !str_contains($html, '</head>')) {
+        return $html;
+    }
+
+    $meta = '    <meta name="google-site-verification" content="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . "\" />\n";
+    return str_replace('</head>', $meta . '  </head>', $html);
 }
 
 function detect_mime_type(string $filePath): string
