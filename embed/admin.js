@@ -678,18 +678,71 @@
 
   function renderHomepageFields() {
     const site = getContent().site;
+    const hero = site.hero || {};
+    const experience = site.experience || {};
+    const pillars = Array.isArray(site.pillars) ? site.pillars : [];
+    const coverage = site.coverage || {};
+    const faq = site.faq || {};
+    const faqItems = Array.from({ length: 6 }, (_, index) => (Array.isArray(faq.items) && faq.items[index] ? faq.items[index] : { eyebrow: '', title: '', body: '' }));
+    const heroProofChips = Array.from({ length: 3 }, (_, index) => (Array.isArray(hero.proofChips) && hero.proofChips[index] ? hero.proofChips[index] : ''));
+    const booking = site.booking || {};
+    const bookingHighlights = Array.from({ length: 3 }, (_, index) => (Array.isArray(booking.highlights) && booking.highlights[index] ? booking.highlights[index] : ''));
+    const bookingSteps = Array.from({ length: 3 }, (_, index) => (Array.isArray(booking.steps) && booking.steps[index] ? booking.steps[index] : { title: '', body: '' }));
+    const reel = site.reel || {};
     byId('homepage-fields').innerHTML = `
       <label class="field">
         <span>Hero headline</span>
-        <input id="hp-hero-headline" type="text" value="${esc(site.hero.headline)}" />
+        <input id="hp-hero-headline" type="text" value="${esc(hero.headline)}" />
       </label>
       <label class="field">
         <span>Hero short line</span>
-        <input id="hp-hero-tagline" type="text" value="${esc(site.hero.tagline)}" />
+        <input id="hp-hero-tagline" type="text" value="${esc(hero.tagline)}" />
       </label>
       <label class="field field--full">
         <span>Hero description</span>
-        <textarea id="hp-hero-lede" rows="4">${esc(site.hero.lede)}</textarea>
+        <textarea id="hp-hero-lede" rows="4">${esc(hero.lede)}</textarea>
+      </label>
+      <label class="field">
+        <span>Hero floating card 1 eyebrow</span>
+        <input id="hp-hero-floating-north-eyebrow" type="text" value="${esc(hero.floatingNorthEyebrow || '')}" />
+      </label>
+      <label class="field">
+        <span>Hero floating card 1 title</span>
+        <input id="hp-hero-floating-north-title" type="text" value="${esc(hero.floatingNorthTitle || '')}" />
+      </label>
+      <label class="field">
+        <span>Hero floating card 2 eyebrow</span>
+        <input id="hp-hero-floating-south-eyebrow" type="text" value="${esc(hero.floatingSouthEyebrow || '')}" />
+      </label>
+      <label class="field">
+        <span>Hero floating card 2 title</span>
+        <input id="hp-hero-floating-south-title" type="text" value="${esc(hero.floatingSouthTitle || '')}" />
+      </label>
+      ${[0, 1, 2]
+        .map(
+          (index) => `
+            <label class="field">
+              <span>Hero chip ${index + 1}</span>
+              <input id="hp-hero-chip-${index}" type="text" value="${esc(heroProofChips[index])}" />
+            </label>
+          `
+        )
+        .join('')}
+      <label class="field">
+        <span>Hero mini card 1 eyebrow</span>
+        <input id="hp-hero-mini-primary-eyebrow" type="text" value="${esc(hero.miniPrimaryEyebrow || '')}" />
+      </label>
+      <label class="field">
+        <span>Hero mini card 1 title</span>
+        <input id="hp-hero-mini-primary-title" type="text" value="${esc(hero.miniPrimaryTitle || '')}" />
+      </label>
+      <label class="field">
+        <span>Hero mini card 2 eyebrow</span>
+        <input id="hp-hero-mini-secondary-eyebrow" type="text" value="${esc(hero.miniSecondaryEyebrow || '')}" />
+      </label>
+      <label class="field">
+        <span>Hero mini card 2 title</span>
+        <input id="hp-hero-mini-secondary-title" type="text" value="${esc(hero.miniSecondaryTitle || '')}" />
       </label>
 
       <label class="field field--full">
@@ -746,6 +799,85 @@
       </label>
 
       <label class="field">
+        <span>Brand promise eyebrow</span>
+        <input id="hp-experience-featured-eyebrow" type="text" value="${esc(experience.featuredEyebrow || '')}" />
+      </label>
+      <label class="field">
+        <span>Brand promise title</span>
+        <input id="hp-experience-featured-title" type="text" value="${esc(experience.featuredTitle || '')}" />
+      </label>
+      <label class="field field--full">
+        <span>Brand promise body</span>
+        <textarea id="hp-experience-featured-body" rows="4">${esc(experience.featuredBody || '')}</textarea>
+      </label>
+      <label class="field">
+        <span>Hosting tile eyebrow</span>
+        <input id="hp-experience-hosting-eyebrow" type="text" value="${esc(experience.hostingEyebrow || '')}" />
+      </label>
+      <label class="field">
+        <span>Hosting tile title</span>
+        <input id="hp-experience-hosting-title" type="text" value="${esc(experience.hostingTitle || '')}" />
+      </label>
+      <label class="field field--full">
+        <span>Hosting tile body</span>
+        <textarea id="hp-experience-hosting-body" rows="3">${esc(experience.hostingBody || '')}</textarea>
+      </label>
+      <label class="field">
+        <span>Guest tile eyebrow</span>
+        <input id="hp-experience-guest-eyebrow" type="text" value="${esc(experience.guestEyebrow || '')}" />
+      </label>
+      <label class="field">
+        <span>Guest tile title</span>
+        <input id="hp-experience-guest-title" type="text" value="${esc(experience.guestTitle || '')}" />
+      </label>
+      <label class="field field--full">
+        <span>Guest tile body</span>
+        <textarea id="hp-experience-guest-body" rows="3">${esc(experience.guestBody || '')}</textarea>
+      </label>
+
+      ${[0, 1, 2, 3]
+        .map(
+          (index) => `
+            <label class="field">
+              <span>Pillar ${index + 1} label</span>
+              <input id="hp-pillar-${index}-label" type="text" value="${esc((pillars[index] && pillars[index].label) || '')}" />
+            </label>
+            <label class="field">
+              <span>Pillar ${index + 1} title</span>
+              <input id="hp-pillar-${index}-title" type="text" value="${esc((pillars[index] && pillars[index].title) || '')}" />
+            </label>
+            <label class="field field--full">
+              <span>Pillar ${index + 1} meta</span>
+              <textarea id="hp-pillar-${index}-meta" rows="2">${esc((pillars[index] && pillars[index].meta) || '')}</textarea>
+            </label>
+          `
+        )
+        .join('')}
+
+      <label class="field">
+        <span>Coverage eyebrow</span>
+        <input id="hp-coverage-eyebrow" type="text" value="${esc(coverage.eyebrow || '')}" />
+      </label>
+      <label class="field">
+        <span>Coverage title</span>
+        <input id="hp-coverage-title" type="text" value="${esc(coverage.title || '')}" />
+      </label>
+      <label class="field field--full">
+        <span>Coverage body</span>
+        <textarea id="hp-coverage-body" rows="4">${esc(coverage.body || '')}</textarea>
+      </label>
+      ${[0, 1, 2, 3]
+        .map(
+          (index) => `
+            <label class="field">
+              <span>Coverage chip ${index + 1}</span>
+              <input id="hp-coverage-chip-${index}" type="text" value="${esc((coverage.chips && coverage.chips[index]) || '')}" />
+            </label>
+          `
+        )
+        .join('')}
+
+      <label class="field">
         <span>Homepage CTA title</span>
         <input id="hp-cta-headline" type="text" value="${esc(site.cta.headline)}" />
       </label>
@@ -758,9 +890,41 @@
         <span>Booking popup title</span>
         <input id="hp-booking-title" type="text" value="${esc(site.booking.title)}" />
       </label>
+      <label class="field">
+        <span>Booking popup kicker</span>
+        <input id="hp-booking-kicker" type="text" value="${esc(booking.kicker || '')}" />
+      </label>
       <label class="field field--full">
         <span>Booking popup text</span>
         <textarea id="hp-booking-lede" rows="3">${esc(site.booking.lede)}</textarea>
+      </label>
+      ${[0, 1, 2]
+        .map(
+          (index) => `
+            <label class="field">
+              <span>Booking highlight ${index + 1}</span>
+              <input id="hp-booking-highlight-${index}" type="text" value="${esc(bookingHighlights[index])}" />
+            </label>
+          `
+        )
+        .join('')}
+      ${bookingSteps
+        .map(
+          (step, index) => `
+            <label class="field">
+              <span>Booking step ${index + 1} title</span>
+              <input id="hp-booking-step-${index}-title" type="text" value="${esc(step.title || '')}" />
+            </label>
+            <label class="field field--full">
+              <span>Booking step ${index + 1} body</span>
+              <textarea id="hp-booking-step-${index}-body" rows="2">${esc(step.body || '')}</textarea>
+            </label>
+          `
+        )
+        .join('')}
+      <label class="field field--full">
+        <span>Booking form intro</span>
+        <textarea id="hp-booking-form-sub" rows="2">${esc(booking.formSub || '')}</textarea>
       </label>
       <label class="field">
         <span>Booking success title</span>
@@ -790,6 +954,18 @@
       <label class="field field--full">
         <span>Menu detail note</span>
         <textarea id="hp-detail-notice" rows="3">${esc(site.detailNotice)}</textarea>
+      </label>
+      <label class="field">
+        <span>Reel eyebrow</span>
+        <input id="hp-reel-kicker" type="text" value="${esc(reel.kicker || '')}" />
+      </label>
+      <label class="field">
+        <span>Reel video caption</span>
+        <input id="hp-reel-video-caption" type="text" value="${esc(reel.videoCaption || '')}" />
+      </label>
+      <label class="field field--full">
+        <span>Reel still caption</span>
+        <input id="hp-reel-still-caption" type="text" value="${esc(reel.stillCaption || '')}" />
       </label>
 
       <label class="field">
@@ -840,6 +1016,35 @@
         <span>Facebook link</span>
         <input id="hp-contact-facebook" type="url" value="${esc(site.contact.facebookHref)}" />
       </label>
+
+      <label class="field">
+        <span>FAQ eyebrow</span>
+        <input id="hp-faq-eyebrow" type="text" value="${esc(faq.eyebrow || '')}" />
+      </label>
+      <label class="field">
+        <span>FAQ title</span>
+        <input id="hp-faq-title" type="text" value="${esc(faq.title || '')}" />
+      </label>
+      <label class="field field--full">
+        <span>FAQ intro</span>
+        <textarea id="hp-faq-lede" rows="3">${esc(faq.lede || '')}</textarea>
+      </label>
+      ${faqItems.map(
+        (item, index) => `
+          <label class="field">
+            <span>FAQ ${index + 1} eyebrow</span>
+            <input id="hp-faq-${index}-eyebrow" type="text" value="${esc(item.eyebrow || '')}" />
+          </label>
+          <label class="field">
+            <span>FAQ ${index + 1} title</span>
+            <input id="hp-faq-${index}-title" type="text" value="${esc(item.title || '')}" />
+          </label>
+          <label class="field field--full">
+            <span>FAQ ${index + 1} body</span>
+            <textarea id="hp-faq-${index}-body" rows="3">${esc(item.body || '')}</textarea>
+          </label>
+        `
+      ).join('')}
     `;
   }
 
@@ -1583,9 +1788,29 @@
 
   function collectHomepageContent() {
     const next = clone(state.bootstrap.content);
+    next.site.hero = next.site.hero || {};
+    next.site.experience = next.site.experience || {};
+    next.site.pillars = Array.isArray(next.site.pillars) ? next.site.pillars : [{}, {}, {}, {}];
+    next.site.coverage = next.site.coverage || {};
+    next.site.coverage.chips = Array.isArray(next.site.coverage.chips) ? next.site.coverage.chips : ['', '', '', ''];
+    next.site.booking = next.site.booking || {};
+    next.site.booking.highlights = Array.isArray(next.site.booking.highlights) ? next.site.booking.highlights : ['', '', ''];
+    next.site.booking.steps = Array.from({ length: 3 }, (_, index) => (Array.isArray(next.site.booking.steps) && next.site.booking.steps[index] ? next.site.booking.steps[index] : {}));
+    next.site.reel = next.site.reel || {};
+    next.site.faq = next.site.faq || {};
+    next.site.faq.items = Array.from({ length: 6 }, (_, index) => (Array.isArray(next.site.faq.items) && next.site.faq.items[index] ? next.site.faq.items[index] : {}));
     next.site.hero.headline = byId('hp-hero-headline').value.trim();
     next.site.hero.tagline = byId('hp-hero-tagline').value.trim();
     next.site.hero.lede = byId('hp-hero-lede').value.trim();
+    next.site.hero.floatingNorthEyebrow = byId('hp-hero-floating-north-eyebrow').value.trim();
+    next.site.hero.floatingNorthTitle = byId('hp-hero-floating-north-title').value.trim();
+    next.site.hero.floatingSouthEyebrow = byId('hp-hero-floating-south-eyebrow').value.trim();
+    next.site.hero.floatingSouthTitle = byId('hp-hero-floating-south-title').value.trim();
+    next.site.hero.proofChips = [0, 1, 2].map((index) => byId(`hp-hero-chip-${index}`).value.trim());
+    next.site.hero.miniPrimaryEyebrow = byId('hp-hero-mini-primary-eyebrow').value.trim();
+    next.site.hero.miniPrimaryTitle = byId('hp-hero-mini-primary-title').value.trim();
+    next.site.hero.miniSecondaryEyebrow = byId('hp-hero-mini-secondary-eyebrow').value.trim();
+    next.site.hero.miniSecondaryTitle = byId('hp-hero-mini-secondary-title').value.trim();
     next.site.quote.text = byId('hp-quote-text').value.trim();
     next.site.quote.cite = byId('hp-quote-cite').value.trim();
     next.site.cuisinesSection.lede = byId('hp-cuisines-lede').value.trim();
@@ -1598,10 +1823,35 @@
     next.site.craft.title = byId('hp-craft-title').value.trim();
     next.site.craft.body1 = byId('hp-craft-body1').value.trim();
     next.site.craft.body2 = byId('hp-craft-body2').value.trim();
+    next.site.experience.featuredEyebrow = byId('hp-experience-featured-eyebrow').value.trim();
+    next.site.experience.featuredTitle = byId('hp-experience-featured-title').value.trim();
+    next.site.experience.featuredBody = byId('hp-experience-featured-body').value.trim();
+    next.site.experience.hostingEyebrow = byId('hp-experience-hosting-eyebrow').value.trim();
+    next.site.experience.hostingTitle = byId('hp-experience-hosting-title').value.trim();
+    next.site.experience.hostingBody = byId('hp-experience-hosting-body').value.trim();
+    next.site.experience.guestEyebrow = byId('hp-experience-guest-eyebrow').value.trim();
+    next.site.experience.guestTitle = byId('hp-experience-guest-title').value.trim();
+    next.site.experience.guestBody = byId('hp-experience-guest-body').value.trim();
+    next.site.pillars = [0, 1, 2, 3].map((index) => ({
+      label: byId(`hp-pillar-${index}-label`).value.trim(),
+      title: byId(`hp-pillar-${index}-title`).value.trim(),
+      meta: byId(`hp-pillar-${index}-meta`).value.trim(),
+    }));
+    next.site.coverage.eyebrow = byId('hp-coverage-eyebrow').value.trim();
+    next.site.coverage.title = byId('hp-coverage-title').value.trim();
+    next.site.coverage.body = byId('hp-coverage-body').value.trim();
+    next.site.coverage.chips = [0, 1, 2, 3].map((index) => byId(`hp-coverage-chip-${index}`).value.trim());
     next.site.cta.headline = byId('hp-cta-headline').value.trim();
     next.site.cta.summary = byId('hp-cta-summary').value.trim();
     next.site.booking.title = byId('hp-booking-title').value.trim();
+    next.site.booking.kicker = byId('hp-booking-kicker').value.trim();
     next.site.booking.lede = byId('hp-booking-lede').value.trim();
+    next.site.booking.highlights = [0, 1, 2].map((index) => byId(`hp-booking-highlight-${index}`).value.trim());
+    next.site.booking.steps = [0, 1, 2].map((index) => ({
+      title: byId(`hp-booking-step-${index}-title`).value.trim(),
+      body: byId(`hp-booking-step-${index}-body`).value.trim(),
+    }));
+    next.site.booking.formSub = byId('hp-booking-form-sub').value.trim();
     next.site.booking.successTitle = byId('hp-booking-success-title').value.trim();
     next.site.booking.successText = byId('hp-booking-success-text').value.trim();
     next.site.booking.fallbackUrl = byId('hp-booking-fallback-url').value.trim();
@@ -1609,6 +1859,9 @@
     next.site.booking.teamWhatsAppHref = byId('hp-booking-team-whatsapp').value.trim();
     next.site.booking.notificationWebhookUrl = byId('hp-booking-webhook-url').value.trim();
     next.site.detailNotice = byId('hp-detail-notice').value.trim();
+    next.site.reel.kicker = byId('hp-reel-kicker').value.trim();
+    next.site.reel.videoCaption = byId('hp-reel-video-caption').value.trim();
+    next.site.reel.stillCaption = byId('hp-reel-still-caption').value.trim();
     next.site.contact.title = byId('hp-contact-title').value.trim();
     next.site.contact.subtitle = byId('hp-contact-subtitle').value.trim();
     next.site.contact.phone = byId('hp-contact-phone').value.trim();
@@ -1621,6 +1874,14 @@
     next.site.contact.instagramHref = byId('hp-contact-instagram').value.trim();
     next.site.contact.whatsappHref = byId('hp-contact-whatsapp').value.trim();
     next.site.contact.facebookHref = byId('hp-contact-facebook').value.trim();
+    next.site.faq.eyebrow = byId('hp-faq-eyebrow').value.trim();
+    next.site.faq.title = byId('hp-faq-title').value.trim();
+    next.site.faq.lede = byId('hp-faq-lede').value.trim();
+    next.site.faq.items = (next.site.faq.items || []).map((_, index) => ({
+      eyebrow: byId(`hp-faq-${index}-eyebrow`).value.trim(),
+      title: byId(`hp-faq-${index}-title`).value.trim(),
+      body: byId(`hp-faq-${index}-body`).value.trim(),
+    }));
     return next;
   }
 

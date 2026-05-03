@@ -881,19 +881,57 @@
     const site = content.site || {};
     const hero = site.hero || {};
     const quote = site.quote || {};
+    const experience = site.experience || {};
+    const pillars = Array.isArray(site.pillars) ? site.pillars : [];
+    const coverage = site.coverage || {};
     const cuisinesSection = site.cuisinesSection || {};
     const servicesSection = site.servicesSection || {};
     const craft = site.craft || {};
     const stats = site.stats || {};
     const cta = site.cta || {};
     const booking = site.booking || {};
+    const faq = site.faq || {};
+    const reel = site.reel || {};
     const contact = site.contact || {};
 
     setNodeText('.hero-headline', hero.headline);
     setNodeText('.hero-tagline', hero.tagline);
     setNodeText('.hero-lede', hero.lede);
+    setNodeText('#hero-floating-north-eyebrow', hero.floatingNorthEyebrow);
+    setNodeText('#hero-floating-north-title', hero.floatingNorthTitle);
+    setNodeText('#hero-floating-south-eyebrow', hero.floatingSouthEyebrow);
+    setNodeText('#hero-floating-south-title', hero.floatingSouthTitle);
+    const proofChips = Array.isArray(hero.proofChips) ? hero.proofChips : [];
+    proofChips.forEach((chip, index) => {
+      setNodeText(`#hero-chip-${index}`, chip);
+    });
+    setNodeText('#hero-mini-primary-eyebrow', hero.miniPrimaryEyebrow);
+    setNodeText('#hero-mini-primary-title', hero.miniPrimaryTitle);
+    setNodeText('#hero-mini-secondary-eyebrow', hero.miniSecondaryEyebrow);
+    setNodeText('#hero-mini-secondary-title', hero.miniSecondaryTitle);
     setNodeText('.pull-quote p', quote.text);
     setNodeText('.pull-quote cite', quote.cite);
+    setNodeText('#experience-featured-eyebrow', experience.featuredEyebrow);
+    setNodeText('#experience-featured-title', experience.featuredTitle);
+    setNodeText('#experience-featured-body', experience.featuredBody);
+    setNodeText('#experience-hosting-eyebrow', experience.hostingEyebrow);
+    setNodeText('#experience-hosting-title', experience.hostingTitle);
+    setNodeText('#experience-hosting-body', experience.hostingBody);
+    setNodeText('#experience-guest-eyebrow', experience.guestEyebrow);
+    setNodeText('#experience-guest-title', experience.guestTitle);
+    setNodeText('#experience-guest-body', experience.guestBody);
+    pillars.forEach((pillar, index) => {
+      setNodeText(`#pillar-${index}-label`, pillar && pillar.label);
+      setNodeText(`#pillar-${index}-title`, pillar && pillar.title);
+      setNodeText(`#pillar-${index}-meta`, pillar && pillar.meta);
+    });
+    setNodeText('#coverage-eyebrow', coverage.eyebrow);
+    setNodeText('#coverage-title', coverage.title);
+    setNodeText('#coverage-body', coverage.body);
+    const coverageChips = Array.isArray(coverage.chips) ? coverage.chips : [];
+    coverageChips.forEach((chip, index) => {
+      setNodeText(`#coverage-chip-${index}`, chip);
+    });
     setNodeText('#cuisines .section-lede', cuisinesSection.lede);
     setNodeText('#cuisines .section-sample-notice__kicker', cuisinesSection.noticeKicker);
     setNodeText('#cuisines .section-sample-notice__body', cuisinesSection.noticeBody);
@@ -920,8 +958,31 @@
     if (statNums[2] && stats.chefExperience != null) statNums[2].textContent = String(stats.chefExperience);
     setNodeText('[data-booking-headline]', cta.headline);
     setNodeText('[data-booking-summary]', cta.summary);
+    setNodeText('#reel-label', reel.kicker);
+    setNodeText('#reel-caption-video', reel.videoCaption);
+    setNodeText('#reel-caption-still', reel.stillCaption);
+    setNodeText('#faq-section-eyebrow', faq.eyebrow);
+    setNodeText('#seo-faq-title', faq.title);
+    setNodeText('#faq-section-lede', faq.lede);
+    const faqItems = Array.isArray(faq.items) ? faq.items : [];
+    faqItems.forEach((item, index) => {
+      setNodeText(`#faq-${index}-eyebrow`, item && item.eyebrow);
+      setNodeText(`#faq-${index}-title`, item && item.title);
+      setNodeText(`#faq-${index}-body`, item && item.body);
+    });
     setNodeText('#booking-title', booking.title);
+    setNodeText('#booking-kicker', booking.kicker);
     setNodeText('.booking-lede', booking.lede);
+    setNodeText('#booking-form-sub', booking.formSub);
+    const bookingHighlights = Array.isArray(booking.highlights) ? booking.highlights : [];
+    bookingHighlights.forEach((line, index) => {
+      setNodeText(`#booking-highlight-${index}`, line);
+    });
+    const bookingSteps = Array.isArray(booking.steps) ? booking.steps : [];
+    bookingSteps.forEach((step, index) => {
+      setNodeText(`#booking-step-${index}-title`, step && step.title);
+      setNodeText(`#booking-step-${index}-body`, step && step.body);
+    });
     setNodeText('.booking-success__title', booking.successTitle);
     setNodeText('.booking-success__text', booking.successText);
     setLink('#booking-fallback-link', booking.fallbackUrl);
@@ -944,6 +1005,103 @@
     if (socialTiles[0] && contact.instagramHref) socialTiles[0].setAttribute('href', contact.instagramHref);
     if (socialTiles[1] && contact.whatsappHref) socialTiles[1].setAttribute('href', contact.whatsappHref);
     if (socialTiles[2] && contact.facebookHref) socialTiles[2].setAttribute('href', contact.facebookHref);
+
+    const schemaNode = document.getElementById('seo-schema');
+    if (schemaNode) {
+      const faqMainEntity = faqItems
+        .filter((item) => item && item.title && item.body)
+        .map((item) => ({
+          '@type': 'Question',
+          name: item.title,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: item.body,
+          },
+        }));
+
+      const schemaPayload = {
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'WebSite',
+            '@id': 'https://www.silerchef.com/#website',
+            url: 'https://www.silerchef.com/',
+            name: 'Siler Chef',
+            description: 'Personal chef and private in-home dining in Reno, Lake Tahoe, and the Bay Area.',
+            inLanguage: 'en-US',
+            publisher: { '@id': 'https://www.silerchef.com/#business' },
+          },
+          {
+            '@type': ['LocalBusiness', 'ProfessionalService'],
+            '@id': 'https://www.silerchef.com/#business',
+            name: 'Siler Chef',
+            alternateName: ['SilerChef', 'Chef Siler'],
+            url: 'https://www.silerchef.com/',
+            image: 'https://www.silerchef.com/images/services-and-occasions/chef-education/hero.jpg',
+            logo: 'https://www.silerchef.com/images/brand/silerchef-logo.png',
+            description: 'Private chef services for Reno, Lake Tahoe, and the Bay Area: custom menus, plated and family-style service, private events, and chef-led lessons.',
+            telephone: contact.phone || '+1-775-389-6677',
+            email: contact.email || 'silerchef@gmail.com',
+            priceRange: '$$$',
+            address: {
+              '@type': 'PostalAddress',
+              addressLocality: 'Reno',
+              addressRegion: 'NV',
+              addressCountry: 'US',
+            },
+            areaServed: [
+              { '@type': 'City', name: 'Reno', containedInPlace: { '@type': 'State', name: 'Nevada' } },
+              { '@type': 'AdministrativeArea', name: 'Lake Tahoe' },
+              { '@type': 'AdministrativeArea', name: 'San Francisco Bay Area' },
+            ],
+            sameAs: [
+              contact.instagramHref || 'https://www.instagram.com/silerchef',
+              contact.facebookHref || 'https://www.facebook.com/silerchef',
+              contact.websiteHref || 'https://www.silerchef.com/',
+            ],
+          },
+          {
+            '@type': 'Service',
+            '@id': 'https://www.silerchef.com/#service',
+            serviceType: 'Personal chef and private dining service',
+            provider: { '@id': 'https://www.silerchef.com/#business' },
+            areaServed: [
+              { '@type': 'City', name: 'Reno' },
+              { '@type': 'AdministrativeArea', name: 'Lake Tahoe' },
+              { '@type': 'AdministrativeArea', name: 'San Francisco Bay Area' },
+            ],
+            availableLanguage: ['en-US'],
+            audience: {
+              '@type': 'Audience',
+              geographicArea: [
+                { '@type': 'State', name: 'Nevada' },
+                { '@type': 'AdministrativeArea', name: 'Lake Tahoe' },
+                { '@type': 'AdministrativeArea', name: 'San Francisco Bay Area' },
+              ],
+            },
+            hasOfferCatalog: {
+              '@type': 'OfferCatalog',
+              name: 'Private chef experiences',
+              itemListElement: [
+                { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Private in-home dining' } },
+                { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Custom tasting menus' } },
+                { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Chef-led celebrations and events' } },
+              ],
+            },
+          },
+        ],
+      };
+
+      if (faqMainEntity.length) {
+        schemaPayload['@graph'].push({
+          '@type': 'FAQPage',
+          '@id': 'https://www.silerchef.com/#faq',
+          mainEntity: faqMainEntity,
+        });
+      }
+
+      schemaNode.textContent = JSON.stringify(schemaPayload, null, 2);
+    }
   }
 
   function remountHubs() {

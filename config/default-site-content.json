@@ -3,11 +3,68 @@
     "hero": {
       "headline": "Private Chef Dining That Feels Like the Best Table in the City",
       "tagline": "Reno · Tahoe · Bay Area · Luxury in-home experiences",
-      "lede": "For hosts who want more than dinner, Siler Chef designs globally inspired menus, refined plating, and an effortless service flow that turns home entertaining into a true occasion."
+      "lede": "For hosts who want more than dinner, Siler Chef designs globally inspired menus, refined plating, and an effortless service flow that turns home entertaining into a true occasion.",
+      "floatingNorthEyebrow": "Chef-led private dining",
+      "floatingNorthTitle": "Restaurant-level presence. At your table.",
+      "floatingSouthEyebrow": "What’s included",
+      "floatingSouthTitle": "Custom menu arc, sourcing, service rhythm, and a polished finish",
+      "proofChips": [
+        "Luxury private chef dining",
+        "Plated or family-style service",
+        "Reno · Tahoe · Bay Area"
+      ],
+      "miniPrimaryEyebrow": "Why it lands",
+      "miniPrimaryTitle": "This feels like bringing the best seat in the city into your home.",
+      "miniSecondaryEyebrow": "Best for",
+      "miniSecondaryTitle": "Anniversaries, executive dinners, birthdays, and nights that deserve a real statement."
     },
     "quote": {
       "text": "Every menu is a conversation - between season, setting, and the people at your table.",
       "cite": "Chef Siler"
+    },
+    "experience": {
+      "featuredEyebrow": "The Siler Difference",
+      "featuredTitle": "Not catering. A chef-led evening that changes the room.",
+      "featuredBody": "The strongest private-chef experiences feel cinematic from the first arrival bite to the last dessert finish. Siler Chef is built for hosts who want atmosphere, polish, and a night guests talk about after they leave.",
+      "hostingEyebrow": "Hosting payoff",
+      "hostingTitle": "High-touch, low-stress entertaining",
+      "hostingBody": "You keep the intimacy of home while the menu, pacing, and presentation carry the luxury.",
+      "guestEyebrow": "Guest impression",
+      "guestTitle": "A statement dinner with real personality",
+      "guestBody": "Global menus, elegant plating, and a custom rhythm designed around your occasion instead of a generic package."
+    },
+    "pillars": [
+      {
+        "label": "Coverage",
+        "title": "Reno · Tahoe · Bay Area",
+        "meta": "Travel for qualified private events"
+      },
+      {
+        "label": "Service",
+        "title": "Plated & family-style",
+        "meta": "Pacing matched to your gathering"
+      },
+      {
+        "label": "Dietary",
+        "title": "By arrangement",
+        "meta": "Allergies, faith, lifestyle preferences"
+      },
+      {
+        "label": "Scheduling",
+        "title": "Your date first",
+        "meta": "We align the menu and guest count once you’ve chosen a time"
+      }
+    ],
+    "coverage": {
+      "eyebrow": "Areas we serve",
+      "title": "Private chef service across Reno, Lake Tahoe, and the Bay Area",
+      "body": "Hosts searching for a private chef in Reno, Lake Tahoe, or the Bay Area can book Siler Chef for in-home dinners, intimate celebrations, corporate meals, and chef-led education sessions with a custom service flow.",
+      "chips": [
+        "Reno, Nevada",
+        "Lake Tahoe",
+        "San Francisco Bay Area",
+        "Travel for qualified events"
+      ]
     },
     "cuisinesSection": {
       "lede": "A portrait of world traditions - tap a cuisine for courses, tasting notes, and photography.",
@@ -38,15 +95,78 @@
       "headline": "Hold your night on the calendar",
       "summary": "Choose a time, tell us about your occasion, and your request will land in the reservation desk for follow-up by phone, email, or WhatsApp."
     },
+    "faq": {
+      "eyebrow": "Questions clients already ask",
+      "title": "Private chef FAQs for Reno, Lake Tahoe, and the Bay Area",
+      "lede": "Clear answers for searchers comparing private-chef options, planning a reservation, or deciding what to send before the first call.",
+      "items": [
+        {
+          "eyebrow": "Service area",
+          "title": "What areas does Siler Chef serve?",
+          "body": "Siler Chef serves Reno, Lake Tahoe, and the San Francisco Bay Area, with travel considered for qualified private events and chef-led occasions."
+        },
+        {
+          "eyebrow": "Reservation flow",
+          "title": "How do reservation requests work?",
+          "body": "Guests send their event date, guest count, event location, preferred cuisine, and any dietary notes. The request goes into the private reservation dashboard, and follow-up happens by phone, email, or WhatsApp."
+        },
+        {
+          "eyebrow": "Menus",
+          "title": "Can the sample menus be customized?",
+          "body": "Yes. Every cuisine and sample menu is only a starting direction. Courses can be adjusted or redesigned from scratch around the host brief, guest list, and dietary needs."
+        },
+        {
+          "eyebrow": "Booking details",
+          "title": "What information should guests send when booking?",
+          "body": "The most useful details are the date, guest count, event location, preferred cuisine, allergy or intolerance notes, and the best phone number for follow-up."
+        },
+        {
+          "eyebrow": "Dietary needs",
+          "title": "Can the menu accommodate dietary restrictions?",
+          "body": "Yes. The planning flow is built to capture allergies, food preferences, and lifestyle requirements early so the menu direction and sourcing can be shaped around them."
+        },
+        {
+          "eyebrow": "Chef education",
+          "title": "Does Siler Chef offer private lessons?",
+          "body": "Yes. Private lessons and chef education sessions can be prepared for small groups, hosts who want a more interactive night, or clients who want a guided culinary workshop."
+        }
+      ]
+    },
     "booking": {
+      "kicker": "Reservation desk",
       "title": "Reserve your date",
       "lede": "Tell us about your table - your request goes straight into the Siler Chef reservation desk, then we follow up by phone, email, or WhatsApp.",
+      "highlights": [
+        "Private chef planning",
+        "Fast follow-up",
+        "Reno · Tahoe · Bay Area"
+      ],
+      "steps": [
+        {
+          "title": "Send the request",
+          "body": "Share your event date, guest count, cuisine choice, and location."
+        },
+        {
+          "title": "We follow up",
+          "body": "Our team reaches out by phone, email, or WhatsApp to confirm the fit."
+        },
+        {
+          "title": "Menu direction",
+          "body": "Chef Siler shapes the service flow and menu around your event."
+        }
+      ],
+      "formSub": "Everything below goes directly to the private reservation dashboard.",
       "successTitle": "Thank you - your request is in.",
       "successText": "Your request is now in the Siler Chef dashboard. We’ll follow up shortly by phone, email, or WhatsApp to confirm details.",
       "fallbackUrl": "https://wa.me/17753896677",
       "notificationEmail": "silerchef@gmail.com",
       "teamWhatsAppHref": "https://wa.me/17753896677",
       "notificationWebhookUrl": ""
+    },
+    "reel": {
+      "kicker": "At the pass",
+      "videoCaption": "Muted autoplay · Sound optional",
+      "stillCaption": "Still — from the pass"
     },
     "detailNotice": "These are sample menu directions and service outlines - every event can be tailored to your brief, guest list, and dietary needs.",
     "contact": {
