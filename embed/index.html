@@ -237,11 +237,15 @@
               <li><a href="#services">Services &amp; Occasions</a></li>
               <li><a href="#contact">Contact</a></li>
               <li class="site-nav__cta-mobile">
-                <a class="header-cta" href="#" data-booking-trigger>Reserve your date</a>
+                <button type="button" class="header-cta" data-booking-trigger data-booking-placement="mobile_nav">
+                  Reserve your date
+                </button>
               </li>
             </ul>
           </nav>
-          <a class="header-cta header-cta--bar" href="#" data-booking-trigger>Reserve your date</a>
+          <button type="button" class="header-cta header-cta--bar" data-booking-trigger data-booking-placement="header_bar">
+            Reserve your date
+          </button>
           <button
             type="button"
             class="nav-toggle"
@@ -349,7 +353,9 @@
             </div>
             <div class="hero-actions">
               <a class="btn btn-primary" href="#cuisines">See Signature Menus</a>
-              <a class="btn btn-ghost" href="#" data-booking-trigger>Check availability</a>
+              <button type="button" class="btn btn-ghost" data-booking-trigger data-booking-placement="hero_check_availability">
+                Check availability
+              </button>
               <a class="btn btn-ghost" href="#contact">Contact</a>
             </div>
           </div>
@@ -727,7 +733,9 @@
                 follow-up by phone, email, or WhatsApp.
               </p>
               <div class="cta-actions">
-                <a class="btn btn-primary" href="#" data-booking-trigger>Reserve your date</a>
+                <button type="button" class="btn btn-primary" data-booking-trigger data-booking-placement="contact_cta">
+                  Reserve your date
+                </button>
                 <a class="btn btn-ghost" href="#contact">Contact</a>
               </div>
             </div>
@@ -893,13 +901,20 @@
 
     <div id="booking-overlay" class="booking-overlay" hidden aria-hidden="true">
       <div class="booking-backdrop" tabindex="-1"></div>
-      <div class="booking-panel" role="dialog" aria-modal="true" aria-labelledby="booking-title">
+      <div
+        class="booking-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="booking-title"
+        aria-describedby="booking-summary"
+        tabindex="-1"
+      >
         <div class="booking-panel__shell">
           <section class="booking-panel__intro">
             <button type="button" class="booking-close btn btn-ghost" aria-label="Close reservation form">← Close</button>
             <p class="booking-kicker">Reservation desk</p>
-            <h2 id="booking-title" class="booking-title gold-text">Reserve your date</h2>
-            <p class="booking-lede">Tell us about your table — your request goes straight into the Siler Chef reservation desk, then we follow up by phone, email, or WhatsApp.</p>
+            <h2 id="booking-title" class="booking-title gold-text" data-booking-headline>Reserve your date</h2>
+            <p id="booking-summary" class="booking-lede" data-booking-summary>Tell us about your table — your request goes straight into the Siler Chef reservation desk, then we follow up by phone, email, or WhatsApp.</p>
             <ul class="booking-highlights" aria-label="Reservation experience highlights">
               <li>Private chef planning</li>
               <li>Fast follow-up</li>

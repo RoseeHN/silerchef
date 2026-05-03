@@ -919,35 +919,60 @@
   const bookingSuccess = document.getElementById('booking-success');
   const bookingError = document.getElementById('booking-error');
   const bookingBackdrop = bookingOverlay && bookingOverlay.querySelector('.booking-backdrop');
+  const bookingPanel = bookingOverlay && bookingOverlay.querySelector('.booking-panel');
   const bookingCloseBtn = bookingOverlay && bookingOverlay.querySelector('.booking-close');
   const bookingDoneBtn = bookingOverlay && bookingOverlay.querySelector('.booking-done');
+  let bookingHideTimer = null;
+
+  function resetBookingState() {
+    if (!bookingForm || !bookingSuccess || !bookingError) return;
+    bookingForm.reset();
+    bookingForm.hidden = false;
+    bookingForm.querySelector('input[name="guestCount"]').value = '2';
+    const preferredContact = bookingForm.querySelector('select[name="preferredContact"]');
+    if (preferredContact) preferredContact.value = 'any';
+    bookingSuccess.hidden = true;
+    bookingError.hidden = true;
+    bookingError.textContent = '';
+  }
 
   function setBookingOpen(open) {
     if (!bookingOverlay) return;
-    bookingOverlay.hidden = !open;
-    bookingOverlay.setAttribute('aria-hidden', open ? 'false' : 'true');
-    document.body.classList.toggle('booking-open', open);
-    document.documentElement.classList.toggle('booking-open', open);
+    if (bookingHideTimer) {
+      clearTimeout(bookingHideTimer);
+      bookingHideTimer = null;
+    }
     if (open) {
+      bookingOverlay.hidden = false;
+      bookingOverlay.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('booking-open');
+      document.documentElement.classList.add('booking-open');
       lockViewport('booking');
       setMobileNavOpen(false);
+      requestAnimationFrame(() => {
+        bookingOverlay.classList.add('is-open');
+      });
       const bookingBody = bookingOverlay.querySelector('.booking-panel__body');
       if (bookingBody) bookingBody.scrollTop = 0;
       const first = bookingForm && bookingForm.querySelector('input[name="firstName"]');
-      if (first) requestAnimationFrame(() => first.focus());
-    } else if (bookingForm && bookingSuccess && bookingError) {
-      unlockViewport('booking');
-      bookingForm.reset();
-      bookingForm.hidden = false;
-      bookingForm.querySelector('input[name="guestCount"]').value = '2';
-      const preferredContact = bookingForm.querySelector('select[name="preferredContact"]');
-      if (preferredContact) preferredContact.value = 'any';
-      bookingSuccess.hidden = true;
-      bookingError.hidden = true;
-      bookingError.textContent = '';
-    } else {
-      unlockViewport('booking');
+      requestAnimationFrame(() => {
+        if (bookingPanel) bookingPanel.focus();
+        window.setTimeout(() => {
+          if (first) first.focus();
+        }, 140);
+      });
+      return;
     }
+    bookingOverlay.classList.remove('is-open');
+    bookingOverlay.setAttribute('aria-hidden', 'true');
+    bookingHideTimer = window.setTimeout(() => {
+      bookingOverlay.hidden = true;
+      document.body.classList.remove('booking-open');
+      document.documentElement.classList.remove('booking-open');
+      unlockViewport('booking');
+      resetBookingState();
+      bookingHideTimer = null;
+    }, 260);
   }
 
   async function applyBookingFromApi() {
@@ -976,7 +1001,7 @@
     el.addEventListener('click', (e) => {
       e.preventDefault();
       trackEvent('booking_trigger', {
-        placement: (el.textContent || '').trim() || 'booking_cta',
+        placement: el.getAttribute('data-booking-placement') || (el.textContent || '').trim() || 'booking_cta',
       });
       setBookingOpen(true);
     });

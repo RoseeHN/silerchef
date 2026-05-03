@@ -433,6 +433,8 @@ html.is-scrolled .site-header {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  appearance: none;
+  -webkit-appearance: none;
   padding: 0.44rem 0.95rem;
   border-radius: 999px;
   font-size: 0.64rem;
@@ -1097,6 +1099,9 @@ body.nav-drawer-open {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
   padding: 0.75rem 1.35rem;
   border-radius: 999px;
   font-size: 0.82rem;
@@ -2241,6 +2246,12 @@ body.scroll-locked {
     max(0.75rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
   overscroll-behavior: contain;
   isolation: isolate;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-flow);
+}
+
+.booking-overlay.is-open {
+  opacity: 1;
 }
 
 .booking-overlay[hidden] {
@@ -2254,6 +2265,8 @@ body.scroll-locked {
   background: rgba(6, 5, 6, 0.82);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.34s var(--ease-flow);
 }
 
 .booking-panel {
@@ -2269,6 +2282,22 @@ body.scroll-locked {
   box-shadow:
     0 32px 110px rgba(0, 0, 0, 0.62),
     inset 0 1px 0 rgba(255, 248, 235, 0.06);
+  opacity: 0;
+  transform: translateY(1.4rem) scale(0.985);
+  transform-origin: center bottom;
+  transition:
+    opacity 0.3s var(--ease-flow),
+    transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.42s var(--ease-flow);
+}
+
+.booking-overlay.is-open .booking-backdrop {
+  opacity: 1;
+}
+
+.booking-overlay.is-open .booking-panel {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 .booking-panel__shell {
@@ -2603,6 +2632,8 @@ body.scroll-locked {
     border-left: none;
     border-right: none;
     border-bottom: none;
+    transform: translateY(2rem);
+    transform-origin: center bottom;
   }
 
   .booking-panel__shell {
