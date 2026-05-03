@@ -540,6 +540,81 @@
     unlockViewport('detail');
   }
 
+  const momentsOverlay = document.getElementById('moments-overlay');
+  const momentsImage = document.getElementById('moments-image');
+  const momentsKicker = document.getElementById('moments-kicker');
+  const momentsTitle = document.getElementById('moments-title');
+  const momentsText = document.getElementById('moments-text');
+  const momentsCount = document.getElementById('moments-count');
+  const momentsClose = momentsOverlay && momentsOverlay.querySelector('.moments-close');
+  const momentsBackdrop = momentsOverlay && momentsOverlay.querySelector('.moments-backdrop');
+  const momentsPrev = momentsOverlay && momentsOverlay.querySelector('.moments-nav--prev');
+  const momentsNext = momentsOverlay && momentsOverlay.querySelector('.moments-nav--next');
+  let momentsHideTimer = null;
+  let momentCards = [];
+  let activeMomentIndex = 0;
+
+  function renderMoment(index) {
+    if (!momentCards.length || !momentsImage || !momentsTitle || !momentsText || !momentsKicker || !momentsCount) return;
+    activeMomentIndex = ((index % momentCards.length) + momentCards.length) % momentCards.length;
+    const card = momentCards[activeMomentIndex];
+    const img = card.querySelector('img');
+    const src = card.getAttribute('data-moment-src') || (img && img.getAttribute('src')) || '';
+    const alt = card.getAttribute('data-moment-alt') || (img && img.getAttribute('alt')) || '';
+    const kicker = card.getAttribute('data-moment-kicker') || 'Gallery moment';
+    const title = card.getAttribute('data-moment-title') || alt || `Moment ${activeMomentIndex + 1}`;
+    momentsImage.src = src;
+    momentsImage.alt = alt || title;
+    momentsKicker.textContent = kicker;
+    momentsTitle.textContent = title;
+    momentsText.textContent = 'A closer look at the atmosphere, plating rhythm, and visual language behind a Siler Chef evening.';
+    momentsCount.textContent = `${String(activeMomentIndex + 1).padStart(2, '0')} / ${String(momentCards.length).padStart(2, '0')}`;
+  }
+
+  function setMomentsOpen(open, index) {
+    if (!momentsOverlay) return;
+    if (momentsHideTimer) {
+      clearTimeout(momentsHideTimer);
+      momentsHideTimer = null;
+    }
+    if (open) {
+      if (typeof index === 'number') renderMoment(index);
+      momentsOverlay.hidden = false;
+      momentsOverlay.setAttribute('aria-hidden', 'false');
+      lockViewport('moments');
+      requestAnimationFrame(() => {
+        momentsOverlay.classList.add('is-open');
+        if (momentsClose) momentsClose.focus();
+      });
+      return;
+    }
+    momentsOverlay.classList.remove('is-open');
+    momentsOverlay.setAttribute('aria-hidden', 'true');
+    momentsHideTimer = window.setTimeout(() => {
+      momentsOverlay.hidden = true;
+      unlockViewport('moments');
+      momentsHideTimer = null;
+    }, 240);
+  }
+
+  function bindMomentsGallery() {
+    momentCards = Array.from(document.querySelectorAll('[data-moment-card]'));
+    momentCards.forEach((card, index) => {
+      card.addEventListener('click', () => {
+        trackEvent('gallery_open', {
+          placement: 'moments_grid',
+          index: index + 1,
+          title: card.getAttribute('data-moment-title') || '',
+        });
+        setMomentsOpen(true, index);
+      });
+    });
+    if (momentsClose) momentsClose.addEventListener('click', () => setMomentsOpen(false));
+    if (momentsBackdrop) momentsBackdrop.addEventListener('click', () => setMomentsOpen(false));
+    if (momentsPrev) momentsPrev.addEventListener('click', () => renderMoment(activeMomentIndex - 1));
+    if (momentsNext) momentsNext.addEventListener('click', () => renderMoment(activeMomentIndex + 1));
+  }
+
   function mountHub(containerId, items, kind, baseFolder, options) {
     const layout = options && options.layout;
     const premium =
@@ -635,6 +710,7 @@
 
   mountHub('cuisines-mount', CUISINES, 'cuisine', 'images/cuisines', { layout: 'cuisine-premium' });
   mountHub('services-mount', SERVICES, 'service', 'images/services-and-occasions', { layout: 'service-premium' });
+  bindMomentsGallery();
 
   if (detailClose) detailClose.addEventListener('click', closeDetail);
   const backdropEl = overlay && overlay.querySelector('.detail-backdrop');
@@ -1259,6 +1335,21 @@
     if (e.key === 'Escape' && bookingOv && !bookingOv.hidden) {
       setBookingOpen(false);
       return;
+    }
+    const momentsOv = document.getElementById('moments-overlay');
+    if (momentsOv && !momentsOv.hidden) {
+      if (e.key === 'Escape') {
+        setMomentsOpen(false);
+        return;
+      }
+      if (e.key === 'ArrowLeft') {
+        renderMoment(activeMomentIndex - 1);
+        return;
+      }
+      if (e.key === 'ArrowRight') {
+        renderMoment(activeMomentIndex + 1);
+        return;
+      }
     }
     if (e.key === 'Escape' && overlay && !overlay.hidden) {
       closeDetail();
