@@ -10,6 +10,8 @@
     selectedServiceSlug: '',
     reservationSearch: '',
     reservationStatusFilter: 'all',
+    simpleMode: true,
+    sidebarOpen: false,
     editorPanels: {
       menu: { block: 0, item: '0:0' },
       service: { block: 0, item: '0:0' },
@@ -209,6 +211,27 @@
     document.body.classList.add('admin-logged-out');
   }
 
+  function syncSimpleModeUI() {
+    document.body.classList.toggle('admin-simple-mode', !!state.simpleMode);
+    const label = `Simple mode: ${state.simpleMode ? 'On' : 'Off'}`;
+    ['simple-mode-btn', 'simple-mode-btn-mobile'].forEach((id) => {
+      const button = byId(id);
+      if (button) {
+        button.textContent = label;
+        button.setAttribute('aria-pressed', state.simpleMode ? 'true' : 'false');
+      }
+    });
+  }
+
+  function setSidebarOpen(open) {
+    state.sidebarOpen = !!open;
+    document.body.classList.toggle('sidebar-open', state.sidebarOpen);
+    const backdrop = byId('sidebar-backdrop');
+    if (backdrop) {
+      backdrop.hidden = !state.sidebarOpen;
+    }
+  }
+
   function getToken() {
     return localStorage.getItem(STORAGE_KEY) || '';
   }
@@ -237,6 +260,7 @@
     byId('logout-btn').hidden = true;
     if (byId('sidebar-logout-btn')) byId('sidebar-logout-btn').hidden = true;
     setAdminMode('logged-out');
+    setSidebarOpen(false);
   }
 
   function showPendingView() {
@@ -245,6 +269,7 @@
     byId('logout-btn').hidden = true;
     if (byId('sidebar-logout-btn')) byId('sidebar-logout-btn').hidden = true;
     setAdminMode('pending');
+    setSidebarOpen(false);
   }
 
   function showAuthenticatedView() {
@@ -253,6 +278,7 @@
     byId('logout-btn').hidden = true;
     if (byId('sidebar-logout-btn')) byId('sidebar-logout-btn').hidden = false;
     setAdminMode('authenticated');
+    syncSimpleModeUI();
   }
 
   function formatDateTime(isoText) {
@@ -1000,7 +1026,7 @@
         <span>Booking success text</span>
         <textarea id="hp-booking-success-text" rows="3">${esc(site.booking.successText)}</textarea>
       </label>
-      <label class="field field--full">
+      <label class="field field--full field--advanced">
         <span>Booking fallback link</span>
         <input id="hp-booking-fallback-url" type="url" value="${esc(site.booking.fallbackUrl)}" />
       </label>
@@ -1012,7 +1038,7 @@
         <span>Team WhatsApp shortcut</span>
         <input id="hp-booking-team-whatsapp" type="url" value="${esc(site.booking.teamWhatsAppHref || '')}" placeholder="https://wa.me/17753896677" />
       </label>
-      <label class="field field--full">
+      <label class="field field--full field--advanced">
         <span>Optional notification webhook</span>
         <input id="hp-booking-webhook-url" type="url" value="${esc(site.booking.notificationWebhookUrl || '')}" placeholder="Optional: Make, Zapier, Slack, or custom endpoint" />
       </label>
@@ -1046,7 +1072,7 @@
         <span>Phone</span>
         <input id="hp-contact-phone" type="text" value="${esc(site.contact.phone)}" />
       </label>
-      <label class="field">
+      <label class="field field--advanced">
         <span>Phone link</span>
         <input id="hp-contact-phone-href" type="text" value="${esc(site.contact.phoneHref)}" />
       </label>
@@ -1054,7 +1080,7 @@
         <span>Email</span>
         <input id="hp-contact-email" type="text" value="${esc(site.contact.email)}" />
       </label>
-      <label class="field">
+      <label class="field field--advanced">
         <span>Email link</span>
         <input id="hp-contact-email-href" type="text" value="${esc(site.contact.emailHref)}" />
       </label>
@@ -1062,7 +1088,7 @@
         <span>Website text</span>
         <input id="hp-contact-website" type="text" value="${esc(site.contact.website)}" />
       </label>
-      <label class="field">
+      <label class="field field--advanced">
         <span>Website link</span>
         <input id="hp-contact-website-href" type="url" value="${esc(site.contact.websiteHref)}" />
       </label>
@@ -1070,15 +1096,15 @@
         <span>Location line</span>
         <input id="hp-contact-location" type="text" value="${esc(site.contact.location)}" />
       </label>
-      <label class="field">
+      <label class="field field--advanced">
         <span>Instagram link</span>
         <input id="hp-contact-instagram" type="url" value="${esc(site.contact.instagramHref)}" />
       </label>
-      <label class="field">
+      <label class="field field--advanced">
         <span>WhatsApp link</span>
         <input id="hp-contact-whatsapp" type="url" value="${esc(site.contact.whatsappHref)}" />
       </label>
-      <label class="field">
+      <label class="field field--advanced">
         <span>Facebook link</span>
         <input id="hp-contact-facebook" type="url" value="${esc(site.contact.facebookHref)}" />
       </label>
@@ -1175,7 +1201,7 @@
               <span>Block title</span>
               <input type="text" id="${prefix}-block-${blockIndex}-title" value="${esc(block.title)}" />
             </label>
-            <label class="field field--full">
+            <label class="field field--full field--advanced">
               <span>Image path</span>
               <input type="text" id="${prefix}-block-${blockIndex}-image" value="${esc(block.image || '')}" />
             </label>
@@ -1218,10 +1244,11 @@
               <span>Card title</span>
               <input type="text" id="menu-card-title" value="${esc(card.title)}" />
             </label>
-            <label class="field">
+            <label class="field field--advanced">
               <span>Card number</span>
               <input type="text" id="menu-card-no" value="${esc(card.no)}" />
             </label>
+            <p class="field-help field-help--advanced field--full field--advanced">Card number and image path are usually left alone in simple mode.</p>
             <label class="field field--full">
               <span>Card tagline</span>
               <textarea id="menu-card-tagline" rows="2">${esc(card.tagline)}</textarea>
@@ -1303,10 +1330,11 @@
               <span>Card title</span>
               <input type="text" id="service-card-title" value="${esc(card.title)}" />
             </label>
-            <label class="field">
+            <label class="field field--advanced">
               <span>Card number</span>
               <input type="text" id="service-card-no" value="${esc(card.no)}" />
             </label>
+            <p class="field-help field-help--advanced field--full field--advanced">Card number and image path are usually left alone in simple mode.</p>
             <label class="field field--full">
               <span>Card tagline</span>
               <textarea id="service-card-tagline" rows="2">${esc(card.tagline)}</textarea>
@@ -2307,9 +2335,36 @@
     byId('sidebar-logout-btn').addEventListener('click', handleLogout);
   }
 
+  if (byId('simple-mode-btn')) {
+    byId('simple-mode-btn').addEventListener('click', () => {
+      state.simpleMode = !state.simpleMode;
+      syncSimpleModeUI();
+    });
+  }
+
+  if (byId('simple-mode-btn-mobile')) {
+    byId('simple-mode-btn-mobile').addEventListener('click', () => {
+      state.simpleMode = !state.simpleMode;
+      syncSimpleModeUI();
+    });
+  }
+
+  if (byId('sidebar-toggle-btn')) {
+    byId('sidebar-toggle-btn').addEventListener('click', () => {
+      setSidebarOpen(!state.sidebarOpen);
+    });
+  }
+
+  if (byId('sidebar-backdrop')) {
+    byId('sidebar-backdrop').addEventListener('click', () => {
+      setSidebarOpen(false);
+    });
+  }
+
   document.querySelectorAll('.admin-tab').forEach((btn) => {
     btn.addEventListener('click', () => {
       setActiveTab(btn.dataset.tab);
+      setSidebarOpen(false);
       const contentRoot = byId('dashboard-content');
       if (contentRoot) {
         contentRoot.scrollIntoView({ behavior: 'smooth', block: 'start' });

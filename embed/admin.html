@@ -84,6 +84,7 @@
         </section>
 
         <section id="dashboard" class="dashboard-shell" hidden>
+          <div id="sidebar-backdrop" class="sidebar-backdrop" hidden></div>
           <aside class="dashboard-sidebar panel" aria-label="Admin navigation">
             <div class="sidebar-brand">
               <p class="admin-kicker">Siler Chef</p>
@@ -142,12 +143,17 @@
             </nav>
 
             <div class="sidebar-actions">
+              <button id="simple-mode-btn" class="ghost-button sidebar-action" type="button">Simple mode: On</button>
               <a id="sidebar-open-website-link" class="ghost-link sidebar-action" href="/" target="_blank" rel="noopener noreferrer">Open website</a>
               <button id="sidebar-logout-btn" class="ghost-button sidebar-action" type="button">Log out</button>
             </div>
           </aside>
 
           <div id="dashboard-content" class="dashboard-content">
+            <section class="dashboard-mobile-toolbar panel" aria-label="Quick controls">
+              <button id="sidebar-toggle-btn" class="ghost-button" type="button">Menu</button>
+              <button id="simple-mode-btn-mobile" class="ghost-button" type="button">Simple mode: On</button>
+            </section>
             <section class="panel panel--overview">
               <div class="overview-hero">
                 <div>
