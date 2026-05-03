@@ -1230,6 +1230,7 @@
 
     const videoUrl = new URL('images/video/chef-reel.mov', window.location.href).href;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let videoReady = false;
 
     function applyStillMode() {
       section.classList.remove('cinematic--has-video');
@@ -1252,9 +1253,17 @@
       if (btn) btn.hidden = false;
     }
 
+    function markVideoReady() {
+      if (videoReady) return;
+      videoReady = true;
+      applyVideoMode();
+    }
+
     video.addEventListener('error', () => {
       applyStillMode();
     });
+    video.addEventListener('loadeddata', markVideoReady);
+    video.addEventListener('canplay', markVideoReady);
 
     if (reduce.matches) {
       applyStillMode();
@@ -1267,7 +1276,10 @@
           applyStillMode();
           return;
         }
-        applyVideoMode();
+        if (video.currentSrc !== videoUrl) {
+          video.src = videoUrl;
+        }
+        video.load();
 
         const io = new IntersectionObserver(
           (entries) => {
