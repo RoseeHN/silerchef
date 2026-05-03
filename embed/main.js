@@ -1000,6 +1000,26 @@
   const bookingDoneBtn = bookingOverlay && bookingOverlay.querySelector('.booking-done');
   let bookingHideTimer = null;
 
+  function populatePreferredTimes() {
+    const select = bookingForm && bookingForm.querySelector('select[name="preferredTime"]');
+    if (!select || select.options.length > 2) return;
+    const formatLabel = (hour24, minute) => {
+      const suffix = hour24 >= 12 ? 'PM' : 'AM';
+      const hour12 = hour24 % 12 || 12;
+      return `${hour12}:${String(minute).padStart(2, '0')} ${suffix}`;
+    };
+    for (let hour = 11; hour <= 22; hour += 1) {
+      [0, 30].forEach((minute) => {
+        if (hour === 22 && minute > 0) return;
+        const value = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = formatLabel(hour, minute);
+        select.appendChild(option);
+      });
+    }
+  }
+
   function resetBookingState() {
     if (!bookingForm || !bookingSuccess || !bookingError) return;
     bookingForm.reset();
@@ -1011,6 +1031,7 @@
     bookingError.hidden = true;
     bookingError.textContent = '';
   }
+  populatePreferredTimes();
 
   function setBookingOpen(open) {
     if (!bookingOverlay) return;

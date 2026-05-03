@@ -1298,7 +1298,7 @@
     const teamStatus = notifications.teamWhatsApp && notifications.teamWhatsApp.status;
     if (emailStatus && emailStatus !== 'skipped') parts.push(`Email ${emailStatus}`);
     if (webhookStatus && webhookStatus !== 'skipped') parts.push(`Webhook ${webhookStatus}`);
-    if (teamStatus === 'configured') parts.push('WhatsApp shortcut ready');
+    if (teamStatus && teamStatus !== 'unconfigured') parts.push(`WhatsApp ${teamStatus}`);
     return parts.length ? parts.join(' · ') : 'Dashboard only';
   }
 

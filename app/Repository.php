@@ -129,10 +129,10 @@ final class Repository
                     : 'No reservation email destination is configured yet.',
             ],
             'teamWhatsApp' => [
-                'status' => $config['teamWhatsAppHref'] !== '' ? 'configured' : 'unconfigured',
+                'status' => $config['teamWhatsAppHref'] !== '' ? 'queued' : 'unconfigured',
                 'target' => $config['teamWhatsAppHref'] !== '' ? $config['teamWhatsAppHref'] : null,
                 'detail' => $config['teamWhatsAppHref'] !== ''
-                    ? 'Team WhatsApp shortcut is ready inside the admin panel.'
+                    ? 'Attempting delivery to the configured team WhatsApp route.'
                     : 'No team WhatsApp route is configured yet.',
             ],
             'webhook' => [
@@ -146,6 +146,9 @@ final class Repository
 
         if ($config['email'] !== '') {
             $alerts['email'] = $this->sendReservationEmailAlert($config['email'], $reservation);
+        }
+        if ($config['teamWhatsAppHref'] !== '') {
+            $alerts['teamWhatsApp'] = $this->sendReservationWhatsAppAlert($config['teamWhatsAppHref'], $reservation);
         }
         if ($config['webhookUrl'] !== '') {
             $alerts['webhook'] = $this->sendReservationWebhookAlert($config['webhookUrl'], $reservation);
@@ -512,7 +515,37 @@ final class Repository
         );
         $body = $this->buildReservationAlertText($reservation);
         $replyTo = trim((string) ($reservation['customer']['email'] ?? ''));
-        $from = env_string('NOTIFICATION_FROM_EMAIL', 'no-reply@silerchef.com');
+        $resendApiKey = env_string('RESEND_API_KEY', '');
+        $from = env_string('NOTIFICATION_FROM_EMAIL', env_string('RESEND_FROM_EMAIL', 'no-reply@silerchef.com'));
+
+        if ($resendApiKey !== '' && $from !== '') {
+            $payload = [
+                'from' => $from,
+                'to' => [$to],
+                'subject' => $subject,
+                'text' => $body,
+            ];
+            if ($replyTo !== '' && valid_email($replyTo)) {
+                $payload['reply_to'] = $replyTo;
+            }
+            [$ok, $statusCode, $detail] = $this->postJsonRequest(
+                'https://api.resend.com/emails',
+                $payload,
+                [
+                    'Authorization: Bearer ' . $resendApiKey,
+                    'Content-Type: application/json',
+                ]
+            );
+
+            return [
+                'status' => $ok ? 'sent' : 'failed',
+                'target' => $to,
+                'detail' => $ok
+                    ? 'Reservation alert sent through Resend.'
+                    : ($detail !== '' ? $detail : ('Resend delivery failed' . ($statusCode > 0 ? ' (HTTP ' . $statusCode . ')' : '') . '.')),
+            ];
+        }
+
         $headers = [
             'MIME-Version: 1.0',
             'Content-Type: text/plain; charset=UTF-8',
@@ -521,14 +554,59 @@ final class Repository
         if ($replyTo !== '' && valid_email($replyTo)) {
             $headers[] = 'Reply-To: ' . $replyTo;
         }
-
         $sent = function_exists('mail') ? @mail($to, $subject, $body, implode("\r\n", $headers)) : false;
         return [
             'status' => $sent ? 'sent' : 'failed',
             'target' => $to,
             'detail' => $sent
                 ? 'Reservation alert sent to the configured inbox.'
-                : 'Email alert could not be delivered from this server yet. Keep using the admin dashboard and add a mail transport if needed.',
+                : 'Email alert could not be delivered from this server yet. Add RESEND_API_KEY and RESEND_FROM_EMAIL for provider-backed delivery.',
+        ];
+    }
+
+    private function sendReservationWhatsAppAlert(string $href, array $reservation): array
+    {
+        $message = $this->buildReservationWhatsAppText($reservation);
+        $quickLink = $this->buildTeamWhatsAppAlertUrl($href, $message);
+        $accountSid = env_string('TWILIO_ACCOUNT_SID', '');
+        $authToken = env_string('TWILIO_AUTH_TOKEN', '');
+        $from = env_string('TWILIO_WHATSAPP_FROM', '');
+        $to = env_string('TWILIO_WHATSAPP_TO', '');
+
+        if ($to === '') {
+            $parsedPhone = $this->extractPhoneFromWhatsAppHref($href);
+            if ($parsedPhone !== '') {
+                $to = 'whatsapp:+' . $parsedPhone;
+            }
+        }
+
+        if ($accountSid !== '' && $authToken !== '' && $from !== '' && $to !== '') {
+            [$ok, $statusCode, $detail] = $this->postFormRequest(
+                'https://api.twilio.com/2010-04-01/Accounts/' . rawurlencode($accountSid) . '/Messages.json',
+                [
+                    'From' => $from,
+                    'To' => $to,
+                    'Body' => $message,
+                ],
+                $accountSid,
+                $authToken
+            );
+
+            return [
+                'status' => $ok ? 'sent' : 'failed',
+                'target' => $to,
+                'detail' => $ok
+                    ? 'WhatsApp alert sent through Twilio.'
+                    : ($detail !== '' ? $detail : ('Twilio WhatsApp delivery failed' . ($statusCode > 0 ? ' (HTTP ' . $statusCode . ')' : '') . '.')),
+                'quickLink' => $quickLink !== '' ? $quickLink : null,
+            ];
+        }
+
+        return [
+            'status' => 'configured',
+            'target' => $quickLink !== '' ? $quickLink : $href,
+            'detail' => 'WhatsApp route is configured. Add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_FROM, and TWILIO_WHATSAPP_TO for automatic delivery.',
+            'quickLink' => $quickLink !== '' ? $quickLink : null,
         ];
     }
 
@@ -548,6 +626,11 @@ final class Repository
 
     private function postJson(string $url, array $payload): array
     {
+        return $this->postJsonRequest($url, $payload, ['Content-Type: application/json']);
+    }
+
+    private function postJsonRequest(string $url, array $payload, array $headers): array
+    {
         $body = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         if (!is_string($body)) {
             return [false, 0, 'Webhook payload could not be encoded.'];
@@ -559,7 +642,7 @@ final class Repository
                 $ch,
                 [
                     CURLOPT_POST => true,
-                    CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                    CURLOPT_HTTPHEADER => $headers,
                     CURLOPT_POSTFIELDS => $body,
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_CONNECTTIMEOUT => 4,
@@ -580,7 +663,7 @@ final class Repository
         $context = stream_context_create([
             'http' => [
                 'method' => 'POST',
-                'header' => "Content-Type: application/json\r\n",
+                'header' => implode("\r\n", $headers) . "\r\n",
                 'content' => $body,
                 'timeout' => 8,
                 'ignore_errors' => true,
@@ -596,12 +679,48 @@ final class Repository
         return [$statusCode >= 200 && $statusCode < 300, $statusCode, ''];
     }
 
+    private function postFormRequest(string $url, array $payload, string $username = '', string $password = ''): array
+    {
+        $body = http_build_query($payload);
+        if (function_exists('curl_init')) {
+            $ch = curl_init($url);
+            $headers = ['Content-Type: application/x-www-form-urlencoded'];
+            curl_setopt_array(
+                $ch,
+                [
+                    CURLOPT_POST => true,
+                    CURLOPT_HTTPHEADER => $headers,
+                    CURLOPT_POSTFIELDS => $body,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_CONNECTTIMEOUT => 4,
+                    CURLOPT_TIMEOUT => 8,
+                    CURLOPT_HEADER => false,
+                ]
+            );
+            if ($username !== '' || $password !== '') {
+                curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+                curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password);
+            }
+            $response = curl_exec($ch);
+            $err = curl_error($ch);
+            $statusCode = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+            curl_close($ch);
+            if ($response === false) {
+                return [false, $statusCode, $err !== '' ? $err : 'Unable to reach the form endpoint.'];
+            }
+            return [$statusCode >= 200 && $statusCode < 300, $statusCode, ''];
+        }
+
+        return [false, 0, 'cURL is required for form-encoded notification delivery.'];
+    }
+
     private function buildReservationAlertPayload(array $reservation): array
     {
         return [
             'type' => 'reservation.created',
             'reservation' => $reservation,
             'summary' => $this->formatReservationQuickSummary($reservation),
+            'whatsAppText' => $this->buildReservationWhatsAppText($reservation),
             'generatedAt' => gmdate('c'),
         ];
     }
@@ -634,6 +753,56 @@ final class Repository
         ];
 
         return implode("\n", $lines);
+    }
+
+    private function buildReservationWhatsAppText(array $reservation): string
+    {
+        $customer = is_array($reservation['customer'] ?? null) ? $reservation['customer'] : [];
+        $request = is_array($reservation['request'] ?? null) ? $reservation['request'] : [];
+        $name = trim(((string) ($customer['firstName'] ?? '')) . ' ' . ((string) ($customer['lastName'] ?? '')));
+
+        $lines = [
+            'New Siler Chef reservation request',
+            'Guest: ' . ($name !== '' ? $name : 'Guest request'),
+            'Date: ' . (((string) ($request['preferredDate'] ?? '')) !== '' ? (string) $request['preferredDate'] : '-'),
+            'Time: ' . (((string) ($request['preferredTime'] ?? '')) !== '' ? (string) $request['preferredTime'] : '-'),
+            'Guests: ' . (((string) ($request['guestCount'] ?? '')) !== '' ? (string) $request['guestCount'] : '-'),
+            'Phone: ' . (((string) ($customer['phone'] ?? '')) !== '' ? (string) $customer['phone'] : '-'),
+            'Email: ' . (((string) ($customer['email'] ?? '')) !== '' ? (string) $customer['email'] : '-'),
+            'ZIP: ' . (((string) ($request['zipCode'] ?? '')) !== '' ? (string) $request['zipCode'] : '-'),
+        ];
+
+        $notes = trim((string) ($request['notes'] ?? ''));
+        if ($notes !== '') {
+            $lines[] = 'Notes: ' . $notes;
+        }
+
+        return implode("\n", $lines);
+    }
+
+    private function buildTeamWhatsAppAlertUrl(string $href, string $message): string
+    {
+        $phone = $this->extractPhoneFromWhatsAppHref($href);
+        if ($phone === '') {
+            return $href;
+        }
+
+        return 'https://wa.me/' . rawurlencode($phone) . '?text=' . rawurlencode($message);
+    }
+
+    private function extractPhoneFromWhatsAppHref(string $href): string
+    {
+        if ($href === '') {
+            return '';
+        }
+        if (preg_match('~wa\.me/(\d+)~', $href, $matches)) {
+            return (string) $matches[1];
+        }
+        if (preg_match('~phone=(\d+)~', $href, $matches)) {
+            return (string) $matches[1];
+        }
+
+        return '';
     }
 
     private function formatReservationQuickSummary(array $reservation): string

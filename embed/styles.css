@@ -2451,6 +2451,7 @@ body.scroll-locked {
 .booking-panel__shell {
   display: grid;
   grid-template-columns: minmax(18rem, 0.9fr) minmax(0, 1.1fr);
+  height: min(100dvh - 1.5rem, 880px);
   min-height: min(100dvh - 1.5rem, 880px);
   max-height: min(100dvh - 1.5rem, 880px);
 }
@@ -2461,6 +2462,12 @@ body.scroll-locked {
   gap: 1rem;
   padding: 1.1rem 1.15rem 1.25rem;
   min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(197, 160, 89, 0.32) transparent;
   background:
     radial-gradient(circle at top left, rgba(197, 160, 89, 0.16), transparent 44%),
     linear-gradient(180deg, rgba(24, 21, 23, 0.96), rgba(14, 12, 14, 0.98));
@@ -2469,6 +2476,7 @@ body.scroll-locked {
 
 .booking-panel__body {
   min-height: 0;
+  height: 100%;
   display: grid;
   align-content: start;
   overflow-y: auto;
@@ -2579,6 +2587,7 @@ body.scroll-locked {
 
 .booking-form {
   display: block;
+  min-height: 100%;
 }
 
 .booking-form__card,
@@ -2593,6 +2602,10 @@ body.scroll-locked {
   box-shadow:
     inset 0 1px 0 rgba(255, 248, 235, 0.05),
     0 18px 42px rgba(0, 0, 0, 0.26);
+}
+
+.booking-form__card {
+  padding-bottom: 1.4rem;
 }
 
 .booking-form__head {
