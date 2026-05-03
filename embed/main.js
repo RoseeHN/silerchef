@@ -177,6 +177,14 @@
     return site.services ? site.services[slug] : null;
   }
 
+  function getCardImageSrc(kind, slug, baseFolder) {
+    const copy = getCopy(kind, slug);
+    const firstBlock = copy && Array.isArray(copy.blocks) ? copy.blocks[0] : null;
+    const dynamicImage = firstBlock && typeof firstBlock.image === 'string' ? firstBlock.image.trim() : '';
+    if (dynamicImage) return dynamicImage;
+    return `${baseFolder}/${slug}/thumb.jpg`;
+  }
+
   function renderBlocks(container, copy) {
     container.innerHTML = '';
     if (!copy || !copy.blocks) return;
@@ -640,7 +648,7 @@
       img.alt = '';
       img.loading = 'lazy';
       img.decoding = 'async';
-      img.src = `${baseFolder}/${item.slug}/thumb.jpg`;
+      img.src = getCardImageSrc(kind, item.slug, baseFolder);
       if (premium) {
         img.sizes = '(max-width: 640px) 100vw, (max-width: 1100px) 50vw, (max-width: 1500px) 33vw, 460px';
         img.width = 800;

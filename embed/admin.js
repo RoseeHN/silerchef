@@ -844,14 +844,22 @@
   }
 
   function blockEditorHtml(prefix, block, blockIndex) {
+    const isMenu = prefix === 'menu';
+    const blockLabel = isMenu ? 'Sample set' : 'Detail section';
+    const itemLabel = isMenu ? 'Course' : 'Point';
+    const itemTitleLabel = isMenu ? 'Course title' : 'Point title';
+    const addItemLabel = isMenu ? 'Add course' : 'Add point';
     const itemsHtml = (block.items || [])
       .map(
         (item, itemIndex) => `
           <div class="editor-item">
-            <h4>Dish ${itemIndex + 1}</h4>
+            <div class="editor-item__head">
+              <h4>${itemLabel} ${itemIndex + 1}</h4>
+              <button class="ghost-button editor-inline-button" type="button" data-remove-item="${prefix}:${blockIndex}:${itemIndex}">Remove ${itemLabel.toLowerCase()}</button>
+            </div>
             <div class="form-layout">
               <label class="field">
-                <span>Dish title</span>
+                <span>${itemTitleLabel}</span>
                 <input type="text" id="${prefix}-block-${blockIndex}-item-${itemIndex}-name" value="${esc(item.name)}" />
               </label>
               <label class="field field--full">
@@ -866,6 +874,13 @@
 
     return `
       <section class="editor-block">
+        <div class="editor-block__head">
+          <div>
+            <p class="panel-kicker">${blockLabel} ${blockIndex + 1}</p>
+            <h4>${esc(block.title || `${blockLabel} ${blockIndex + 1}`)}</h4>
+          </div>
+          <button class="danger-button editor-inline-button" type="button" data-remove-block="${prefix}:${blockIndex}">Remove ${blockLabel.toLowerCase()}</button>
+        </div>
         <div class="form-layout">
           <label class="field">
             <span>Block title</span>
@@ -877,6 +892,9 @@
           </label>
         </div>
         <div class="editor-items">${itemsHtml}</div>
+        <div class="utility-actions">
+          <button class="ghost-button editor-inline-button" type="button" data-add-item="${prefix}:${blockIndex}">${addItemLabel}</button>
+        </div>
       </section>
     `;
   }
@@ -927,6 +945,9 @@
         <section class="editor-card">
           <h3>Sample menu blocks</h3>
           <p class="editor-help">Each block is one sample menu set shown when the guest opens this cuisine.</p>
+          <div class="utility-actions">
+            <button class="ghost-button editor-inline-button" type="button" data-add-block="menu">Add sample set</button>
+          </div>
           <div class="editor-blocks">
             ${(detail.blocks || []).map((block, index) => blockEditorHtml('menu', block, index)).join('')}
           </div>
@@ -1008,6 +1029,9 @@
         <section class="editor-card">
           <h3>Detail sections</h3>
           <p class="editor-help">These blocks appear inside the opened service detail view.</p>
+          <div class="utility-actions">
+            <button class="ghost-button editor-inline-button" type="button" data-add-block="service">Add detail section</button>
+          </div>
           <div class="editor-blocks">
             ${(detail.blocks || []).map((block, index) => blockEditorHtml('service', block, index)).join('')}
           </div>
@@ -1611,6 +1635,164 @@
     }));
   }
 
+  function createEmptyEditorItem() {
+    return {
+      name: '',
+      desc: '',
+    };
+  }
+
+  function createEmptyEditorBlock(prefix) {
+    const isMenu = prefix === 'menu';
+    return {
+      title: isMenu ? 'New sample set' : 'New detail section',
+      image: '',
+      items: [createEmptyEditorItem()],
+    };
+  }
+
+  function makeCardNo(length) {
+    return String(length + 1).padStart(2, '0');
+  }
+
+  function createDynamicSlug(prefix) {
+    return `${prefix}-${Date.now().toString(36).slice(-6)}`;
+  }
+
+  function createEmptyCuisineCard() {
+    const content = getContent();
+    const slug = createDynamicSlug('cuisine');
+    return {
+      card: {
+        slug,
+        title: 'New Cuisine',
+        no: makeCardNo((content.cuisineCards || []).length),
+        tagline: 'Describe the flavor profile and guest experience for this cuisine.',
+      },
+      detail: {
+        intro: 'Add a short introduction that explains the mood, menu direction, and why this cuisine belongs on the table.',
+        blocks: [createEmptyEditorBlock('menu')],
+      },
+    };
+  }
+
+  function createEmptyServiceCard() {
+    const content = getContent();
+    const slug = createDynamicSlug('service');
+    return {
+      card: {
+        slug,
+        title: 'New Service',
+        no: makeCardNo((content.serviceCards || []).length),
+        tagline: 'Describe the kind of event this service is designed for.',
+      },
+      detail: {
+        intro: 'Add a short introduction that explains how this service feels, flows, and what the guest receives.',
+        blocks: [createEmptyEditorBlock('service')],
+      },
+    };
+  }
+
+  function getEditorDetail(prefix) {
+    const content = getContent();
+    if (prefix === 'menu') {
+      const slug = state.selectedCuisineSlug;
+      return slug ? content.cuisines[slug] : null;
+    }
+    const slug = state.selectedServiceSlug;
+    return slug ? content.services[slug] : null;
+  }
+
+  function rerenderEditor(prefix) {
+    if (prefix === 'menu') {
+      renderMenuEditor();
+      return;
+    }
+    renderServiceEditor();
+  }
+
+  function addEditorBlock(prefix) {
+    const detail = getEditorDetail(prefix);
+    if (!detail) return;
+    detail.blocks = Array.isArray(detail.blocks) ? detail.blocks : [];
+    detail.blocks.push(createEmptyEditorBlock(prefix));
+    rerenderEditor(prefix);
+  }
+
+  function removeEditorBlock(prefix, blockIndex) {
+    const detail = getEditorDetail(prefix);
+    if (!detail || !Array.isArray(detail.blocks)) return;
+    detail.blocks.splice(blockIndex, 1);
+    if (!detail.blocks.length) {
+      detail.blocks.push(createEmptyEditorBlock(prefix));
+    }
+    rerenderEditor(prefix);
+  }
+
+  function addEditorItem(prefix, blockIndex) {
+    const detail = getEditorDetail(prefix);
+    const block = detail && Array.isArray(detail.blocks) ? detail.blocks[blockIndex] : null;
+    if (!block) return;
+    block.items = Array.isArray(block.items) ? block.items : [];
+    block.items.push(createEmptyEditorItem());
+    rerenderEditor(prefix);
+  }
+
+  function removeEditorItem(prefix, blockIndex, itemIndex) {
+    const detail = getEditorDetail(prefix);
+    const block = detail && Array.isArray(detail.blocks) ? detail.blocks[blockIndex] : null;
+    if (!block || !Array.isArray(block.items)) return;
+    block.items.splice(itemIndex, 1);
+    if (!block.items.length) {
+      block.items.push(createEmptyEditorItem());
+    }
+    rerenderEditor(prefix);
+  }
+
+  function addContentCard(kind) {
+    const content = getContent();
+    if (kind === 'cuisine') {
+      const next = createEmptyCuisineCard();
+      content.cuisineCards.push(next.card);
+      content.cuisines[next.card.slug] = next.detail;
+      state.selectedCuisineSlug = next.card.slug;
+      renderCuisineSelect();
+      renderMenuEditor();
+      renderMenuPreview(next.card, next.detail);
+      return;
+    }
+
+    const next = createEmptyServiceCard();
+    content.serviceCards.push(next.card);
+    content.services[next.card.slug] = next.detail;
+    state.selectedServiceSlug = next.card.slug;
+    renderServiceSelect();
+    renderServiceEditor();
+    renderServicePreview(next.card, next.detail, next.card.slug);
+  }
+
+  function removeContentCard(kind) {
+    const content = getContent();
+    if (kind === 'cuisine') {
+      if ((content.cuisineCards || []).length <= 1) return;
+      const slug = state.selectedCuisineSlug;
+      content.cuisineCards = content.cuisineCards.filter((row) => row.slug !== slug);
+      delete content.cuisines[slug];
+      state.selectedCuisineSlug = content.cuisineCards[0] ? content.cuisineCards[0].slug : '';
+      renderCuisineSelect();
+      renderMenuEditor();
+      return;
+    }
+
+    if ((content.serviceCards || []).length <= 1) return;
+    const slug = state.selectedServiceSlug;
+    content.serviceCards = content.serviceCards.filter((row) => row.slug !== slug);
+    delete content.services[slug];
+    state.selectedServiceSlug = content.serviceCards[0] ? content.serviceCards[0].slug : '';
+    renderServiceSelect();
+    renderServiceEditor();
+  }
+
   function collectCuisineContent() {
     const next = clone(state.bootstrap.content);
     const slug = state.selectedCuisineSlug;
@@ -1794,6 +1976,45 @@
   });
 
   document.addEventListener('click', (event) => {
+    const addCardBtn = event.target.closest('[data-add-card]');
+    if (addCardBtn && state.bootstrap) {
+      addContentCard(addCardBtn.getAttribute('data-add-card') || 'cuisine');
+      return;
+    }
+
+    const removeCardBtn = event.target.closest('[data-remove-card]');
+    if (removeCardBtn && state.bootstrap) {
+      removeContentCard(removeCardBtn.getAttribute('data-remove-card') || 'cuisine');
+      return;
+    }
+
+    const addBlockBtn = event.target.closest('[data-add-block]');
+    if (addBlockBtn && state.bootstrap) {
+      addEditorBlock(addBlockBtn.getAttribute('data-add-block') || 'menu');
+      return;
+    }
+
+    const removeBlockBtn = event.target.closest('[data-remove-block]');
+    if (removeBlockBtn && state.bootstrap) {
+      const [prefix, blockIndexRaw] = String(removeBlockBtn.getAttribute('data-remove-block') || '').split(':');
+      removeEditorBlock(prefix || 'menu', Number(blockIndexRaw));
+      return;
+    }
+
+    const addItemBtn = event.target.closest('[data-add-item]');
+    if (addItemBtn && state.bootstrap) {
+      const [prefix, blockIndexRaw] = String(addItemBtn.getAttribute('data-add-item') || '').split(':');
+      addEditorItem(prefix || 'menu', Number(blockIndexRaw));
+      return;
+    }
+
+    const removeItemBtn = event.target.closest('[data-remove-item]');
+    if (removeItemBtn && state.bootstrap) {
+      const [prefix, blockIndexRaw, itemIndexRaw] = String(removeItemBtn.getAttribute('data-remove-item') || '').split(':');
+      removeEditorItem(prefix || 'menu', Number(blockIndexRaw), Number(itemIndexRaw));
+      return;
+    }
+
     const jumpBtn = event.target.closest('[data-jump-homepage]');
     if (jumpBtn) {
       setActiveTab('homepage');

@@ -94,6 +94,11 @@ body {
   justify-content: space-between;
 }
 
+.panel-head {
+  width: 100%;
+  min-width: 0;
+}
+
 .admin-header,
 .subsection-head {
   flex-wrap: wrap;
@@ -304,7 +309,13 @@ label span,
 
 .dashboard-content {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
+  min-width: 0;
+}
+
+.dashboard-content > * {
+  width: 100%;
   min-width: 0;
 }
 
@@ -352,24 +363,25 @@ label span,
 }
 
 .overview-hero {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
   align-items: end;
-  justify-content: space-between;
   gap: 1rem;
-  flex-wrap: wrap;
+  width: 100%;
+  min-width: 0;
 }
 
 .overview-badges {
   display: flex;
   flex-wrap: wrap;
   gap: 0.7rem;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 .overview-actions {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 0.7rem;
   margin-top: 0.8rem;
 }
@@ -403,6 +415,8 @@ label span,
 
 .dashboard-utility-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
+  grid-auto-rows: 1fr;
 }
 
 .utility-card {
@@ -542,6 +556,13 @@ label span,
 
 .tab-panel.is-active {
   display: grid;
+  width: 100%;
+  min-width: 0;
+}
+
+.tab-panel > .panel {
+  width: 100%;
+  min-width: 0;
 }
 
 .form-layout {
@@ -655,8 +676,13 @@ select:focus {
 
 .selector-bar {
   display: grid;
+  grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
   gap: 0.75rem;
-  max-width: 360px;
+  align-items: end;
+}
+
+.selector-bar .utility-actions {
+  justify-content: flex-start;
 }
 
 .editor-preview-card {
@@ -723,6 +749,20 @@ select:focus {
   border: 1px solid rgba(197, 160, 89, 0.14);
   border-radius: var(--radius-soft);
   background: rgba(15, 13, 15, 0.58);
+}
+
+.editor-block__head,
+.editor-item__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.editor-inline-button {
+  min-height: 2.55rem;
+  padding-inline: 0.9rem;
 }
 
 .editor-card h3,
@@ -1039,9 +1079,8 @@ body.admin-auth-pending .admin-main::before {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .overview-badges,
-  .overview-actions {
-    justify-content: flex-start;
+  .overview-hero {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1065,6 +1104,7 @@ body.admin-auth-pending .admin-main::before {
     grid-template-columns: 1fr;
   }
 
+  .selector-bar,
   .sidebar-snapshot,
   .sidebar-nav,
   .sidebar-actions {
