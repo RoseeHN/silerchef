@@ -10,6 +10,10 @@
     selectedServiceSlug: '',
     reservationSearch: '',
     reservationStatusFilter: 'all',
+    editorPanels: {
+      menu: { block: 0, item: '0:0' },
+      service: { block: 0, item: '0:0' },
+    },
   };
 
   const TAB_COPY = {
@@ -95,6 +99,68 @@
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
+  }
+
+  function getEditorPanelState(prefix) {
+    if (!state.editorPanels[prefix]) {
+      state.editorPanels[prefix] = { block: 0, item: '0:0' };
+    }
+    return state.editorPanels[prefix];
+  }
+
+  function ensureEditorExpansion(prefix, blocks) {
+    const panelState = getEditorPanelState(prefix);
+    const safeBlocks = Array.isArray(blocks) ? blocks : [];
+    if (!safeBlocks.length) {
+      panelState.block = null;
+      panelState.item = null;
+      return;
+    }
+
+    const maxBlockIndex = safeBlocks.length - 1;
+    if (typeof panelState.block !== 'number' || panelState.block < 0 || panelState.block > maxBlockIndex) {
+      panelState.block = 0;
+    }
+
+    const activeBlock = safeBlocks[panelState.block] || safeBlocks[0];
+    const items = Array.isArray(activeBlock && activeBlock.items) ? activeBlock.items : [];
+    if (!items.length) {
+      panelState.item = null;
+      return;
+    }
+
+    const currentItem = String(panelState.item || '');
+    const [blockRaw, itemRaw] = currentItem.split(':').map((value) => Number(value));
+    if (blockRaw !== panelState.block || !Number.isInteger(itemRaw) || itemRaw < 0 || itemRaw >= items.length) {
+      panelState.item = `${panelState.block}:0`;
+    }
+  }
+
+  function isBlockExpanded(prefix, blockIndex) {
+    return getEditorPanelState(prefix).block === blockIndex;
+  }
+
+  function isItemExpanded(prefix, blockIndex, itemIndex) {
+    return getEditorPanelState(prefix).item === `${blockIndex}:${itemIndex}`;
+  }
+
+  function toggleEditorBlock(prefix, blockIndex) {
+    const panelState = getEditorPanelState(prefix);
+    panelState.block = panelState.block === blockIndex ? null : blockIndex;
+    if (panelState.block == null) {
+      panelState.item = null;
+    } else {
+      panelState.item = `${blockIndex}:0`;
+    }
+    rerenderEditor(prefix);
+  }
+
+  function toggleEditorItem(prefix, blockIndex, itemIndex) {
+    const panelState = getEditorPanelState(prefix);
+    const key = `${blockIndex}:${itemIndex}`;
+    panelState.block = blockIndex;
+    panelState.item = panelState.item === key ? null : key;
+    rerenderEditor(prefix);
   }
 
   function clone(value) {
@@ -1054,23 +1120,35 @@
     const itemLabel = isMenu ? 'Course' : 'Point';
     const itemTitleLabel = isMenu ? 'Course title' : 'Point title';
     const addItemLabel = isMenu ? 'Add course' : 'Add point';
+    const blockExpanded = isBlockExpanded(prefix, blockIndex);
+    const itemCount = Array.isArray(block.items) ? block.items.length : 0;
     const itemsHtml = (block.items || [])
       .map(
         (item, itemIndex) => `
-          <div class="editor-item">
-            <div class="editor-item__head">
-              <h4>${itemLabel} ${itemIndex + 1}</h4>
-              <button class="ghost-button editor-inline-button" type="button" data-remove-item="${prefix}:${blockIndex}:${itemIndex}">Remove ${itemLabel.toLowerCase()}</button>
-            </div>
-            <div class="form-layout">
-              <label class="field">
-                <span>${itemTitleLabel}</span>
-                <input type="text" id="${prefix}-block-${blockIndex}-item-${itemIndex}-name" value="${esc(item.name)}" />
-              </label>
-              <label class="field field--full">
-                <span>Description</span>
-                <textarea id="${prefix}-block-${blockIndex}-item-${itemIndex}-desc" rows="3">${esc(item.desc)}</textarea>
-              </label>
+          <div class="editor-item ${isItemExpanded(prefix, blockIndex, itemIndex) ? 'is-open' : ''}">
+            <button class="editor-item__toggle" type="button" data-toggle-item="${prefix}:${blockIndex}:${itemIndex}" aria-expanded="${isItemExpanded(prefix, blockIndex, itemIndex) ? 'true' : 'false'}">
+              <div class="editor-item__summary">
+                <p class="panel-kicker">${itemLabel} ${itemIndex + 1}</p>
+                <h4>${esc(item.name || `${itemLabel} ${itemIndex + 1}`)}</h4>
+                <p class="editor-summary-note">${esc(item.desc || `Open this ${itemLabel.toLowerCase()} to edit its title and description.`)}</p>
+              </div>
+              <span class="editor-disclosure" aria-hidden="true">${isItemExpanded(prefix, blockIndex, itemIndex) ? '−' : '+'}</span>
+            </button>
+            <div class="editor-item__body" ${isItemExpanded(prefix, blockIndex, itemIndex) ? '' : 'hidden'}>
+              <div class="editor-item__head">
+                <p class="editor-microcopy">Only open the course you want to update. Everything else stays tucked away.</p>
+                <button class="ghost-button editor-inline-button" type="button" data-remove-item="${prefix}:${blockIndex}:${itemIndex}">Remove ${itemLabel.toLowerCase()}</button>
+              </div>
+              <div class="form-layout">
+                <label class="field">
+                  <span>${itemTitleLabel}</span>
+                  <input type="text" id="${prefix}-block-${blockIndex}-item-${itemIndex}-name" value="${esc(item.name)}" />
+                </label>
+                <label class="field field--full">
+                  <span>Description</span>
+                  <textarea id="${prefix}-block-${blockIndex}-item-${itemIndex}-desc" rows="3">${esc(item.desc)}</textarea>
+                </label>
+              </div>
             </div>
           </div>
         `
@@ -1078,27 +1156,34 @@
       .join('');
 
     return `
-      <section class="editor-block">
-        <div class="editor-block__head">
-          <div>
+      <section class="editor-block ${blockExpanded ? 'is-open' : ''}">
+        <button class="editor-block__toggle" type="button" data-toggle-block="${prefix}:${blockIndex}" aria-expanded="${blockExpanded ? 'true' : 'false'}">
+          <div class="editor-block__summary">
             <p class="panel-kicker">${blockLabel} ${blockIndex + 1}</p>
             <h4>${esc(block.title || `${blockLabel} ${blockIndex + 1}`)}</h4>
+            <p class="editor-summary-note">${itemCount} ${itemLabel.toLowerCase()}${itemCount === 1 ? '' : 's'} inside this section.</p>
           </div>
-          <button class="danger-button editor-inline-button" type="button" data-remove-block="${prefix}:${blockIndex}">Remove ${blockLabel.toLowerCase()}</button>
-        </div>
-        <div class="form-layout">
-          <label class="field">
-            <span>Block title</span>
-            <input type="text" id="${prefix}-block-${blockIndex}-title" value="${esc(block.title)}" />
-          </label>
-          <label class="field field--full">
-            <span>Image path</span>
-            <input type="text" id="${prefix}-block-${blockIndex}-image" value="${esc(block.image || '')}" />
-          </label>
-        </div>
-        <div class="editor-items">${itemsHtml}</div>
-        <div class="utility-actions">
-          <button class="ghost-button editor-inline-button" type="button" data-add-item="${prefix}:${blockIndex}">${addItemLabel}</button>
+          <span class="editor-disclosure" aria-hidden="true">${blockExpanded ? '−' : '+'}</span>
+        </button>
+        <div class="editor-block__body" ${blockExpanded ? '' : 'hidden'}>
+          <div class="editor-block__head">
+            <p class="editor-microcopy">Only this sample set is open. Close it any time and move to the next one.</p>
+            <button class="danger-button editor-inline-button" type="button" data-remove-block="${prefix}:${blockIndex}">Remove ${blockLabel.toLowerCase()}</button>
+          </div>
+          <div class="form-layout">
+            <label class="field">
+              <span>Block title</span>
+              <input type="text" id="${prefix}-block-${blockIndex}-title" value="${esc(block.title)}" />
+            </label>
+            <label class="field field--full">
+              <span>Image path</span>
+              <input type="text" id="${prefix}-block-${blockIndex}-image" value="${esc(block.image || '')}" />
+            </label>
+          </div>
+          <div class="editor-items">${itemsHtml}</div>
+          <div class="utility-actions">
+            <button class="ghost-button editor-inline-button" type="button" data-add-item="${prefix}:${blockIndex}">${addItemLabel}</button>
+          </div>
         </div>
       </section>
     `;
@@ -1121,6 +1206,7 @@
     const card = getCuisineCard(slug);
     const detail = getContent().cuisines[slug];
     if (!card || !detail) return;
+    ensureEditorExpansion('menu', detail.blocks || []);
     renderMenuPreview(card, detail);
     byId('menu-editor').innerHTML = `
       <div class="editor-shell">
@@ -1149,7 +1235,7 @@
 
         <section class="editor-card">
           <h3>Sample menu blocks</h3>
-          <p class="editor-help">Each block is one sample menu set shown when the guest opens this cuisine.</p>
+          <p class="editor-help">Each block is one sample menu set. Only the section you open stays visible, so editing stays simple and focused.</p>
           <div class="utility-actions">
             <button class="ghost-button editor-inline-button" type="button" data-add-block="menu">Add sample set</button>
           </div>
@@ -1205,6 +1291,7 @@
     const card = getServiceCard(slug);
     const detail = getContent().services[slug];
     if (!card || !detail) return;
+    ensureEditorExpansion('service', detail.blocks || []);
     renderServicePreview(card, detail, slug);
     byId('service-editor').innerHTML = `
       <div class="editor-shell">
@@ -1233,7 +1320,7 @@
 
         <section class="editor-card">
           <h3>Detail sections</h3>
-          <p class="editor-help">These blocks appear inside the opened service detail view.</p>
+          <p class="editor-help">Only the detail section you open stays on screen, so updates stay easy to follow.</p>
           <div class="utility-actions">
             <button class="ghost-button editor-inline-button" type="button" data-add-block="service">Add detail section</button>
           </div>
@@ -1965,6 +2052,7 @@
   }
 
   function rerenderEditor(prefix) {
+    syncEditorDraft(prefix);
     if (prefix === 'menu') {
       renderMenuEditor();
       return;
@@ -1972,11 +2060,29 @@
     renderServiceEditor();
   }
 
+  function syncEditorDraft(prefix) {
+    if (!state.bootstrap) return;
+    try {
+      if (prefix === 'menu' && byId('menu-editor') && byId('menu-card-title')) {
+        state.bootstrap.content = collectCuisineContent();
+        return;
+      }
+      if (prefix === 'service' && byId('service-editor') && byId('service-card-title')) {
+        state.bootstrap.content = collectServiceContent();
+      }
+    } catch (err) {
+      // Ignore partial draft sync failures while sections are re-rendering.
+    }
+  }
+
   function addEditorBlock(prefix) {
     const detail = getEditorDetail(prefix);
     if (!detail) return;
     detail.blocks = Array.isArray(detail.blocks) ? detail.blocks : [];
     detail.blocks.push(createEmptyEditorBlock(prefix));
+    const panelState = getEditorPanelState(prefix);
+    panelState.block = detail.blocks.length - 1;
+    panelState.item = `${panelState.block}:0`;
     rerenderEditor(prefix);
   }
 
@@ -1987,6 +2093,7 @@
     if (!detail.blocks.length) {
       detail.blocks.push(createEmptyEditorBlock(prefix));
     }
+    ensureEditorExpansion(prefix, detail.blocks);
     rerenderEditor(prefix);
   }
 
@@ -1996,6 +2103,9 @@
     if (!block) return;
     block.items = Array.isArray(block.items) ? block.items : [];
     block.items.push(createEmptyEditorItem());
+    const panelState = getEditorPanelState(prefix);
+    panelState.block = blockIndex;
+    panelState.item = `${blockIndex}:${block.items.length - 1}`;
     rerenderEditor(prefix);
   }
 
@@ -2007,11 +2117,16 @@
     if (!block.items.length) {
       block.items.push(createEmptyEditorItem());
     }
+    const panelState = getEditorPanelState(prefix);
+    panelState.block = blockIndex;
+    panelState.item = `${blockIndex}:0`;
     rerenderEditor(prefix);
   }
 
   function addContentCard(kind) {
     const content = getContent();
+    if (kind === 'cuisine') syncEditorDraft('menu');
+    if (kind === 'service') syncEditorDraft('service');
     if (kind === 'cuisine') {
       const next = createEmptyCuisineCard();
       content.cuisineCards.push(next.card);
@@ -2034,6 +2149,8 @@
 
   function removeContentCard(kind) {
     const content = getContent();
+    if (kind === 'cuisine') syncEditorDraft('menu');
+    if (kind === 'service') syncEditorDraft('service');
     if (kind === 'cuisine') {
       if ((content.cuisineCards || []).length <= 1) return;
       const slug = state.selectedCuisineSlug;
@@ -2201,12 +2318,14 @@
   });
 
   byId('cuisine-select').addEventListener('change', (event) => {
+    syncEditorDraft('menu');
     state.selectedCuisineSlug = event.target.value;
     renderMenuEditor();
     renderDashboardInsights();
   });
 
   byId('service-select').addEventListener('change', (event) => {
+    syncEditorDraft('service');
     state.selectedServiceSlug = event.target.value;
     renderServiceEditor();
     renderDashboardInsights();
@@ -2273,6 +2392,20 @@
     if (removeItemBtn && state.bootstrap) {
       const [prefix, blockIndexRaw, itemIndexRaw] = String(removeItemBtn.getAttribute('data-remove-item') || '').split(':');
       removeEditorItem(prefix || 'menu', Number(blockIndexRaw), Number(itemIndexRaw));
+      return;
+    }
+
+    const toggleBlockBtn = event.target.closest('[data-toggle-block]');
+    if (toggleBlockBtn && state.bootstrap) {
+      const [prefix, blockIndexRaw] = String(toggleBlockBtn.getAttribute('data-toggle-block') || '').split(':');
+      toggleEditorBlock(prefix || 'menu', Number(blockIndexRaw));
+      return;
+    }
+
+    const toggleItemBtn = event.target.closest('[data-toggle-item]');
+    if (toggleItemBtn && state.bootstrap) {
+      const [prefix, blockIndexRaw, itemIndexRaw] = String(toggleItemBtn.getAttribute('data-toggle-item') || '').split(':');
+      toggleEditorItem(prefix || 'menu', Number(blockIndexRaw), Number(itemIndexRaw));
       return;
     }
 

@@ -751,6 +751,71 @@ select:focus {
   background: rgba(15, 13, 15, 0.58);
 }
 
+.editor-block,
+.editor-item {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.editor-block__toggle,
+.editor-item__toggle {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.editor-block__summary,
+.editor-item__summary {
+  display: grid;
+  gap: 0.28rem;
+}
+
+.editor-summary-note,
+.editor-microcopy {
+  margin: 0;
+  color: rgba(243, 234, 209, 0.68);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.editor-disclosure {
+  width: 2.2rem;
+  min-width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(197, 160, 89, 0.18);
+  background: rgba(24, 21, 22, 0.82);
+  color: var(--gold-2);
+  font-size: 1.2rem;
+  line-height: 1;
+  box-shadow: inset 0 1px 0 rgba(255, 250, 235, 0.05);
+}
+
+.editor-block__body,
+.editor-item__body {
+  display: grid;
+  gap: 0.95rem;
+}
+
+.editor-block.is-open,
+.editor-item.is-open {
+  border-color: rgba(212, 188, 106, 0.24);
+  background: rgba(18, 16, 18, 0.8);
+}
+
 .editor-block__head,
 .editor-item__head {
   display: flex;
@@ -768,6 +833,10 @@ select:focus {
 .editor-card h3,
 .editor-block h4 {
   margin-bottom: 0.15rem;
+}
+
+.editor-item h4 {
+  margin: 0;
 }
 
 .editor-help,
