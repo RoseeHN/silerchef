@@ -12,6 +12,69 @@
     reservationStatusFilter: 'all',
   };
 
+  const TAB_COPY = {
+    homepage: {
+      kicker: 'Homepage command',
+      title: 'Shape the first impression guests get from the brand',
+      note: 'Hero copy, booking messaging, and contact routing live here. This is the fastest place to sharpen positioning and conversion.',
+      badges: ['Hero narrative', 'Booking CTA', 'Contact routing'],
+      actions: [
+        { type: 'button', label: 'Edit homepage copy', jump: 'homepage' },
+        { type: 'link', label: 'Open homepage', href: '#home' },
+      ],
+    },
+    menus: {
+      kicker: 'Menus workspace',
+      title: 'Curate cuisine stories, sample sets, and food-led persuasion',
+      note: 'Use this section to keep cuisine cards aspirational and the menu details aligned with the experience guests are shopping for.',
+      badges: ['Cuisine cards', 'Sample menus', 'Photo pairing'],
+      actions: [
+        { type: 'button', label: 'Go to cuisines', jump: 'menus' },
+        { type: 'link', label: 'Open cuisines section', href: '#cuisines' },
+      ],
+    },
+    services: {
+      kicker: 'Services workspace',
+      title: 'Design the offer structure behind each occasion',
+      note: 'Services should explain how the night flows, what the guest receives, and why each format feels premium and intentional.',
+      badges: ['Occasions', 'Lessons', 'Detail blocks'],
+      actions: [
+        { type: 'button', label: 'Edit services', jump: 'services' },
+        { type: 'link', label: 'Open services section', href: '#services' },
+      ],
+    },
+    availability: {
+      kicker: 'Availability control',
+      title: 'Keep the calendar clean before reservations turn into friction',
+      note: 'Blocked dates and planning notes should be current so guests never submit for dates that are already unavailable.',
+      badges: ['Blocked dates', 'Planning note', 'Booking guardrails'],
+      actions: [
+        { type: 'button', label: 'Manage availability', jump: 'availability' },
+        { type: 'button', label: 'Review reservation desk', jump: 'reservations' },
+      ],
+    },
+    reservations: {
+      kicker: 'Reservation desk',
+      title: 'Turn incoming requests into fast, high-touch follow-up',
+      note: 'This view is about response speed, clear status management, and making it easy to call, email, or WhatsApp the guest right away.',
+      badges: ['Guest pipeline', 'Follow-up', 'Status tracking'],
+      actions: [
+        { type: 'button', label: 'Review requests', jump: 'reservations' },
+        { type: 'link', label: 'Open contact section', href: '#contact' },
+      ],
+    },
+    analytics: {
+      kicker: 'Analytics and SEO',
+      title: 'Read demand signals and tighten the conversion path',
+      note: 'This layer should tell you what guests open, where interest is building, and which sections still need SEO or booking refinements.',
+      badges: ['Traffic', 'Content demand', 'Optimization'],
+      actions: [
+        { type: 'button', label: 'Refresh metrics', jump: 'analytics' },
+        { type: 'link', label: 'Open live website', href: '#home' },
+      ],
+    },
+  };
+
   function getApiBase() {
     const base = window.__SILERCHEF_API_BASE__ || '';
     return base ? String(base).replace(/\/$/, '') : '';
@@ -171,6 +234,36 @@
     return `${base || '/'}${hash || ''}`;
   }
 
+  function getCurrentCuisineCard() {
+    const content = getContent();
+    if (!content || !content.cuisineCards || !content.cuisineCards.length) return null;
+    return getCuisineCard(state.selectedCuisineSlug || content.cuisineCards[0].slug);
+  }
+
+  function getCurrentServiceCard() {
+    const content = getContent();
+    if (!content || !content.serviceCards || !content.serviceCards.length) return null;
+    return getServiceCard(state.selectedServiceSlug || content.serviceCards[0].slug);
+  }
+
+  function renderOverviewFrame(config) {
+    const overview = config || TAB_COPY.homepage;
+    byId('overview-kicker').textContent = overview.kicker;
+    byId('overview-title').textContent = overview.title;
+    byId('overview-note').textContent = overview.note;
+    byId('overview-badges').innerHTML = (overview.badges || [])
+      .map((badge) => `<span class="overview-badge">${esc(badge)}</span>`)
+      .join('');
+    byId('overview-actions').innerHTML = (overview.actions || [])
+      .map((action) => {
+        if (action.type === 'button') {
+          return `<button class="ghost-button overview-action" type="button" data-jump-tab="${esc(action.jump)}">${esc(action.label)}</button>`;
+        }
+        return `<a class="ghost-link overview-action" href="${esc(buildWebsiteSectionHref(action.href || ''))}" target="_blank" rel="noopener noreferrer">${esc(action.label)}</a>`;
+      })
+      .join('');
+  }
+
   function renderDashboardInsights() {
     if (!state.bootstrap) return;
     const content = getContent();
@@ -182,17 +275,294 @@
     const topService = getTopRow((metrics.topContent || {}).services || []);
     const reservations = state.bootstrap.reservations || [];
     const blockedDates = state.bootstrap.availability ? state.bootstrap.availability.blockedDates || [] : [];
+    const availabilityNote = state.bootstrap.availability ? state.bootstrap.availability.note || '' : '';
     const education = content.services['chef-education'] || { intro: '', blocks: [] };
     const educationPlaceholder =
       isPlaceholderCopy(education.intro) ||
       (education.blocks || []).some((block) =>
         isPlaceholderCopy(block.title) || (block.items || []).some((item) => isPlaceholderCopy(item.desc) || isPlaceholderCopy(item.name))
       );
+    const pendingReservations = reservations.filter((row) => row.status === 'pending');
+    const currentCuisine = getCurrentCuisineCard();
+    const currentService = getCurrentServiceCard();
 
     const actionCard = byId('action-center-card');
     const routingCard = byId('routing-overview-card');
     const contentCard = byId('content-health-card');
     const trafficCard = byId('traffic-insight-card');
+
+    renderOverviewFrame(TAB_COPY[state.activeTab] || TAB_COPY.homepage);
+
+    if (state.activeTab === 'menus') {
+      if (actionCard) {
+        actionCard.innerHTML = `
+          <p class="panel-kicker">Selected cuisine</p>
+          <h3>${esc(currentCuisine ? currentCuisine.title : 'Cuisine selection')}</h3>
+          <div class="utility-meta">
+            <span class="utility-pill">${esc(currentCuisine ? currentCuisine.no : '--')}</span>
+            <span class="utility-pill">${esc(topCuisine ? `${formatCount(topCuisine.count)} opens` : 'No opens yet')}</span>
+          </div>
+          <p class="utility-note">${esc(currentCuisine ? currentCuisine.tagline : 'Choose a cuisine card to edit its menu direction and visual tone.')}</p>
+          <div class="utility-actions">
+            <button class="ghost-button utility-link" type="button" data-jump-tab="menus">Edit this cuisine</button>
+          </div>
+        `;
+      }
+
+      if (routingCard) {
+        routingCard.innerHTML = `
+          <p class="panel-kicker">Menu structure</p>
+          <h3>What the cuisine section is doing</h3>
+          <div class="utility-specs">
+            <div class="utility-spec"><span>Live cuisines</span><strong>${esc(String(content.cuisineCards.length))}</strong></div>
+            <div class="utility-spec"><span>Top cuisine interest</span><strong>${esc(topCuisine ? topCuisine.title : 'No data yet')}</strong></div>
+            <div class="utility-spec"><span>Current focus</span><strong>${esc(currentCuisine ? currentCuisine.title : 'Not selected')}</strong></div>
+          </div>
+          <p class="utility-note">The menu section should feel curated, visual, and easy to compare at a glance before the guest opens details.</p>
+        `;
+      }
+
+      if (contentCard) {
+        contentCard.innerHTML = `
+          <p class="panel-kicker">Visual pairing</p>
+          <h3>How this section reads right now</h3>
+          <ul class="utility-list">
+            <li>${esc(currentCuisine ? currentCuisine.title : 'Cuisine cards')} should lead with a strong regional identity.</li>
+            <li>Keep each sample set distinct so the menus feel worth opening.</li>
+            <li>Use imagery that immediately signals premium plating or craft.</li>
+          </ul>
+        `;
+      }
+
+      if (trafficCard) {
+        trafficCard.innerHTML = `
+          <p class="panel-kicker">Demand signal</p>
+          <h3>What guests are opening in cuisines</h3>
+          <ul class="utility-list">
+            <li>${esc(topCuisine ? `${topCuisine.title} is currently the strongest pull.` : 'Cuisines have not gathered enough interaction yet.')}</li>
+            <li>${esc(currentCuisine ? `${currentCuisine.title} is the card you are editing now.` : 'Select a cuisine to start refining it.')}</li>
+            <li>Use this data to decide which cuisines deserve stronger hero imagery or shorter intros.</li>
+          </ul>
+          <p class="utility-note">Last tracked event: ${esc(formatDateTime(recentActivity.lastEventAt))}</p>
+        `;
+      }
+      return;
+    }
+
+    if (state.activeTab === 'services') {
+      if (actionCard) {
+        actionCard.innerHTML = `
+          <p class="panel-kicker">Selected service</p>
+          <h3>${esc(currentService ? currentService.title : 'Service selection')}</h3>
+          <div class="utility-meta">
+            <span class="utility-pill">${esc(currentService ? currentService.no : '--')}</span>
+            <span class="utility-pill">${esc(topService ? `${formatCount(topService.count)} opens` : 'No opens yet')}</span>
+          </div>
+          <p class="utility-note">${esc(currentService ? currentService.tagline : 'Choose a service card to refine its positioning, detail blocks, and photography.')}</p>
+          <div class="utility-actions">
+            <button class="ghost-button utility-link" type="button" data-jump-tab="services">Edit this service</button>
+          </div>
+        `;
+      }
+
+      if (routingCard) {
+        routingCard.innerHTML = `
+          <p class="panel-kicker">Offer structure</p>
+          <h3>How the service section is framed</h3>
+          <div class="utility-specs">
+            <div class="utility-spec"><span>Live services</span><strong>${esc(String(content.serviceCards.length))}</strong></div>
+            <div class="utility-spec"><span>Top service interest</span><strong>${esc(topService ? topService.title : 'No data yet')}</strong></div>
+            <div class="utility-spec"><span>Current focus</span><strong>${esc(currentService ? currentService.title : 'Not selected')}</strong></div>
+          </div>
+          <p class="utility-note">Services should explain the event format clearly enough that guests can imagine the full flow before contacting you.</p>
+        `;
+      }
+
+      if (contentCard) {
+        const serviceLines = [];
+        if (educationPlaceholder) serviceLines.push('Private Lessons & Education still contains placeholder copy.');
+        serviceLines.push('Each service card should feel distinct, not like a duplicate with swapped wording.');
+        serviceLines.push('Detail blocks should describe guest experience, not just ingredients or logistics.');
+        contentCard.innerHTML = `
+          <p class="panel-kicker">Experience design</p>
+          <h3>What still needs sharpening</h3>
+          <ul class="utility-list">${serviceLines.map((line) => `<li>${esc(line)}</li>`).join('')}</ul>
+        `;
+      }
+
+      if (trafficCard) {
+        trafficCard.innerHTML = `
+          <p class="panel-kicker">Guest interest</p>
+          <h3>What visitor behavior is showing</h3>
+          <ul class="utility-list">
+            <li>${esc(topService ? `${topService.title} is pulling the most attention right now.` : 'Service cards have not built enough interaction yet.')}</li>
+            <li>${esc(currentService ? `${currentService.title} is the current editing focus.` : 'Select a service to refine its structure.')}</li>
+            <li>Strong service cards should immediately signal who the experience is for and what mood it creates.</li>
+          </ul>
+          <p class="utility-note">Last tracked event: ${esc(formatDateTime(recentActivity.lastEventAt))}</p>
+        `;
+      }
+      return;
+    }
+
+    if (state.activeTab === 'availability') {
+      if (actionCard) {
+        actionCard.innerHTML = `
+          <p class="panel-kicker">Calendar status</p>
+          <h3>Availability guardrails</h3>
+          <div class="utility-meta">
+            <span class="utility-pill">${esc(`${blockedDates.length} blocked date${blockedDates.length === 1 ? '' : 's'}`)}</span>
+            <span class="utility-pill">${esc(`${pendingReservations.length} pending request${pendingReservations.length === 1 ? '' : 's'}`)}</span>
+          </div>
+          <ul class="utility-list">
+            <li>${esc(blockedDates.length ? 'Blocked dates are active and preventing those days from being requested.' : 'No blocked dates are active right now.')}</li>
+            <li>${esc(availabilityNote ? 'A planning note is saved for internal scheduling.' : 'No internal planning note is saved yet.')}</li>
+          </ul>
+        `;
+      }
+
+      if (routingCard) {
+        routingCard.innerHTML = `
+          <p class="panel-kicker">Planning note</p>
+          <h3>Internal scheduling context</h3>
+          <p class="utility-note">${esc(availabilityNote || 'Add a note here when travel, event cadence, or seasonal workload should stay visible to the team.')}</p>
+        `;
+      }
+
+      if (contentCard) {
+        const datesPreview = blockedDates
+          .slice(0, 3)
+          .map((row) => `<li>${esc(row.date)}${row.label ? ` - ${esc(row.label)}` : ''}</li>`)
+          .join('');
+        contentCard.innerHTML = `
+          <p class="panel-kicker">Upcoming closures</p>
+          <h3>Dates the system is currently protecting</h3>
+          ${blockedDates.length ? `<ul class="utility-list">${datesPreview}</ul>` : '<p class="utility-note">No dates are blocked yet.</p>'}
+        `;
+      }
+
+      if (trafficCard) {
+        trafficCard.innerHTML = `
+          <p class="panel-kicker">Booking pressure</p>
+          <h3>How availability connects to demand</h3>
+          <ul class="utility-list">
+            <li>${esc(overview.bookingOpens ? `${formatCount(overview.bookingOpens)} booking open${overview.bookingOpens === 1 ? '' : 's'} tracked so far.` : 'No booking-open events tracked yet.')}</li>
+            <li>Keep closures current before demand rises so the desk does not spend time declining the wrong dates.</li>
+          </ul>
+        `;
+      }
+      return;
+    }
+
+    if (state.activeTab === 'reservations') {
+      const recentReservation = reservations[0];
+      if (actionCard) {
+        actionCard.innerHTML = `
+          <p class="panel-kicker">Reservation queue</p>
+          <h3>What needs attention first</h3>
+          <div class="utility-meta">
+            <span class="utility-pill">${esc(`${pendingReservations.length} pending`)}</span>
+            <span class="utility-pill">${esc(`${reservations.length} total`)}</span>
+          </div>
+          <ul class="utility-list">
+            <li>${esc(pendingReservations.length ? 'Pending requests should be handled first for a premium response feel.' : 'No pending reservations are waiting right now.')}</li>
+            <li>${esc(recentReservation ? `Latest request: ${recentReservation.firstName || 'Guest'} ${recentReservation.lastName || ''}`.trim() : 'No recent guest request has been stored yet.')}</li>
+          </ul>
+          <div class="utility-actions">
+            <button class="ghost-button utility-link" type="button" data-jump-tab="reservations">Open reservation desk</button>
+          </div>
+        `;
+      }
+
+      if (routingCard) {
+        routingCard.innerHTML = `
+          <p class="panel-kicker">Follow-up routing</p>
+          <h3>How the team responds</h3>
+          <div class="utility-specs">
+            <div class="utility-spec"><span>Email alerts</span><strong>${esc(booking.notificationEmail || 'Dashboard only')}</strong></div>
+            <div class="utility-spec"><span>WhatsApp</span><strong>${esc(formatRouteLabel(booking.teamWhatsAppHref))}</strong></div>
+            <div class="utility-spec"><span>Fallback CTA</span><strong>${esc(booking.fallbackUrl ? 'Ready' : 'Missing')}</strong></div>
+          </div>
+          <p class="utility-note">The desk should feel immediate: request stored, guest visible, follow-up channel obvious.</p>
+        `;
+      }
+
+      if (contentCard) {
+        contentCard.innerHTML = `
+          <p class="panel-kicker">Desk quality</p>
+          <h3>What makes this feel premium</h3>
+          <ul class="utility-list">
+            <li>Fast follow-up by the guest’s preferred contact channel.</li>
+            <li>Clear statuses so no request disappears into the cracks.</li>
+            <li>ZIP code, occasion, and notes captured before the first call.</li>
+          </ul>
+        `;
+      }
+
+      if (trafficCard) {
+        trafficCard.innerHTML = `
+          <p class="panel-kicker">Activity signal</p>
+          <h3>Current reservation momentum</h3>
+          <ul class="utility-list">
+            <li>${esc(overview.reservationSubmits ? `${formatCount(overview.reservationSubmits)} reservation submit${overview.reservationSubmits === 1 ? '' : 's'} tracked.` : 'No reservation submits tracked yet.')}</li>
+            <li>${esc(overview.whatsappClicks ? `${formatCount(overview.whatsappClicks)} WhatsApp click${overview.whatsappClicks === 1 ? '' : 's'} indicate direct contact intent.` : 'No WhatsApp clicks tracked yet.')}</li>
+          </ul>
+          <p class="utility-note">Last tracked event: ${esc(formatDateTime(recentActivity.lastEventAt))}</p>
+        `;
+      }
+      return;
+    }
+
+    if (state.activeTab === 'analytics') {
+      if (actionCard) {
+        actionCard.innerHTML = `
+          <p class="panel-kicker">Macro view</p>
+          <h3>Topline performance</h3>
+          <div class="utility-specs">
+            <div class="utility-spec"><span>Page views</span><strong>${esc(formatCount(overview.pageViews || 0))}</strong></div>
+            <div class="utility-spec"><span>Unique sessions</span><strong>${esc(formatCount(overview.uniqueSessions || 0))}</strong></div>
+            <div class="utility-spec"><span>Booking opens</span><strong>${esc(formatCount(overview.bookingOpens || 0))}</strong></div>
+            <div class="utility-spec"><span>Reservation submits</span><strong>${esc(formatCount(overview.reservationSubmits || 0))}</strong></div>
+          </div>
+        `;
+      }
+
+      if (routingCard) {
+        routingCard.innerHTML = `
+          <p class="panel-kicker">Content demand</p>
+          <h3>What people are exploring most</h3>
+          <ul class="utility-list">
+            <li>${esc(topCuisine ? `${topCuisine.title} leads cuisine interest.` : 'No cuisine interaction data yet.')}</li>
+            <li>${esc(topService ? `${topService.title} leads service interest.` : 'No service interaction data yet.')}</li>
+            <li>${esc(overview.whatsappClicks ? `WhatsApp has ${formatCount(overview.whatsappClicks)} click${overview.whatsappClicks === 1 ? '' : 's'}.` : 'WhatsApp has no tracked clicks yet.')}</li>
+          </ul>
+        `;
+      }
+
+      if (contentCard) {
+        contentCard.innerHTML = `
+          <p class="panel-kicker">Optimization priorities</p>
+          <h3>What to improve next</h3>
+          <ul class="utility-list">
+            <li>${esc(!overview.bookingOpens && overview.pageViews > 0 ? 'Guests are arriving but not opening booking yet.' : 'Booking-open behavior is being captured.')}</li>
+            <li>${esc(educationPlaceholder ? 'Education content still reads like a draft and weakens trust.' : 'Education content looks production-ready.')}</li>
+            <li>${esc(!content.site.contact.instagramHref || !content.site.contact.facebookHref ? 'Some social/contact proof is still incomplete.' : 'Core contact proof is present.')}</li>
+          </ul>
+        `;
+      }
+
+      if (trafficCard) {
+        trafficCard.innerHTML = `
+          <p class="panel-kicker">Tracking pulse</p>
+          <h3>Current instrumentation snapshot</h3>
+          <ul class="utility-list">
+            <li>${esc(`Last tracked event: ${formatDateTime(recentActivity.lastEventAt)}`)}</li>
+            <li>${esc(overview.pageViews ? `${formatPercent(((overview.bookingOpens || 0) / Math.max(overview.pageViews, 1)) * 100)} booking-open rate against page views.` : 'Need more traffic data before conversion rate reads matter.')}</li>
+          </ul>
+        `;
+      }
+      return;
+    }
 
     if (actionCard) {
       const actionLines = [];
@@ -277,10 +647,19 @@
       const isActive = btn.dataset.tab === tabName;
       btn.classList.toggle('is-active', isActive);
       btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      if (isActive) {
+        btn.setAttribute('aria-current', 'page');
+      } else {
+        btn.removeAttribute('aria-current');
+      }
     });
     document.querySelectorAll('.tab-panel').forEach((panel) => {
       panel.classList.toggle('is-active', panel.dataset.panel === tabName);
     });
+    renderDashboardInsights();
+    if (window.location.pathname.indexOf('/admin') !== -1) {
+      window.history.replaceState(null, '', `#admin-${tabName}`);
+    }
   }
 
   function getContent() {
@@ -1136,11 +1515,11 @@
 
   function renderDashboard() {
     updateSummary();
+    renderCuisineSelect();
+    renderServiceSelect();
     renderDashboardInsights();
     renderHomepageFields();
-    renderCuisineSelect();
     renderMenuEditor();
-    renderServiceSelect();
     renderServiceEditor();
     renderAvailabilityEditor();
     renderReservations();
@@ -1363,17 +1742,25 @@
   }
 
   document.querySelectorAll('.admin-tab').forEach((btn) => {
-    btn.addEventListener('click', () => setActiveTab(btn.dataset.tab));
+    btn.addEventListener('click', () => {
+      setActiveTab(btn.dataset.tab);
+      const contentRoot = byId('dashboard-content');
+      if (contentRoot) {
+        contentRoot.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
   });
 
   byId('cuisine-select').addEventListener('change', (event) => {
     state.selectedCuisineSlug = event.target.value;
     renderMenuEditor();
+    renderDashboardInsights();
   });
 
   byId('service-select').addEventListener('change', (event) => {
     state.selectedServiceSlug = event.target.value;
     renderServiceEditor();
+    renderDashboardInsights();
   });
 
   byId('reservation-search').addEventListener('input', (event) => {
@@ -1412,8 +1799,23 @@
     if (reservationsBtn) {
       setActiveTab('reservations');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    const jumpTabBtn = event.target.closest('[data-jump-tab]');
+    if (jumpTabBtn) {
+      setActiveTab(jumpTabBtn.getAttribute('data-jump-tab') || 'homepage');
+      const contentRoot = byId('dashboard-content');
+      if (contentRoot) {
+        contentRoot.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   });
+
+  const hashTab = (window.location.hash || '').replace(/^#admin-/, '');
+  if (TAB_COPY[hashTab]) {
+    state.activeTab = hashTab;
+  }
 
   if (getToken()) {
     showPendingView();

@@ -147,19 +147,22 @@
             </div>
           </aside>
 
-          <div class="dashboard-content">
+          <div id="dashboard-content" class="dashboard-content">
             <section class="panel panel--overview">
               <div class="overview-hero">
                 <div>
-                  <p class="panel-kicker">Operations overview</p>
-                  <h2>Everything important, without the clutter</h2>
-                  <p class="panel-note">Track demand, update the website, manage blocked dates, and handle reservation follow-up from a single polished workspace.</p>
+                  <p id="overview-kicker" class="panel-kicker">Operations overview</p>
+                  <h2 id="overview-title">Everything important, without the clutter</h2>
+                  <p id="overview-note" class="panel-note">Track demand, update the website, manage blocked dates, and handle reservation follow-up from a single polished workspace.</p>
                 </div>
-                <div class="overview-badges" aria-label="Dashboard capabilities">
-                  <span class="overview-badge">Reservations</span>
-                  <span class="overview-badge">Availability</span>
-                  <span class="overview-badge">Menus</span>
-                  <span class="overview-badge">Analytics</span>
+                <div>
+                  <div id="overview-badges" class="overview-badges" aria-label="Dashboard capabilities">
+                    <span class="overview-badge">Reservations</span>
+                    <span class="overview-badge">Availability</span>
+                    <span class="overview-badge">Menus</span>
+                    <span class="overview-badge">Analytics</span>
+                  </div>
+                  <div id="overview-actions" class="overview-actions"></div>
                 </div>
               </div>
             </section>
