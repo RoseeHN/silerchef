@@ -71,10 +71,10 @@ final class Repository
         $createdAt = gmdate('c');
         $stmt = $this->pdo->prepare(
             'INSERT INTO reservations (
-                id, first_name, last_name, email, phone, zip_code, preferred_date, preferred_time, preferred_contact, guest_count, notes,
+                id, first_name, last_name, email, phone, event_location, zip_code, preferred_date, preferred_time, preferred_contact, guest_count, cuisine_preference, allergy_notes, notes,
                 status, admin_note, notification_log, wix_sync_ok, wix_contact_id, wix_sync_error, created_at, updated_at
             ) VALUES (
-                :id, :first_name, :last_name, :email, :phone, :zip_code, :preferred_date, :preferred_time, :preferred_contact, :guest_count, :notes,
+                :id, :first_name, :last_name, :email, :phone, :event_location, :zip_code, :preferred_date, :preferred_time, :preferred_contact, :guest_count, :cuisine_preference, :allergy_notes, :notes,
                 :status, :admin_note, :notification_log, :wix_sync_ok, :wix_contact_id, :wix_sync_error, :created_at, :updated_at
             )'
         );
@@ -85,11 +85,14 @@ final class Repository
                 ':last_name' => $payload['lastName'],
                 ':email' => $payload['email'],
                 ':phone' => $payload['phone'] ?? '',
+                ':event_location' => $payload['eventLocation'] ?? '',
                 ':zip_code' => normalize_zip_code((string) ($payload['zipCode'] ?? '')),
                 ':preferred_date' => $payload['preferredDate'] ?? '',
                 ':preferred_time' => $payload['preferredTime'] ?? '',
                 ':preferred_contact' => normalize_preferred_contact((string) ($payload['preferredContact'] ?? '')),
                 ':guest_count' => $payload['guestCount'],
+                ':cuisine_preference' => $payload['cuisinePreference'] ?? '',
+                ':allergy_notes' => $payload['allergyNotes'] ?? '',
                 ':notes' => $payload['notes'] ?? '',
                 ':status' => 'pending',
                 ':admin_note' => '',
@@ -413,11 +416,14 @@ final class Repository
                 last_name TEXT NOT NULL,
                 email TEXT NOT NULL,
                 phone TEXT NOT NULL,
+                event_location TEXT NOT NULL DEFAULT \'\',
                 zip_code TEXT NOT NULL DEFAULT \'\',
                 preferred_date TEXT NOT NULL,
                 preferred_time TEXT NOT NULL,
                 preferred_contact TEXT NOT NULL DEFAULT \'any\',
                 guest_count INTEGER NULL,
+                cuisine_preference TEXT NOT NULL DEFAULT \'\',
+                allergy_notes TEXT NOT NULL DEFAULT \'\',
                 notes TEXT NOT NULL,
                 status TEXT NOT NULL,
                 admin_note TEXT NOT NULL,
@@ -446,8 +452,11 @@ final class Repository
 
     private function ensureReservationColumns(): void
     {
+        $this->ensureColumn('reservations', 'event_location', "TEXT NOT NULL DEFAULT ''");
         $this->ensureColumn('reservations', 'zip_code', "TEXT NOT NULL DEFAULT ''");
         $this->ensureColumn('reservations', 'preferred_contact', "TEXT NOT NULL DEFAULT 'any'");
+        $this->ensureColumn('reservations', 'cuisine_preference', "TEXT NOT NULL DEFAULT ''");
+        $this->ensureColumn('reservations', 'allergy_notes', "TEXT NOT NULL DEFAULT ''");
         $this->ensureColumn('reservations', 'notification_log', "TEXT NOT NULL DEFAULT '{}'");
     }
 
@@ -737,14 +746,16 @@ final class Repository
             'Created at: ' . (string) ($reservation['createdAt'] ?? gmdate('c')),
             '',
             'Guest: ' . trim(((string) ($customer['firstName'] ?? '')) . ' ' . ((string) ($customer['lastName'] ?? ''))),
-            'Email: ' . (string) ($customer['email'] ?? '-'),
+            'Email: ' . (((string) ($customer['email'] ?? '')) !== '' ? (string) $customer['email'] : '-'),
             'Phone: ' . ((string) ($customer['phone'] ?? '') !== '' ? (string) $customer['phone'] : '-'),
-            'ZIP code: ' . ((string) ($request['zipCode'] ?? '') !== '' ? (string) $request['zipCode'] : '-'),
+            'Event location: ' . ((string) ($request['eventLocation'] ?? '') !== '' ? (string) $request['eventLocation'] : '-'),
             'Preferred contact: ' . ucfirst((string) ($request['preferredContact'] ?? 'any')),
             '',
             'Preferred date: ' . ((string) ($request['preferredDate'] ?? '') !== '' ? (string) $request['preferredDate'] : '-'),
             'Preferred time: ' . ((string) ($request['preferredTime'] ?? '') !== '' ? (string) $request['preferredTime'] : '-'),
             'Guests: ' . ((string) ($request['guestCount'] ?? '') !== '' ? (string) $request['guestCount'] : '-'),
+            'Cuisine: ' . ((string) ($request['cuisinePreference'] ?? '') !== '' ? (string) $request['cuisinePreference'] : '-'),
+            'Allergies / intolerances: ' . ((string) ($request['allergyNotes'] ?? '') !== '' ? (string) $request['allergyNotes'] : '-'),
             '',
             'Notes:',
             ((string) ($request['notes'] ?? '') !== '' ? (string) $request['notes'] : '-'),
@@ -767,11 +778,21 @@ final class Repository
             'Date: ' . (((string) ($request['preferredDate'] ?? '')) !== '' ? (string) $request['preferredDate'] : '-'),
             'Time: ' . (((string) ($request['preferredTime'] ?? '')) !== '' ? (string) $request['preferredTime'] : '-'),
             'Guests: ' . (((string) ($request['guestCount'] ?? '')) !== '' ? (string) $request['guestCount'] : '-'),
+            'Cuisine: ' . (((string) ($request['cuisinePreference'] ?? '')) !== '' ? (string) $request['cuisinePreference'] : '-'),
+            'Location: ' . (((string) ($request['eventLocation'] ?? '')) !== '' ? (string) $request['eventLocation'] : '-'),
             'Phone: ' . (((string) ($customer['phone'] ?? '')) !== '' ? (string) $customer['phone'] : '-'),
             'Email: ' . (((string) ($customer['email'] ?? '')) !== '' ? (string) $customer['email'] : '-'),
-            'ZIP: ' . (((string) ($request['zipCode'] ?? '')) !== '' ? (string) $request['zipCode'] : '-'),
         ];
 
+        $zipCode = trim((string) ($request['zipCode'] ?? ''));
+        if ($zipCode !== '') {
+            $lines[] = 'ZIP: ' . $zipCode;
+        }
+
+        $allergyNotes = trim((string) ($request['allergyNotes'] ?? ''));
+        if ($allergyNotes !== '') {
+            $lines[] = 'Allergies: ' . $allergyNotes;
+        }
         $notes = trim((string) ($request['notes'] ?? ''));
         if ($notes !== '') {
             $lines[] = 'Notes: ' . $notes;
@@ -849,10 +870,10 @@ final class Repository
             }
             $stmt = $this->pdo->prepare(
                 'INSERT INTO reservations (
-                    id, first_name, last_name, email, phone, zip_code, preferred_date, preferred_time, preferred_contact, guest_count, notes,
+                    id, first_name, last_name, email, phone, event_location, zip_code, preferred_date, preferred_time, preferred_contact, guest_count, cuisine_preference, allergy_notes, notes,
                     status, admin_note, notification_log, wix_sync_ok, wix_contact_id, wix_sync_error, created_at, updated_at
                 ) VALUES (
-                    :id, :first_name, :last_name, :email, :phone, :zip_code, :preferred_date, :preferred_time, :preferred_contact, :guest_count, :notes,
+                    :id, :first_name, :last_name, :email, :phone, :event_location, :zip_code, :preferred_date, :preferred_time, :preferred_contact, :guest_count, :cuisine_preference, :allergy_notes, :notes,
                     :status, :admin_note, :notification_log, :wix_sync_ok, :wix_contact_id, :wix_sync_error, :created_at, :updated_at
                 )'
             );
@@ -863,11 +884,14 @@ final class Repository
                     ':last_name' => (string) ($reservation['customer']['lastName'] ?? ''),
                     ':email' => (string) ($reservation['customer']['email'] ?? ''),
                     ':phone' => (string) ($reservation['customer']['phone'] ?? ''),
+                    ':event_location' => (string) ($reservation['request']['eventLocation'] ?? ''),
                     ':zip_code' => normalize_zip_code((string) ($reservation['request']['zipCode'] ?? '')),
                     ':preferred_date' => (string) ($reservation['request']['preferredDate'] ?? ''),
                     ':preferred_time' => (string) ($reservation['request']['preferredTime'] ?? ''),
                     ':preferred_contact' => normalize_preferred_contact((string) ($reservation['request']['preferredContact'] ?? '')),
                     ':guest_count' => $reservation['request']['guestCount'] ?? null,
+                    ':cuisine_preference' => (string) ($reservation['request']['cuisinePreference'] ?? ''),
+                    ':allergy_notes' => (string) ($reservation['request']['allergyNotes'] ?? ''),
                     ':notes' => (string) ($reservation['request']['notes'] ?? ''),
                     ':status' => normalize_reservation_status((string) ($reservation['status'] ?? 'pending')),
                     ':admin_note' => (string) ($reservation['adminNote'] ?? ''),
@@ -1036,11 +1060,14 @@ final class Repository
                 'phone' => (string) $row['phone'],
             ],
             'request' => [
+                'eventLocation' => (string) ($row['event_location'] ?? ''),
                 'zipCode' => (string) ($row['zip_code'] ?? ''),
                 'preferredDate' => (string) $row['preferred_date'],
                 'preferredTime' => (string) $row['preferred_time'],
                 'preferredContact' => normalize_preferred_contact((string) ($row['preferred_contact'] ?? 'any')),
                 'guestCount' => $row['guest_count'] !== null ? (int) $row['guest_count'] : null,
+                'cuisinePreference' => (string) ($row['cuisine_preference'] ?? ''),
+                'allergyNotes' => (string) ($row['allergy_notes'] ?? ''),
                 'notes' => (string) $row['notes'],
             ],
         ];

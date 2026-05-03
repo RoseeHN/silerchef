@@ -1119,13 +1119,16 @@
       const payload = {
         firstName: fd.get('firstName'),
         lastName: fd.get('lastName'),
-        email: fd.get('email'),
+        email: fd.get('email') || '',
         phone: fd.get('phone') || '',
+        eventLocation: fd.get('eventLocation') || '',
         zipCode: fd.get('zipCode') || '',
         preferredDate: fd.get('preferredDate') || '',
         preferredTime: fd.get('preferredTime') || '',
         preferredContact: fd.get('preferredContact') || 'any',
         guestCount: guestRaw === '' || guestRaw === null ? null : Number(guestRaw),
+        cuisinePreference: fd.get('cuisinePreference') || '',
+        allergyNotes: fd.get('allergyNotes') || '',
         notes: fd.get('notes') || '',
       };
       const blockedMsg = getBlockedDateMessage(payload.preferredDate);

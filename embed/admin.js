@@ -494,7 +494,7 @@
           <ul class="utility-list">
             <li>Fast follow-up by the guest’s preferred contact channel.</li>
             <li>Clear statuses so no request disappears into the cracks.</li>
-            <li>ZIP code, occasion, and notes captured before the first call.</li>
+            <li>Guest count, event location, cuisine preference, and allergy notes captured before the first call.</li>
           </ul>
         `;
       }
@@ -1099,6 +1099,9 @@
           row.customer && row.customer.lastName,
           row.customer && row.customer.email,
           row.customer && row.customer.phone,
+          row.request && row.request.eventLocation,
+          row.request && row.request.cuisinePreference,
+          row.request && row.request.allergyNotes,
           row.request && row.request.zipCode,
           row.request && row.request.notes,
           row.adminNote,
@@ -1157,9 +1160,12 @@
         `Date: ${esc(row.request.preferredDate || '-')}`,
         `Time: ${esc(row.request.preferredTime || '-')}`,
         `Guests: ${esc(row.request.guestCount == null ? '-' : row.request.guestCount)}`,
-        `ZIP code: ${esc(row.request.zipCode || '-')}`,
+        `Location: ${esc(row.request.eventLocation || '-')}`,
+        `Cuisine: ${esc(row.request.cuisinePreference || '-')}`,
+        `Allergies: ${esc(row.request.allergyNotes || '-')}`,
         `Preferred follow-up: ${esc(formatPreferredContact(row.request.preferredContact || 'any'))}`,
       ];
+      if (row.request.zipCode) requestLines.push(`ZIP code: ${esc(row.request.zipCode)}`);
       if (row.request.notes) requestLines.push(`Notes: ${esc(row.request.notes)}`);
 
       const notificationSummary = summarizeReservationNotifications(row.notifications || {});
@@ -1170,7 +1176,7 @@
           <div>
             <h3 class="reservation-title">${esc(row.customer.firstName)} ${esc(row.customer.lastName)}</h3>
             <div class="reservation-meta">
-              <span>${esc(row.customer.email)}</span>
+              <span>${esc(row.customer.email || 'No email provided')}</span>
               <span>${esc(row.customer.phone || 'No phone')}</span>
               <span>${esc(formatDateTime(row.createdAt))}</span>
             </div>

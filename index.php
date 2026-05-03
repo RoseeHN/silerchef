@@ -79,12 +79,23 @@ function route_api(string $path, string $method, Repository $repository, AdminAu
         $firstName = trim((string) ($payload['firstName'] ?? ''));
         $lastName = trim((string) ($payload['lastName'] ?? ''));
         $email = trim((string) ($payload['email'] ?? ''));
-        if ($firstName === '' || $lastName === '' || $email === '' || !valid_email($email)) {
-            json_response(['error' => 'validation', 'detail' => 'name_email_required'], 400);
+        $phone = trim((string) ($payload['phone'] ?? ''));
+        $eventLocation = trim((string) ($payload['eventLocation'] ?? ''));
+        $preferredDate = trim((string) ($payload['preferredDate'] ?? ''));
+        $preferredTime = trim((string) ($payload['preferredTime'] ?? ''));
+        $cuisinePreference = trim((string) ($payload['cuisinePreference'] ?? ''));
+        $guestCount = is_numeric($payload['guestCount'] ?? null) ? (int) $payload['guestCount'] : null;
+        if ($firstName === '' || $lastName === '' || $phone === '') {
+            json_response(['error' => 'validation', 'detail' => 'Please add your first name, last name, and phone number.'], 400);
+        }
+        if ($email !== '' && !valid_email($email)) {
+            json_response(['error' => 'validation', 'detail' => 'Please enter a valid email address or leave the email field blank.'], 400);
+        }
+        if ($eventLocation === '' || $preferredDate === '' || $cuisinePreference === '' || $guestCount === null || $guestCount < 1) {
+            json_response(['error' => 'validation', 'detail' => 'Please add the event location, date, guest count, and preferred cuisine.'], 400);
         }
 
         $availability = $repository->getAvailability();
-        $preferredDate = trim((string) ($payload['preferredDate'] ?? ''));
         foreach ($availability['blockedDates'] as $row) {
             if (($row['date'] ?? '') === $preferredDate) {
                 json_response(
@@ -104,12 +115,15 @@ function route_api(string $path, string $method, Repository $repository, AdminAu
                 'firstName' => $firstName,
                 'lastName' => $lastName,
                 'email' => $email,
-                'phone' => trim((string) ($payload['phone'] ?? '')),
+                'phone' => $phone,
+                'eventLocation' => $eventLocation,
                 'zipCode' => normalize_zip_code((string) ($payload['zipCode'] ?? '')),
                 'preferredDate' => $preferredDate,
-                'preferredTime' => trim((string) ($payload['preferredTime'] ?? '')),
+                'preferredTime' => $preferredTime,
                 'preferredContact' => normalize_preferred_contact((string) ($payload['preferredContact'] ?? '')),
-                'guestCount' => is_numeric($payload['guestCount'] ?? null) ? (int) $payload['guestCount'] : null,
+                'guestCount' => $guestCount,
+                'cuisinePreference' => $cuisinePreference,
+                'allergyNotes' => trim((string) ($payload['allergyNotes'] ?? '')),
                 'notes' => trim((string) ($payload['notes'] ?? '')),
             ]
         );

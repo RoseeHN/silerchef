@@ -154,7 +154,7 @@
                 "name": "How do reservation requests work?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Guests submit a preferred date, guest count, ZIP code, and occasion details through the reservation form. The request lands in the private dashboard, then follow-up happens by phone, email, or WhatsApp."
+                  "text": "Guests submit their event date, guest count, event location, preferred cuisine, and any allergy notes through the reservation form. The request lands in the private dashboard, then follow-up happens by phone, email, or WhatsApp."
                 }
               },
               {
@@ -170,7 +170,7 @@
                 "name": "What information should guests send when booking?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "The most useful details are the preferred date, approximate guest count, ZIP code, occasion type, dietary restrictions, and any expectations for pacing or service style."
+                  "text": "The most useful details are the event date, guest count, event location, preferred cuisine, allergy or intolerance notes, and the best phone number for follow-up."
                 }
               },
               {
@@ -870,7 +870,7 @@
                 <p class="faq-card__eyebrow">Reservation flow</p>
                 <h3 class="faq-card__title">How do reservation requests work?</h3>
                 <p class="faq-card__body">
-                  Guests send a preferred date, guest count, ZIP code, and occasion details. The request goes into the private reservation dashboard, and follow-up happens by phone, email, or WhatsApp.
+                  Guests send their event date, guest count, event location, preferred cuisine, and any dietary notes. The request goes into the private reservation dashboard, and follow-up happens by phone, email, or WhatsApp.
                 </p>
               </article>
               <article class="faq-card">
@@ -884,7 +884,7 @@
                 <p class="faq-card__eyebrow">Booking details</p>
                 <h3 class="faq-card__title">What information should guests send when booking?</h3>
                 <p class="faq-card__body">
-                  The most useful details are the date, guest count, ZIP code, event type, allergies or dietary restrictions, and any expectations around pacing, service style, or celebration goals.
+                  The most useful details are the date, guest count, event location, preferred cuisine, allergy or intolerance notes, and the best phone number for follow-up.
                 </p>
               </article>
               <article class="faq-card">
@@ -1031,7 +1031,7 @@
               <article class="booking-step">
                 <span class="booking-step__no">01</span>
                 <strong>Send the request</strong>
-                <p>Share your preferred date, guest count, and occasion details.</p>
+                <p>Share your event date, guest count, cuisine choice, and location.</p>
               </article>
               <article class="booking-step">
                 <span class="booking-step__no">02</span>
@@ -1064,17 +1064,17 @@
                   </label>
                 </div>
                 <label class="booking-field">
-                  <span>Email</span>
-                  <input name="email" type="email" required autocomplete="email" maxlength="320" />
+                  <span>Email (optional)</span>
+                  <input name="email" type="email" autocomplete="email" maxlength="320" />
                 </label>
                 <label class="booking-field">
                   <span>Phone</span>
-                  <input name="phone" type="tel" autocomplete="tel" placeholder="+1 (775) …" maxlength="40" />
+                  <input name="phone" type="tel" required autocomplete="tel" placeholder="+1 (775) …" maxlength="40" />
                 </label>
                 <div class="booking-form__row booking-form__row--split">
                   <label class="booking-field">
-                    <span>ZIP code</span>
-                    <input name="zipCode" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="20" placeholder="89511" />
+                    <span>Event location</span>
+                    <input name="eventLocation" type="text" required autocomplete="address-level2" maxlength="160" placeholder="Reno, NV or venue address" />
                   </label>
                   <label class="booking-field">
                     <span>Preferred follow-up</span>
@@ -1100,13 +1100,31 @@
                     </select>
                   </label>
                 </div>
+                <div class="booking-form__row booking-form__row--split">
+                  <label class="booking-field">
+                    <span>Guests</span>
+                    <input name="guestCount" type="number" min="1" max="99" value="2" required />
+                  </label>
+                  <label class="booking-field">
+                    <span>Preferred cuisine</span>
+                    <select name="cuisinePreference" required>
+                      <option value="">Select a cuisine</option>
+                      <option value="American Cuisine">American Cuisine</option>
+                      <option value="Italian Cuisine">Italian Cuisine</option>
+                      <option value="Greek Cuisine">Greek Cuisine</option>
+                      <option value="Turkish Cuisine">Turkish Cuisine</option>
+                      <option value="Global Fusion">Global Fusion</option>
+                      <option value="Not sure yet">Not sure yet</option>
+                    </select>
+                  </label>
+                </div>
                 <label class="booking-field">
-                  <span>Guests</span>
-                  <input name="guestCount" type="number" min="1" max="99" value="2" required />
+                  <span>Intolerances or allergies</span>
+                  <textarea name="allergyNotes" rows="3" maxlength="1200" placeholder="Tell us about any allergies, intolerances, or ingredients to avoid."></textarea>
                 </label>
                 <label class="booking-field">
-                  <span>Occasion &amp; dietary notes</span>
-                  <textarea name="notes" rows="3" maxlength="2000" placeholder="Birthday, allergies, pacing…"></textarea>
+                  <span>Occasion &amp; extra notes</span>
+                  <textarea name="notes" rows="3" maxlength="2000" placeholder="Birthday, anniversary, kitchen notes, pacing, special requests…"></textarea>
                 </label>
                 <p id="booking-error" class="booking-error" role="alert" hidden></p>
                 <div class="booking-actions">
