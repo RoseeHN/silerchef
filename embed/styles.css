@@ -2230,8 +2230,8 @@ body.scroll-locked {
 .detail-sheet {
   position: relative;
   z-index: 1;
-  width: min(96vw, 1360px);
-  max-height: min(94dvh - 1rem, 860px);
+  width: min(97vw, 1440px);
+  max-height: min(95dvh - 0.75rem, 900px);
   overflow: hidden;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
@@ -2251,7 +2251,7 @@ body.scroll-locked {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   display: grid;
-  grid-template-columns: minmax(23rem, 0.94fr) minmax(0, 1.06fr);
+  grid-template-columns: minmax(24rem, 1fr) minmax(0, 1fr);
   align-items: start;
   scrollbar-width: thin;
   scrollbar-color: rgba(197, 160, 89, 0.42) transparent;
@@ -3300,8 +3300,8 @@ body.scroll-locked {
   border: 1px solid rgba(197, 160, 89, 0.18);
   width: 100%;
   max-width: 100%;
-  aspect-ratio: 16 / 9;
-  max-height: min(48vh, 360px);
+  aspect-ratio: 5 / 4;
+  max-height: min(56vh, 470px);
   box-shadow:
     inset 0 1px 0 rgba(255, 248, 235, 0.05),
     0 16px 42px rgba(0, 0, 0, 0.24);
@@ -3334,8 +3334,8 @@ body.scroll-locked {
 
 @media (max-width: 640px) {
   .detail-hero-wrap {
-    aspect-ratio: 4 / 3;
-    max-height: min(46vh, 320px);
+    aspect-ratio: 4 / 5;
+    max-height: min(50vh, 420px);
   }
 }
 
@@ -3365,10 +3365,11 @@ body.scroll-locked {
   width: 100%;
   height: 100%;
   max-width: none;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
   display: block;
   margin: 0;
+  padding: clamp(0.5rem, 1.2vw, 0.9rem);
   filter: none;
 }
 
