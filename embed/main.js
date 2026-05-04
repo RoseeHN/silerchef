@@ -360,9 +360,6 @@
     const prefersReduced =
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const prefersTapToZoom =
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(pointer: coarse)').matches;
 
     function scheduleAutoplay() {
       clearAutoplayTimer();
@@ -406,25 +403,15 @@
       im.sizes = '124px';
       b.appendChild(im);
       b.addEventListener('click', () => {
-        if (prefersTapToZoom) {
-          openMomentsLightbox(lightboxItems, idx);
-          return;
-        }
-        if (currentIdx === idx) {
-          openMomentsLightbox(lightboxItems, idx);
-          return;
-        }
         goToIndex(idx, true);
+        openMomentsLightbox(lightboxItems, idx);
         scheduleAutoplay();
       });
       b.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
-          if (currentIdx === idx) {
-            openMomentsLightbox(lightboxItems, idx);
-            return;
-          }
           goToIndex(idx, true);
+          openMomentsLightbox(lightboxItems, idx);
         }
       });
       stripEl.appendChild(b);
