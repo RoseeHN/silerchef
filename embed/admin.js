@@ -647,6 +647,7 @@
             <li>${esc(!overview.bookingOpens && overview.pageViews > 0 ? 'Guests are arriving but not opening booking yet.' : 'Booking-open behavior is being captured.')}</li>
             <li>${esc(educationPlaceholder ? 'Education content still reads like a draft and weakens trust.' : 'Education content looks production-ready.')}</li>
             <li>${esc(!content.site.contact.instagramHref || !content.site.contact.facebookHref ? 'Some social/contact proof is still incomplete.' : 'Core contact proof is present.')}</li>
+            <li>${esc(!content.site.contact.yelpHref ? 'Yelp business link not set yet — strong for local discovery.' : 'Yelp is linked.')}</li>
           </ul>
         `;
       }
@@ -707,6 +708,7 @@
       if (educationPlaceholder) healthLines.push('Private Lessons & Education still contains placeholder copy.');
       if (!content.site.contact.instagramHref) healthLines.push('Instagram link is missing.');
       if (!content.site.contact.facebookHref) healthLines.push('Facebook link is missing.');
+      if (!content.site.contact.yelpHref) healthLines.push('Yelp link is not set — add your listing URL for local search.');
       if (!booking.notificationEmail) healthLines.push('Reservation email route is not configured.');
       if (!healthLines.length) healthLines.push('Contact details, booking routes, and visible content look complete.');
 
@@ -1107,6 +1109,10 @@
       <label class="field field--advanced">
         <span>Instagram link</span>
         <input id="hp-contact-instagram" type="url" value="${esc(site.contact.instagramHref)}" />
+      </label>
+      <label class="field field--advanced">
+        <span>Yelp link</span>
+        <input id="hp-contact-yelp" type="url" value="${esc(site.contact.yelpHref || '')}" placeholder="https://www.yelp.com/biz/..." />
       </label>
       <label class="field field--advanced">
         <span>WhatsApp link</span>
@@ -2024,6 +2030,7 @@
     next.site.contact.websiteHref = byId('hp-contact-website-href').value.trim();
     next.site.contact.location = byId('hp-contact-location').value.trim();
     next.site.contact.instagramHref = byId('hp-contact-instagram').value.trim();
+    next.site.contact.yelpHref = byId('hp-contact-yelp').value.trim();
     next.site.contact.whatsappHref = byId('hp-contact-whatsapp').value.trim();
     next.site.contact.facebookHref = byId('hp-contact-facebook').value.trim();
     next.site.faq.eyebrow = byId('hp-faq-eyebrow').value.trim();

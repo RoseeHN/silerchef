@@ -1102,15 +1102,61 @@ body.nav-drawer-open {
   }
 
   .hero-panel--visual {
-    max-width: min(26rem, 100%);
-    margin-left: auto;
-    margin-right: auto;
+    /* Stack overlays in normal flow: centered full-width rails (no asymmetric float offsets). */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: clamp(1rem, 4vw, 1.35rem);
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
     width: 100%;
-    padding-top: 0.45rem;
+    padding: 0.35rem 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .hero-floating-card {
+    position: relative;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    width: 100%;
+    max-width: none;
+    flex-shrink: 0;
+    box-sizing: border-box;
   }
 
   .hero-frame--feature {
+    width: 100%;
+    max-width: none;
     max-height: min(52vh, 440px);
+    flex-shrink: 0;
+  }
+
+  /* Small scale + cover can clip unevenly at rounded corners on iOS Safari. */
+  .hero-frame--feature img {
+    transform: none;
+    transform-origin: center center;
+    object-fit: cover;
+    object-position: center center;
+  }
+
+  .hero-panel--visual .hero-frame--feature:hover img {
+    transform: none;
+  }
+
+  .hero-panel--visual .hero-frame:hover img {
+    transform: none;
+  }
+
+  .hero-panel--visual .hero-frame:hover {
+    transform: none;
+    border-color: rgba(212, 188, 106, 0.45);
+  }
+
+  .hero-panel__strip {
+    margin-top: 0;
   }
 
   .hero-panel--copy {
@@ -1138,14 +1184,6 @@ body.nav-drawer-open {
     max-width: 34rem;
     margin-left: auto;
     margin-right: auto;
-  }
-
-  .hero-floating-card--north {
-    left: 0.55rem;
-  }
-
-  .hero-floating-card--south {
-    right: 0.55rem;
   }
 
   .hero {
@@ -1616,6 +1654,13 @@ main {
 
 .social-tile--instagram:hover {
   border-color: rgba(228, 180, 140, 0.55);
+}
+
+.social-tile--yelp:hover {
+  border-color: rgba(215, 64, 70, 0.55);
+  box-shadow:
+    0 14px 44px rgba(0, 0, 0, 0.38),
+    0 0 24px rgba(215, 64, 70, 0.1);
 }
 
 .social-tile--whatsapp {

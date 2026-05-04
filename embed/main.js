@@ -975,10 +975,27 @@
     }
     const locationNode = document.querySelector('#contact .contact-col:last-child .contact-item:last-child div');
     if (locationNode && contact.location != null) locationNode.textContent = String(contact.location);
-    const socialTiles = document.querySelectorAll('.contact-social a');
-    if (socialTiles[0] && contact.instagramHref) socialTiles[0].setAttribute('href', contact.instagramHref);
-    if (socialTiles[1] && contact.whatsappHref) socialTiles[1].setAttribute('href', contact.whatsappHref);
-    if (socialTiles[2] && contact.facebookHref) socialTiles[2].setAttribute('href', contact.facebookHref);
+    const contactSocialMap = {
+      instagram: contact.instagramHref,
+      yelp: contact.yelpHref,
+      whatsapp: contact.whatsappHref,
+      facebook: contact.facebookHref,
+    };
+    document.querySelectorAll('a[data-contact-social]').forEach((el) => {
+      const key = el.getAttribute('data-contact-social');
+      const raw =
+        key && Object.prototype.hasOwnProperty.call(contactSocialMap, key)
+          ? String(contactSocialMap[key] ?? '').trim()
+          : '';
+      const valid =
+        raw && (/^https?:\/\//i.test(raw) || /^tel:/i.test(raw) || /^mailto:/i.test(raw));
+      if (valid) {
+        el.setAttribute('href', raw);
+        el.removeAttribute('hidden');
+      } else {
+        el.setAttribute('hidden', '');
+      }
+    });
 
     const schemaNode = document.getElementById('seo-schema');
     if (schemaNode) {
@@ -1028,11 +1045,16 @@
               { '@type': 'AdministrativeArea', name: 'Lake Tahoe' },
               { '@type': 'AdministrativeArea', name: 'San Francisco Bay Area' },
             ],
-            sameAs: [
-              contact.instagramHref || 'https://www.instagram.com/silerchef',
-              contact.facebookHref || 'https://www.facebook.com/silerchef',
-              contact.websiteHref || 'https://www.silerchef.com/',
-            ],
+            sameAs: (() => {
+              const list = [
+                contact.instagramHref || 'https://www.instagram.com/silerchef',
+                contact.facebookHref || 'https://www.facebook.com/silerchef',
+              ];
+              const yelp = contact.yelpHref && String(contact.yelpHref).trim();
+              if (yelp && /^https?:\/\//i.test(yelp)) list.push(yelp);
+              list.push(contact.websiteHref || 'https://www.silerchef.com/');
+              return list;
+            })(),
           },
           {
             '@type': 'Service',
@@ -1314,6 +1336,16 @@
         network: 'instagram',
         placement: 'contact_social',
         label: 'Instagram',
+      });
+    });
+  });
+
+  document.querySelectorAll('.social-tile--yelp').forEach((el) => {
+    el.addEventListener('click', () => {
+      trackEvent('social_click', {
+        network: 'yelp',
+        placement: 'contact_social',
+        label: 'Yelp',
       });
     });
   });

@@ -127,6 +127,7 @@ const DEFAULT_SITE_CONTENT = {
       websiteHref: 'https://www.silerchef.com/',
       location: 'Reno, Nevada, USA',
       instagramHref: 'https://www.instagram.com/silerchef',
+      yelpHref: '',
       whatsappHref: 'https://wa.me/17753896677',
       facebookHref: 'https://www.facebook.com/silerchef',
     },
