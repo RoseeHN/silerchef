@@ -1048,7 +1048,7 @@
             sameAs: (() => {
               const list = [
                 contact.instagramHref || 'https://www.instagram.com/silerchef',
-                contact.facebookHref || 'https://www.facebook.com/silerchef',
+                contact.facebookHref || 'https://www.facebook.com/share/1Eea7fQpfV/?mibextid=wwXIfr',
               ];
               const yelp = contact.yelpHref && String(contact.yelpHref).trim();
               if (yelp && /^https?:\/\//i.test(yelp)) list.push(yelp);

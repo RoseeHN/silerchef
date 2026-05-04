@@ -129,7 +129,7 @@ const DEFAULT_SITE_CONTENT = {
       instagramHref: 'https://www.instagram.com/silerchef',
       yelpHref: 'https://www.yelp.com/biz/siler-chef-reno',
       whatsappHref: 'https://wa.me/17753896677',
-      facebookHref: 'https://www.facebook.com/silerchef',
+      facebookHref: 'https://www.facebook.com/share/1Eea7fQpfV/?mibextid=wwXIfr',
     },
   },
   cuisineCards: [
