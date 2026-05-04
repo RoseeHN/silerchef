@@ -199,9 +199,17 @@
     return `${baseFolder}/${slug}/thumb.jpg`;
   }
 
-  function renderBlocks(container, copy) {
+  function renderBlocks(container, copy, kind, slug) {
     container.innerHTML = '';
     if (!copy || !copy.blocks) return;
+    const fallbackImage =
+      kind && slug
+        ? getCardImageSrc(
+            kind,
+            slug,
+            kind === 'cuisine' ? 'images/cuisines' : 'images/services-and-occasions'
+          )
+        : '';
     copy.blocks.forEach((block) => {
       const article = document.createElement('article');
       article.className = 'meal-card observe' + (block.image ? ' meal-card--with-visual' : '');
@@ -218,7 +226,17 @@
         img.loading = 'lazy';
         img.decoding = 'async';
         img.sizes = '(max-width: 520px) 72px, 108px';
-        img.addEventListener('error', () => {
+        img.addEventListener('error', function onBlockImageError() {
+          img.removeEventListener('error', onBlockImageError);
+          if (fallbackImage && fallbackImage !== block.image) {
+            img.src = fallbackImage;
+            img.addEventListener('error', function onFallbackError() {
+              img.removeEventListener('error', onFallbackError);
+              fig.remove();
+              article.classList.remove('meal-card--with-visual');
+            });
+            return;
+          }
           fig.remove();
           article.classList.remove('meal-card--with-visual');
         });
@@ -505,17 +523,11 @@
     detailIntro.textContent = copy && copy.intro ? copy.intro : '';
     detailIntro.hidden = !(copy && copy.intro);
 
-    renderBlocks(detailBlocks, copy);
+    renderBlocks(detailBlocks, copy, kind, slug);
 
-    const warmUrls = [];
-    if (copy && Array.isArray(copy.blocks)) {
-      copy.blocks.forEach((block) => {
-        if (block && typeof block.image === 'string' && block.image && !warmUrls.includes(block.image)) {
-          warmUrls.push(block.image);
-        }
-      });
-    }
-    setupCarousel(detailHero, detailStrip, warmUrls.slice(0, 4));
+    const warmPreview = getCardImageSrc(kind, slug, baseFolder);
+    const warmUrls = warmPreview ? [warmPreview] : [];
+    setupCarousel(detailHero, detailStrip, warmUrls);
 
     overlay.hidden = false;
     overlay.setAttribute('aria-hidden', 'false');
