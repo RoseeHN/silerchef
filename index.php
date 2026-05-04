@@ -287,6 +287,7 @@ function redirect_legacy_embed_paths(string $requestPath, string $requestUri, st
     $normalizedPath = match ($requestPath) {
         '/index.html', '/index', '/index/' => '/',
         '/admin.html', '/admin/' => '/admin',
+        '/gallery.html', '/gallery/' => '/gallery',
         default => null,
     };
 
@@ -309,6 +310,8 @@ function serve_embed_file(string $requestPath, string|false $embedDir): never
     $path = $requestPath === '/' ? '/index.html' : $requestPath;
     if ($path === '/admin') {
         $path = '/admin.html';
+    } elseif ($path === '/gallery') {
+        $path = '/gallery.html';
     }
 
     $candidate = realpath($embedDir . $path);
@@ -368,6 +371,8 @@ function detect_mime_type(string $filePath): string
         'jpeg' => 'image/jpeg',
         'gif' => 'image/gif',
         'webp' => 'image/webp',
+        'mov' => 'video/quicktime',
+        'mp4' => 'video/mp4',
         'ico' => 'image/x-icon',
         'woff' => 'font/woff',
         'woff2' => 'font/woff2',
