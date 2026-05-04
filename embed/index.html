@@ -1375,7 +1375,9 @@
                 </label>
                 <p id="booking-error" class="booking-error" role="alert" hidden></p>
                 <div class="booking-actions">
-                  <button type="submit" class="btn btn-primary">Submit request</button>
+                  <button type="submit" class="btn btn-primary" data-booking-submit>
+                    <span data-booking-submit-label>Submit request</span>
+                  </button>
                 </div>
                 <p class="booking-fallback">
                   <a
@@ -1392,7 +1394,10 @@
               <div class="booking-success__card">
                 <p class="booking-success__kicker">Request received</p>
                 <p class="booking-success__title gold-text">Thank you — your request is in.</p>
-                <p class="booking-success__text">Your request is now in the Siler Chef dashboard. We’ll follow up shortly by phone, email, or WhatsApp to confirm details.</p>
+                <p class="booking-success__text" data-booking-success-text>
+                  Your request is now in the Siler Chef dashboard. We’ll follow up shortly by phone, email, or WhatsApp to confirm details.
+                </p>
+                <div class="booking-success__meta" data-booking-success-meta hidden></div>
                 <button type="button" class="btn btn-primary booking-done">Done</button>
               </div>
             </div>

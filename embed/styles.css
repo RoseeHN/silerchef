@@ -2925,6 +2925,10 @@ body.scroll-locked {
   background: rgba(114, 45, 39, 0.18);
 }
 
+.booking-error.is-visible {
+  animation: bookingNoticeIn 180ms ease;
+}
+
 .booking-actions {
   margin-top: 0.1rem;
   display: flex;
@@ -2933,6 +2937,12 @@ body.scroll-locked {
 
 .booking-actions .btn {
   width: 100%;
+}
+
+.booking-actions .btn[disabled] {
+  cursor: wait;
+  opacity: 0.78;
+  filter: saturate(0.85);
 }
 
 .booking-fallback {
@@ -2963,6 +2973,38 @@ body.scroll-locked {
   font-size: 0.94rem;
   color: var(--text-muted);
   line-height: 1.62;
+}
+
+.booking-success__meta {
+  display: grid;
+  gap: 0.38rem;
+  padding: 0.9rem 1rem;
+  border-radius: calc(var(--radius) - 4px);
+  border: 1px solid rgba(197, 160, 89, 0.16);
+  background: linear-gradient(180deg, rgba(197, 160, 89, 0.08), rgba(19, 17, 19, 0.92));
+}
+
+.booking-success__meta p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: rgba(243, 234, 209, 0.82);
+}
+
+.booking-success__meta strong {
+  color: rgba(243, 234, 209, 0.96);
+}
+
+@keyframes bookingNoticeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 900px) {

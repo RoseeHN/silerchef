@@ -1226,6 +1226,10 @@
   const bookingForm = document.getElementById('booking-form');
   const bookingSuccess = document.getElementById('booking-success');
   const bookingError = document.getElementById('booking-error');
+  const bookingSuccessText = bookingOverlay && bookingOverlay.querySelector('[data-booking-success-text]');
+  const bookingSuccessMeta = bookingOverlay && bookingOverlay.querySelector('[data-booking-success-meta]');
+  const bookingSubmitBtn = bookingForm && bookingForm.querySelector('[data-booking-submit]');
+  const bookingSubmitLabel = bookingForm && bookingForm.querySelector('[data-booking-submit-label]');
   const bookingBackdrop = bookingOverlay && bookingOverlay.querySelector('.booking-backdrop');
   const bookingPanel = bookingOverlay && bookingOverlay.querySelector('.booking-panel');
   const bookingCloseBtn = bookingOverlay && bookingOverlay.querySelector('.booking-close');
@@ -1261,9 +1265,66 @@
     if (preferredContact) preferredContact.value = 'any';
     bookingSuccess.hidden = true;
     bookingError.hidden = true;
+    bookingError.classList.remove('is-visible');
     bookingError.textContent = '';
+    if (bookingSuccessMeta) {
+      bookingSuccessMeta.hidden = true;
+      bookingSuccessMeta.innerHTML = '';
+    }
+    if (bookingSuccessText) {
+      bookingSuccessText.textContent =
+        'Your request is now in the Siler Chef dashboard. We’ll follow up shortly by phone, email, or WhatsApp to confirm details.';
+    }
+    setBookingSubmitting(false);
   }
   populatePreferredTimes();
+
+  function setBookingSubmitting(isSubmitting) {
+    if (!bookingSubmitBtn) return;
+    bookingSubmitBtn.disabled = !!isSubmitting;
+    bookingSubmitBtn.setAttribute('aria-busy', isSubmitting ? 'true' : 'false');
+    if (bookingSubmitLabel) {
+      bookingSubmitLabel.textContent = isSubmitting ? 'Sending request...' : 'Submit request';
+    }
+  }
+
+  function showBookingError(message) {
+    if (!bookingError) return;
+    bookingError.textContent = message;
+    bookingError.hidden = false;
+    bookingError.classList.add('is-visible');
+    const bookingBody = bookingOverlay && bookingOverlay.querySelector('.booking-panel__body');
+    if (bookingBody) bookingBody.scrollTo({ top: bookingError.offsetTop - 24, behavior: 'smooth' });
+  }
+
+  function formatAlertStatus(alert) {
+    const status = String((alert && alert.status) || '').toLowerCase();
+    if (status === 'sent' || status === 'saved') return 'ready';
+    if (status === 'configured') return 'ready';
+    if (status === 'queued') return 'queued';
+    if (status === 'skipped') return 'skipped';
+    if (status === 'unconfigured') return 'not configured yet';
+    if (status === 'failed') return 'needs setup';
+    return status || 'pending';
+  }
+
+  function renderSuccessMeta(data) {
+    if (!bookingSuccessMeta) return;
+    const alerts = data && typeof data === 'object' ? data.alerts || {} : {};
+    const items = [];
+    if (data && data.reservationId) {
+      items.push(`<p><strong>Reference:</strong> ${String(data.reservationId)}</p>`);
+    }
+    items.push('<p><strong>Dashboard:</strong> request saved successfully.</p>');
+    if (alerts.email) {
+      items.push(`<p><strong>Email alert:</strong> ${formatAlertStatus(alerts.email)}.</p>`);
+    }
+    if (alerts.teamWhatsApp) {
+      items.push(`<p><strong>WhatsApp alert:</strong> ${formatAlertStatus(alerts.teamWhatsApp)}.</p>`);
+    }
+    bookingSuccessMeta.innerHTML = items.join('');
+    bookingSuccessMeta.hidden = items.length === 0;
+  }
 
   function setBookingOpen(open) {
     if (!bookingOverlay) return;
@@ -1345,7 +1406,9 @@
       e.preventDefault();
       if (!bookingError) return;
       bookingError.hidden = true;
+      bookingError.classList.remove('is-visible');
       bookingError.textContent = '';
+      setBookingSubmitting(true);
       const fd = new FormData(bookingForm);
       const guestRaw = fd.get('guestCount');
       const payload = {
@@ -1366,8 +1429,8 @@
       };
       const blockedMsg = getBlockedDateMessage(payload.preferredDate);
       if (blockedMsg) {
-        bookingError.textContent = blockedMsg;
-        bookingError.hidden = false;
+        setBookingSubmitting(false);
+        showBookingError(blockedMsg);
         return;
       }
       try {
@@ -1384,18 +1447,26 @@
             (typeof data.detail === 'string' && data.detail) ||
             (typeof data.error === 'string' && data.error) ||
             'Something went wrong. Try again or message us on WhatsApp below.';
-          bookingError.textContent = msg;
-          bookingError.hidden = false;
+          setBookingSubmitting(false);
+          showBookingError(msg);
           return;
         }
         bookingForm.hidden = true;
         if (bookingSuccess) bookingSuccess.hidden = false;
+        if (bookingSuccessText) {
+          bookingSuccessText.textContent =
+            'Your request has been saved. Chef Fikret will review it from the reservation desk and follow up by phone, email, or WhatsApp.';
+        }
+        renderSuccessMeta(data);
+        const bookingBody = bookingOverlay && bookingOverlay.querySelector('.booking-panel__body');
+        if (bookingBody) bookingBody.scrollTo({ top: 0, behavior: 'smooth' });
         trackEvent('reservation_submit', {
           placement: 'booking_form',
         });
+        setBookingSubmitting(false);
       } catch {
-        bookingError.textContent = 'Network error. Check your connection and try again.';
-        bookingError.hidden = false;
+        setBookingSubmitting(false);
+        showBookingError('Network error. Check your connection and try again.');
       }
     });
   }

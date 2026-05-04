@@ -17,6 +17,9 @@
       service: { block: 0, item: '0:0' },
     },
   };
+  const BOOTSTRAP_REFRESH_MS = 30000;
+  let bootstrapRefreshTimer = null;
+  let bootstrapRefreshInFlight = false;
 
   const TAB_COPY = {
     homepage: {
@@ -262,6 +265,7 @@
   }
 
   function showLoggedOutView() {
+    stopBootstrapPolling();
     byId('admin-stage').hidden = false;
     byId('login-card').hidden = false;
     byId('dashboard').hidden = true;
@@ -272,6 +276,7 @@
   }
 
   function showPendingView() {
+    stopBootstrapPolling();
     byId('admin-stage').hidden = true;
     byId('dashboard').hidden = true;
     byId('logout-btn').hidden = true;
@@ -287,6 +292,35 @@
     if (byId('sidebar-logout-btn')) byId('sidebar-logout-btn').hidden = false;
     setAdminMode('authenticated');
     syncSimpleModeUI();
+    startBootstrapPolling();
+  }
+
+  function stopBootstrapPolling() {
+    if (bootstrapRefreshTimer) {
+      window.clearInterval(bootstrapRefreshTimer);
+      bootstrapRefreshTimer = null;
+    }
+  }
+
+  function startBootstrapPolling() {
+    stopBootstrapPolling();
+    if (!getToken()) return;
+    bootstrapRefreshTimer = window.setInterval(() => {
+      if (document.visibilityState !== 'visible') return;
+      refreshBootstrapSilently();
+    }, BOOTSTRAP_REFRESH_MS);
+  }
+
+  async function refreshBootstrapSilently() {
+    if (!getToken() || bootstrapRefreshInFlight) return;
+    bootstrapRefreshInFlight = true;
+    try {
+      await loadBootstrap();
+    } catch (_) {
+      // Silent refresh should not interrupt the operator while the desk is open.
+    } finally {
+      bootstrapRefreshInFlight = false;
+    }
   }
 
   function formatDateTime(isoText) {
@@ -2414,6 +2448,16 @@
         contentRoot.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
+  });
+
+  window.addEventListener('focus', () => {
+    refreshBootstrapSilently();
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      refreshBootstrapSilently();
+    }
   });
 
   byId('cuisine-select').addEventListener('change', (event) => {
