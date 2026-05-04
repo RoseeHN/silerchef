@@ -122,6 +122,32 @@ function buildStore() {
     return arr;
   }
 
+  function normalizeAllergyFlags(raw) {
+    const allowed = new Set([
+      'dairy',
+      'eggs',
+      'peanuts',
+      'tree-nuts',
+      'gluten',
+      'soy',
+      'sesame',
+      'fish',
+      'shellfish',
+      'other',
+    ]);
+    const arr = Array.isArray(raw) ? raw : [];
+    const out = [];
+    for (const item of arr) {
+      const key = String(item || '')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-');
+      if (!key || !allowed.has(key) || out.includes(key)) continue;
+      out.push(key);
+    }
+    return out;
+  }
+
   async function createReservation(payload) {
     const reservations = await listReservations();
     const reservation = {
@@ -140,7 +166,13 @@ function buildStore() {
         preferredDate: payload.preferredDate || '',
         preferredTime: payload.preferredTime || '',
         guestCount: payload.guestCount,
-        notes: payload.notes || '',
+        preferredContact: String(payload.preferredContact || '').trim().slice(0, 40) || 'any',
+        eventLocation: String(payload.eventLocation || '').trim().slice(0, 200),
+        zipCode: String(payload.zipCode || '').trim().slice(0, 20),
+        cuisinePreference: String(payload.cuisinePreference || '').trim().slice(0, 200),
+        allergyFlags: normalizeAllergyFlags(payload.allergyFlags),
+        allergyNotes: String(payload.allergyNotes || '').trim().slice(0, 1200),
+        notes: String(payload.notes || '').trim().slice(0, 2000),
       },
     };
     reservations.unshift(reservation);

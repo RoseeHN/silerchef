@@ -140,7 +140,7 @@ function validEmail(s) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 }
 
-/** Creates a Wix CRM contact with full reservation note (Bookings calendar needs separate setup). */
+/** Persists reservation to disk, then syncs to Wix CRM when email + config allow. Always returns 200 on successful save when Wix is optional/skipped/failed — guest dashboard still receives the request. */
 app.post('/api/reservations', async (req, res) => {
   const p = req.body;
   if (!p || typeof p !== 'object') {
@@ -150,8 +150,13 @@ app.post('/api/reservations', async (req, res) => {
   const firstName = String(p.firstName || '').trim();
   const lastName = String(p.lastName || '').trim();
   const email = String(p.email || '').trim();
-  if (!firstName || !lastName || !email || !validEmail(email)) {
-    res.status(400).json({ error: 'validation', detail: 'name_email_required' });
+  const phone = String(p.phone || '').trim();
+  if (!firstName || !lastName || !phone) {
+    res.status(400).json({ error: 'validation', detail: 'name_phone_required' });
+    return;
+  }
+  if (email && !validEmail(email)) {
+    res.status(400).json({ error: 'validation', detail: 'invalid_email' });
     return;
   }
   const availability = await store.getAvailability();
@@ -163,18 +168,54 @@ app.post('/api/reservations', async (req, res) => {
     });
     return;
   }
-  const reservation = await store.createReservation({
+  const allergyFlags = Array.isArray(p.allergyFlags) ? p.allergyFlags : [];
+  const payloadForStore = {
     firstName,
     lastName,
     email,
-    phone: String(p.phone || '').trim(),
+    phone,
+    preferredContact: String(p.preferredContact || '').trim(),
     preferredDate: String(p.preferredDate || '').trim(),
     preferredTime: String(p.preferredTime || '').trim(),
     guestCount: Number.isFinite(Number(p.guestCount)) ? Number(p.guestCount) : null,
+    eventLocation: String(p.eventLocation || '').trim(),
+    zipCode: String(p.zipCode || '').trim(),
+    cuisinePreference: String(p.cuisinePreference || '').trim(),
+    allergyNotes: String(p.allergyNotes || '').trim(),
+    allergyFlags,
     notes: String(p.notes || '').trim(),
-  });
+  };
+
+  let reservation;
   try {
-    const result = await createWixContactFromReservation(p);
+    reservation = await store.createReservation(payloadForStore);
+  } catch (e) {
+    console.error('reservation_save_error', e);
+    res.status(500).json({ error: 'server_error', detail: 'Unable to save reservation' });
+    return;
+  }
+
+  const respondOk = (wixSynced, extras) =>
+    res.json({
+      ok: true,
+      reservationId: reservation.id,
+      wixSynced: !!wixSynced,
+      ...(extras || {}),
+    });
+
+  if (!email) {
+    await store.updateReservation(reservation.id, {
+      wixSync: { ok: false, contactId: null, error: 'skipped_no_email' },
+    });
+    respondOk(false, { wixNote: 'no_email_skip_crm' });
+    return;
+  }
+
+  try {
+    const result = await createWixContactFromReservation({
+      ...payloadForStore,
+      allergyFlags: reservation.request.allergyFlags,
+    });
     if (!result.ok) {
       await store.updateReservation(reservation.id, {
         wixSync: {
@@ -184,13 +225,12 @@ app.post('/api/reservations', async (req, res) => {
         },
       });
       if (result.code === 'missing_wix_config') {
-        res.status(503).json({
-          error: 'server_misconfigured',
-          detail: 'Set WIX_META_SITE_ID and WIX_API_KEY (Contacts: Manage) on Railway.',
-        });
+        respondOk(false, { wixNote: 'wix_not_configured' });
         return;
       }
-      res.status(502).json({ error: 'wix_error', status: result.status, detail: result.detail });
+      respondOk(false, {
+        wixNote: result.code || 'wix_error',
+      });
       return;
     }
     await store.updateReservation(reservation.id, {
@@ -200,7 +240,7 @@ app.post('/api/reservations', async (req, res) => {
         error: null,
       },
     });
-    res.json({ ok: true, contactId: result.contactId, reservationId: reservation.id });
+    respondOk(true, { contactId: result.contactId });
   } catch (e) {
     console.error('reservation_error', e);
     await store.updateReservation(reservation.id, {
@@ -210,7 +250,7 @@ app.post('/api/reservations', async (req, res) => {
         error: 'server_error',
       },
     });
-    res.status(500).json({ error: 'server_error' });
+    respondOk(false, { wixNote: 'wix_exception' });
   }
 });
 

@@ -207,57 +207,57 @@
     <div class="bg-texture" aria-hidden="true"></div>
     <div class="bg-vignette" aria-hidden="true"></div>
 
-    <div class="page">
-      <header class="site-header">
-        <div class="header-inner">
-          <a class="brand-lockup" href="#home">
-            <span class="brand-lockup__shell">
-              <span class="brand-mark" aria-hidden="true">
-                <img
-                  class="brand-logo brand-logo--header"
-                  src="images/brand/silerchef-logo.png"
-                  width="48"
-                  height="48"
-                  alt=""
-                  decoding="async"
-                  fetchpriority="low"
-                />
-              </span>
-              <span class="brand-text">
-                <strong>Siler Chef</strong>
-                <small>Personal Chef & Culinary Artist</small>
-              </span>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand-lockup" href="#home">
+          <span class="brand-lockup__shell">
+            <span class="brand-mark" aria-hidden="true">
+              <img
+                class="brand-logo brand-logo--header"
+                src="images/brand/silerchef-logo.png"
+                width="48"
+                height="48"
+                alt=""
+                decoding="async"
+                fetchpriority="low"
+              />
             </span>
-          </a>
-          <nav id="site-nav" class="site-nav" aria-label="Primary">
-            <ul>
-              <li><a href="#home">Home</a></li>
-              <li><a href="#cuisines">Cuisines</a></li>
-              <li><a href="#moments">Gallery</a></li>
-              <li><a href="#services">Services &amp; Occasions</a></li>
-              <li><a href="#contact">Contact</a></li>
-              <li class="site-nav__cta-mobile">
-                <button type="button" class="header-cta" data-booking-trigger data-booking-placement="mobile_nav">
-                  Reserve your date
-                </button>
-              </li>
-            </ul>
-          </nav>
-          <button type="button" class="header-cta header-cta--bar" data-booking-trigger data-booking-placement="header_bar">
-            Reserve your date
-          </button>
-          <button
-            type="button"
-            class="nav-toggle"
-            aria-label="Open menu"
-            aria-expanded="false"
-            aria-controls="site-nav"
-          >
-            <span></span><span></span><span></span>
-          </button>
-        </div>
-      </header>
+            <span class="brand-text">
+              <strong>Siler Chef</strong>
+              <small>Personal Chef & Culinary Artist</small>
+            </span>
+          </span>
+        </a>
+        <nav id="site-nav" class="site-nav" aria-label="Primary">
+          <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#cuisines">Cuisines</a></li>
+            <li><a href="#moments">Gallery</a></li>
+            <li><a href="#services">Services &amp; Occasions</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li class="site-nav__cta-mobile">
+              <button type="button" class="header-cta" data-booking-trigger data-booking-placement="mobile_nav">
+                Reserve your date
+              </button>
+            </li>
+          </ul>
+        </nav>
+        <button type="button" class="header-cta header-cta--bar" data-booking-trigger data-booking-placement="header_bar">
+          Reserve your date
+        </button>
+        <button
+          type="button"
+          class="nav-toggle"
+          aria-label="Open menu"
+          aria-expanded="false"
+          aria-controls="site-nav"
+        >
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
 
+    <div class="page">
       <section id="home" class="hero hero--editorial observe">
         <div class="ambient-sparkles" aria-hidden="true">
           <span class="ambient-sparkles__dot"></span>
@@ -1064,7 +1064,7 @@
                   </label>
                 </div>
                 <label class="booking-field">
-                  <span>Email (optional)</span>
+                  <span>Email (recommended for confirmations)</span>
                   <input name="email" type="email" autocomplete="email" maxlength="320" />
                 </label>
                 <label class="booking-field">
@@ -1118,9 +1118,44 @@
                     </select>
                   </label>
                 </div>
+                <div class="booking-field booking-field--allergens">
+                  <span>Food allergies &amp; intolerances</span>
+                  <p class="booking-allergy-hint">Tick anything that must stay off the menu, then describe severity or substitutes below.</p>
+                  <div class="booking-allergy-grid" role="group" aria-label="Common allergens">
+                    <label class="booking-allergy-label"
+                      ><input type="checkbox" name="allergyFlag" value="dairy" /> Dairy / milk</label
+                    >
+                    <label class="booking-allergy-label"><input type="checkbox" name="allergyFlag" value="eggs" /> Eggs</label>
+                    <label class="booking-allergy-label"
+                      ><input type="checkbox" name="allergyFlag" value="peanuts" /> Peanuts</label
+                    >
+                    <label class="booking-allergy-label"
+                      ><input type="checkbox" name="allergyFlag" value="tree-nuts" /> Tree nuts</label
+                    >
+                    <label class="booking-allergy-label"
+                      ><input type="checkbox" name="allergyFlag" value="gluten" /> Wheat / gluten</label
+                    >
+                    <label class="booking-allergy-label"><input type="checkbox" name="allergyFlag" value="soy" /> Soy</label>
+                    <label class="booking-allergy-label"
+                      ><input type="checkbox" name="allergyFlag" value="sesame" /> Sesame</label
+                    >
+                    <label class="booking-allergy-label"><input type="checkbox" name="allergyFlag" value="fish" /> Fish</label>
+                    <label class="booking-allergy-label"
+                      ><input type="checkbox" name="allergyFlag" value="shellfish" /> Shellfish</label
+                    >
+                    <label class="booking-allergy-label"
+                      ><input type="checkbox" name="allergyFlag" value="other" /> Other (explain below)</label
+                    >
+                  </div>
+                </div>
                 <label class="booking-field">
-                  <span>Intolerances or allergies</span>
-                  <textarea name="allergyNotes" rows="3" maxlength="1200" placeholder="Tell us about any allergies, intolerances, or ingredients to avoid."></textarea>
+                  <span>Allergy details &amp; ingredients to avoid</span>
+                  <textarea
+                    name="allergyNotes"
+                    rows="3"
+                    maxlength="1200"
+                    placeholder="E.g. anaphylactic to shellfish · mild lactose intolerance · kosher/halal • vegan…"
+                  ></textarea>
                 </label>
                 <label class="booking-field">
                   <span>Occasion &amp; extra notes</span>
@@ -1162,34 +1197,36 @@
         aria-modal="true"
         aria-labelledby="detail-title"
       >
-        <div class="detail-sheet__stage">
-          <div class="detail-toolbar">
-            <button type="button" class="detail-close btn btn-ghost" aria-label="Close">← Back</button>
-          </div>
-          <div class="detail-hero-stage">
-            <div class="detail-hero-wrap">
-              <img id="detail-hero-img" class="detail-hero-img" alt="" />
+        <div class="detail-toolbar">
+          <button type="button" class="detail-close btn btn-ghost" aria-label="Close">← Back</button>
+        </div>
+        <div class="detail-sheet-scroll">
+          <div class="detail-sheet__stage">
+            <div class="detail-hero-stage">
+              <div class="detail-hero-wrap">
+                <img id="detail-hero-img" class="detail-hero-img" alt="" />
+              </div>
+            </div>
+            <div class="detail-stage-copy">
+              <p id="detail-kicker" class="detail-kicker">Cuisine portfolio</p>
+              <h2 id="detail-title" class="detail-title gold-text"></h2>
+              <p id="detail-intro" class="detail-intro"></p>
             </div>
           </div>
-          <div class="detail-stage-copy">
-            <p id="detail-kicker" class="detail-kicker">Cuisine portfolio</p>
-            <h2 id="detail-title" class="detail-title gold-text"></h2>
-            <p id="detail-intro" class="detail-intro"></p>
-          </div>
-        </div>
-        <div class="detail-sheet-inner">
-          <aside class="detail-sample-notice" role="note" aria-label="Menu notice">
-            <p>
-              <strong>Illustrative only.</strong> These are sample menu directions and service outlines - every event can be tailored to your brief, guest list, and dietary needs.
-            </p>
-          </aside>
-          <div id="detail-blocks" class="detail-blocks"></div>
-          <div class="detail-gallery-dock" aria-label="Image gallery">
-            <span class="detail-gallery-label">Gallery</span>
-            <div class="detail-strip-bar">
-              <button type="button" class="detail-strip-prev" aria-label="Scroll thumbnails left">‹</button>
-              <div id="detail-strip" class="detail-strip"></div>
-              <button type="button" class="detail-strip-next" aria-label="Scroll thumbnails right">›</button>
+          <div class="detail-sheet-inner">
+            <aside class="detail-sample-notice" role="note" aria-label="Menu notice">
+              <p>
+                <strong>Illustrative only.</strong> These are sample menu directions and service outlines - every event can be tailored to your brief, guest list, and dietary needs.
+              </p>
+            </aside>
+            <div id="detail-blocks" class="detail-blocks"></div>
+            <div class="detail-gallery-dock" aria-label="Image gallery">
+              <span class="detail-gallery-label">Gallery</span>
+              <div class="detail-strip-bar">
+                <button type="button" class="detail-strip-prev" aria-label="Scroll thumbnails left">‹</button>
+                <div id="detail-strip" class="detail-strip"></div>
+                <button type="button" class="detail-strip-next" aria-label="Scroll thumbnails right">›</button>
+              </div>
             </div>
           </div>
         </div>

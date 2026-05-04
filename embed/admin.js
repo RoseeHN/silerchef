@@ -82,8 +82,16 @@
   };
 
   function getApiBase() {
-    const base = window.__SILERCHEF_API_BASE__ || '';
-    return base ? String(base).replace(/\/$/, '') : '';
+    if (typeof window !== 'undefined' && window.__SILERCHEF_API_BASE__) {
+      const b = String(window.__SILERCHEF_API_BASE__).trim();
+      if (b) return b.replace(/\/$/, '');
+    }
+    const meta = document.querySelector('meta[name="silerchef-api-base"]');
+    if (meta) {
+      const raw = String(meta.getAttribute('content') || '').trim();
+      if (raw) return raw.replace(/\/$/, '');
+    }
+    return '';
   }
 
   function apiUrl(path) {
@@ -1438,16 +1446,18 @@
       .filter((row) => {
         if (status !== 'all' && row.status !== status) return false;
         if (!query) return true;
+        const rq = row.request || {};
         const haystack = [
           row.customer && row.customer.firstName,
           row.customer && row.customer.lastName,
           row.customer && row.customer.email,
           row.customer && row.customer.phone,
-          row.request && row.request.eventLocation,
-          row.request && row.request.cuisinePreference,
-          row.request && row.request.allergyNotes,
-          row.request && row.request.zipCode,
-          row.request && row.request.notes,
+          rq.eventLocation,
+          rq.cuisinePreference,
+          formatReservationAllergyFlags(rq.allergyFlags || []),
+          rq.allergyNotes,
+          rq.zipCode,
+          rq.notes,
           row.adminNote,
         ]
           .join(' ')
@@ -1500,17 +1510,23 @@
       }
     }
     reservations.forEach((row) => {
+      const rq = row.request || {};
+      const allergyChecklist =
+        Array.isArray(rq.allergyFlags) && rq.allergyFlags.length
+          ? `Allergen checklist: ${esc(formatReservationAllergyFlags(rq.allergyFlags))}`
+          : '';
       const requestLines = [
-        `Date: ${esc(row.request.preferredDate || '-')}`,
-        `Time: ${esc(row.request.preferredTime || '-')}`,
-        `Guests: ${esc(row.request.guestCount == null ? '-' : row.request.guestCount)}`,
-        `Location: ${esc(row.request.eventLocation || '-')}`,
-        `Cuisine: ${esc(row.request.cuisinePreference || '-')}`,
-        `Allergies: ${esc(row.request.allergyNotes || '-')}`,
-        `Preferred follow-up: ${esc(formatPreferredContact(row.request.preferredContact || 'any'))}`,
+        `Date: ${esc(rq.preferredDate || '-')}`,
+        `Time: ${esc(rq.preferredTime || '-')}`,
+        `Guests: ${esc(rq.guestCount == null ? '-' : rq.guestCount)}`,
+        `Location: ${esc(rq.eventLocation || '-')}`,
+        `Cuisine: ${esc(rq.cuisinePreference || '-')}`,
       ];
-      if (row.request.zipCode) requestLines.push(`ZIP code: ${esc(row.request.zipCode)}`);
-      if (row.request.notes) requestLines.push(`Notes: ${esc(row.request.notes)}`);
+      if (allergyChecklist) requestLines.push(allergyChecklist);
+      requestLines.push(`Allergy & dietary notes: ${esc(rq.allergyNotes || '-')}`);
+      requestLines.push(`Preferred follow-up: ${esc(formatPreferredContact(rq.preferredContact || 'any'))}`);
+      if (rq.zipCode) requestLines.push(`ZIP code: ${esc(rq.zipCode)}`);
+      if (rq.notes) requestLines.push(`Notes: ${esc(rq.notes)}`);
 
       const notificationSummary = summarizeReservationNotifications(row.notifications || {});
       const card = document.createElement('article');
@@ -1664,6 +1680,24 @@
     return labels[key] || 'Any method';
   }
 
+  const RESERVATION_ALLERGY_LABELS = {
+    dairy: 'Dairy / milk',
+    eggs: 'Eggs',
+    peanuts: 'Peanuts',
+    'tree-nuts': 'Tree nuts',
+    gluten: 'Wheat / gluten',
+    soy: 'Soy',
+    sesame: 'Sesame',
+    fish: 'Fish',
+    shellfish: 'Shellfish',
+    other: 'Other',
+  };
+
+  function formatReservationAllergyFlags(flags) {
+    if (!Array.isArray(flags) || !flags.length) return '';
+    return flags.map((key) => RESERVATION_ALLERGY_LABELS[key] || key).join(', ');
+  }
+
   function renderReservationRoutingNote() {
     const note = byId('reservation-routing-note');
     if (!note) return;
@@ -1681,6 +1715,9 @@
         routes.length
           ? `Every request is stored here first. Mirror routes currently enabled: ${routes.join(' · ')}.`
           : 'Every request is stored here first. Add an email inbox, WhatsApp shortcut, or webhook from the Homepage tab when you are ready.'
+      )}</p>
+      <p class="panel-note routing-persist-hint">${esc(
+        'If submitted requests are missing: open this admin from the same server as the site API, or set the silerchef-api-base meta to your API URL. On Railway (or similar), mount a persistent volume for DATA_DIR so reservations are not wiped on redeploy.'
       )}</p>
     `;
   }

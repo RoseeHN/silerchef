@@ -2,12 +2,39 @@
 
 const WIX_CONTACTS_URL = 'https://www.wixapis.com/contacts/v4/contacts';
 
+const ALLERGY_LABELS = {
+  dairy: 'Dairy / milk',
+  eggs: 'Eggs',
+  peanuts: 'Peanuts',
+  'tree-nuts': 'Tree nuts',
+  gluten: 'Wheat / gluten',
+  soy: 'Soy',
+  sesame: 'Sesame',
+  fish: 'Fish',
+  shellfish: 'Shellfish',
+  other: 'Other (see notes)',
+};
+
+function formatAllergyFlags(flags) {
+  if (!Array.isArray(flags) || !flags.length) return '';
+  return flags.map((key) => ALLERGY_LABELS[key] || key).join('; ');
+}
+
 function buildReservationNote(p) {
+  const allergyLine = [];
+  const flagsText = formatAllergyFlags(p.allergyFlags);
+  if (flagsText) allergyLine.push(`Allergy checklist: ${flagsText}`);
+  if (p.allergyNotes) allergyLine.push(`Allergy notes: ${String(p.allergyNotes).slice(0, 800)}`);
   const lines = [
     'Siler Chef — website reservation request',
+    p.eventLocation ? `Event location: ${p.eventLocation}` : '',
+    p.zipCode ? `ZIP: ${p.zipCode}` : '',
     `Preferred date: ${p.preferredDate || '—'}`,
     `Preferred time: ${p.preferredTime || '—'}`,
     `Guests: ${p.guestCount != null ? p.guestCount : '—'}`,
+    p.cuisinePreference ? `Cuisine: ${p.cuisinePreference}` : '',
+    ...allergyLine,
+    p.preferredContact && p.preferredContact !== 'any' ? `Preferred follow-up: ${p.preferredContact}` : '',
     p.notes ? `Notes: ${p.notes}` : '',
   ];
   return lines.filter(Boolean).join('\n');
@@ -33,6 +60,12 @@ async function createWixContactFromReservation(raw) {
     preferredTime: raw.preferredTime ? String(raw.preferredTime).trim().slice(0, 16) : '',
     guestCount: Number.isFinite(Number(raw.guestCount)) ? Math.min(999, Math.max(1, Number(raw.guestCount))) : null,
     notes: raw.notes ? String(raw.notes).trim().slice(0, 2000) : '',
+    eventLocation: raw.eventLocation ? String(raw.eventLocation).trim().slice(0, 200) : '',
+    zipCode: raw.zipCode ? String(raw.zipCode).trim().slice(0, 20) : '',
+    cuisinePreference: raw.cuisinePreference ? String(raw.cuisinePreference).trim().slice(0, 200) : '',
+    allergyNotes: raw.allergyNotes ? String(raw.allergyNotes).trim().slice(0, 1200) : '',
+    allergyFlags: Array.isArray(raw.allergyFlags) ? raw.allergyFlags : [],
+    preferredContact: raw.preferredContact ? String(raw.preferredContact).trim().slice(0, 40) : '',
   };
 
   const note = buildReservationNote(p);

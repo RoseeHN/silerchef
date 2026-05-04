@@ -262,7 +262,6 @@
 
   let stripScrollHandler = null;
   let stripAutoplayTimer = null;
-  let stripMarqueeRaf = null;
   let dockInteractionCleanup = null;
   let lockedScrollY = 0;
   let activeModalLock = '';
@@ -271,13 +270,6 @@
     if (stripAutoplayTimer) {
       clearInterval(stripAutoplayTimer);
       stripAutoplayTimer = null;
-    }
-  }
-
-  function cancelStripMarquee() {
-    if (stripMarqueeRaf != null) {
-      cancelAnimationFrame(stripMarqueeRaf);
-      stripMarqueeRaf = null;
     }
   }
 
@@ -290,7 +282,6 @@
 
   function resetCarouselTimers() {
     clearAutoplayTimer();
-    cancelStripMarquee();
     teardownDockListeners();
   }
 
@@ -345,6 +336,18 @@
 
     let currentIdx = 0;
 
+    const prefersReduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function scheduleAutoplay() {
+      clearAutoplayTimer();
+      if (urls.length <= 1 || prefersReduced) return;
+      stripAutoplayTimer = window.setInterval(() => {
+        goToIndex(currentIdx + 1, true);
+      }, 4600);
+    }
+
     function goToIndex(idx, scrollThumb) {
       const n = urls.length;
       currentIdx = ((idx % n) + n) % n;
@@ -377,6 +380,7 @@
       b.appendChild(im);
       b.addEventListener('click', () => {
         goToIndex(idx, true);
+        scheduleAutoplay();
       });
       stripEl.appendChild(b);
     });
@@ -398,51 +402,14 @@
       nextBtn.addEventListener('click', stripScrollHandler.next);
     }
 
-    const prefersReduced =
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    function scheduleAutoplay() {
-      clearAutoplayTimer();
-      if (urls.length <= 1 || prefersReduced) return;
-      stripAutoplayTimer = window.setInterval(() => {
-        goToIndex(currentIdx + 1, true);
-      }, 4200);
-    }
-
-    function startStripMarquee() {
-      cancelStripMarquee();
-      if (urls.length <= 1 || prefersReduced) return;
-      let last = performance.now();
-      const speedPxPerSec = 42;
-      function tick(now) {
-        const dt = Math.min(48, now - last);
-        last = now;
-        const maxScroll = stripEl.scrollWidth - stripEl.clientWidth;
-        if (maxScroll <= 4) {
-          stripMarqueeRaf = requestAnimationFrame(tick);
-          return;
-        }
-        stripEl.scrollLeft += (speedPxPerSec * dt) / 1000;
-        if (stripEl.scrollLeft >= maxScroll - 1) {
-          stripEl.scrollLeft = 0;
-        }
-        stripMarqueeRaf = requestAnimationFrame(tick);
-      }
-      stripMarqueeRaf = requestAnimationFrame(tick);
-    }
-
     scheduleAutoplay();
-    startStripMarquee();
 
     if (dock && urls.length > 1 && !prefersReduced) {
       const pause = () => {
         clearAutoplayTimer();
-        cancelStripMarquee();
       };
       const resume = () => {
         scheduleAutoplay();
-        startStripMarquee();
       };
       dock.addEventListener('mouseenter', pause);
       dock.addEventListener('mouseleave', resume);
@@ -523,8 +490,8 @@
     document.body.classList.add('detail-open');
     lockViewport('detail');
 
-    const sheetInner = overlay.querySelector('.detail-sheet-inner');
-    if (sheetInner) sheetInner.scrollTop = 0;
+    const sheetScroll = overlay.querySelector('.detail-sheet-scroll');
+    if (sheetScroll) sheetScroll.scrollTop = 0;
 
     collectGalleryUrls(baseFolder, slug).then((urls) => {
       setupCarousel(detailHero, detailStrip, urls);
@@ -562,6 +529,11 @@
   let momentCards = [];
   let activeMomentIndex = 0;
 
+  function scrollMomentsPanelTop() {
+    const panel = momentsOverlay && momentsOverlay.querySelector('.moments-panel');
+    if (panel) panel.scrollTop = 0;
+  }
+
   function renderMoment(index) {
     if (!momentCards.length || !momentsImage || !momentsTitle || !momentsText || !momentsKicker || !momentsCount) return;
     activeMomentIndex = ((index % momentCards.length) + momentCards.length) % momentCards.length;
@@ -577,6 +549,7 @@
     momentsTitle.textContent = title;
     momentsText.textContent = 'A closer look at the atmosphere, plating rhythm, and visual language behind a Siler Chef evening.';
     momentsCount.textContent = `${String(activeMomentIndex + 1).padStart(2, '0')} / ${String(momentCards.length).padStart(2, '0')}`;
+    scrollMomentsPanelTop();
   }
 
   function setMomentsOpen(open, index) {
@@ -591,6 +564,7 @@
       momentsOverlay.setAttribute('aria-hidden', 'false');
       lockViewport('moments');
       requestAnimationFrame(() => {
+        scrollMomentsPanelTop();
         momentsOverlay.classList.add('is-open');
         if (momentsClose) momentsClose.focus();
       });
@@ -1294,6 +1268,7 @@
         preferredContact: fd.get('preferredContact') || 'any',
         guestCount: guestRaw === '' || guestRaw === null ? null : Number(guestRaw),
         cuisinePreference: fd.get('cuisinePreference') || '',
+        allergyFlags: fd.getAll('allergyFlag').map((v) => String(v || '').trim()),
         allergyNotes: fd.get('allergyNotes') || '',
         notes: fd.get('notes') || '',
       };
