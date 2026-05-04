@@ -1499,7 +1499,7 @@
     const capStill = section && section.querySelector('.cinematic-caption__still');
     if (!section || !video) return;
 
-    const videoUrl = new URL('images/video/chef-reel.mov', window.location.href).href;
+    const videoUrl = new URL('images/video/chef-reel.mp4', window.location.href).href;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
     let videoReady = false;
 
