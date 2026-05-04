@@ -138,9 +138,14 @@
   async function collectNumberedImages(basePath) {
     const found = [];
     let misses = 0;
-    for (let i = 1; i <= 40; i++) {
-      const candidate = `${basePath}/${pad2(i)}.jpg`;
-      const hit = await probeImage(candidate);
+    const extensions = ['jpg', 'jpeg', 'png', 'webp'];
+    for (let i = 1; i <= 80; i++) {
+      let hit = null;
+      for (const ext of extensions) {
+        const candidate = `${basePath}/${pad2(i)}.${ext}`;
+        hit = await probeImage(candidate);
+        if (hit) break;
+      }
       if (hit) {
         found.push(hit);
         misses = 0;
@@ -155,18 +160,30 @@
   }
 
   async function collectGalleryUrls(baseFolder, slug) {
+    const copy = getCopy('cuisine', slug) || getCopy('service', slug);
     const base = `${baseFolder}/${slug}`;
     const found = [];
-    const hero = await probeImage(`${base}/hero.jpg`);
-    if (hero) found.push(hero);
-
+    if (copy && Array.isArray(copy.blocks) && copy.blocks.length) {
+      for (const block of copy.blocks) {
+        const raw = typeof block.image === 'string' ? block.image.trim() : '';
+        if (!raw) continue;
+        const hit = /^https?:\/\//i.test(raw) ? raw : await probeImage(raw);
+        if (hit) found.push(hit);
+      }
+      if (found.length) {
+        return [...new Set(found)];
+      }
+    }
     const fromGallery = await collectNumberedImages(`${base}/gallery`);
     fromGallery.forEach((u) => found.push(u));
 
-    if (found.length <= (hero ? 1 : 0)) {
+    if (!found.length) {
       const fromLegacy = await collectNumberedImages(base);
       fromLegacy.forEach((u) => found.push(u));
     }
+
+    const hero = (await probeImage(`${base}/hero.jpg`)) || (await probeImage(`${base}/hero.jpeg`));
+    if (hero) found.push(hero);
 
     return [...new Set(found)];
   }
@@ -335,10 +352,20 @@
     }
 
     let currentIdx = 0;
+    const lightboxItems = urls.map((url, idx) => ({
+      src: url,
+      alt: `Gallery image ${idx + 1}`,
+      kicker: detailKicker && detailKicker.textContent ? detailKicker.textContent : 'Gallery moment',
+      title: detailTitle && detailTitle.textContent ? `${detailTitle.textContent} · Image ${idx + 1}` : `Gallery image ${idx + 1}`,
+      text: detailIntro && detailIntro.textContent ? detailIntro.textContent : 'A closer look at this menu direction and its visual language.',
+    }));
 
     const prefersReduced =
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const prefersTapToZoom =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(pointer: coarse)').matches;
 
     function scheduleAutoplay() {
       clearAutoplayTimer();
@@ -366,6 +393,9 @@
       }
     }
 
+    heroEl.style.cursor = 'zoom-in';
+    heroEl.onclick = () => openMomentsLightbox(lightboxItems, currentIdx);
+
     urls.forEach((url, idx) => {
       const b = document.createElement('button');
       b.type = 'button';
@@ -379,8 +409,26 @@
       im.sizes = '124px';
       b.appendChild(im);
       b.addEventListener('click', () => {
+        if (prefersTapToZoom) {
+          openMomentsLightbox(lightboxItems, idx);
+          return;
+        }
+        if (currentIdx === idx) {
+          openMomentsLightbox(lightboxItems, idx);
+          return;
+        }
         goToIndex(idx, true);
         scheduleAutoplay();
+      });
+      b.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          if (currentIdx === idx) {
+            openMomentsLightbox(lightboxItems, idx);
+            return;
+          }
+          goToIndex(idx, true);
+        }
       });
       stripEl.appendChild(b);
     });
@@ -528,6 +576,24 @@
   let momentsHideTimer = null;
   let momentCards = [];
   let activeMomentIndex = 0;
+  let activeMomentItems = [];
+
+  function buildMomentItemFromCard(card) {
+    const img = card.querySelector('img');
+    return {
+      src: card.getAttribute('data-moment-src') || (img && img.getAttribute('src')) || '',
+      alt: card.getAttribute('data-moment-alt') || (img && img.getAttribute('alt')) || '',
+      kicker: card.getAttribute('data-moment-kicker') || 'Gallery moment',
+      title: card.getAttribute('data-moment-title') || (img && img.getAttribute('alt')) || 'Moment',
+      text: 'A closer look at the atmosphere, plating rhythm, and visual language behind a Siler Chef evening.',
+    };
+  }
+
+  function openMomentsLightbox(items, index) {
+    if (!Array.isArray(items) || !items.length || !momentsOverlay) return;
+    activeMomentItems = items;
+    setMomentsOpen(true, index);
+  }
 
   function scrollMomentsPanelTop() {
     const panel = momentsOverlay && momentsOverlay.querySelector('.moments-panel');
@@ -535,20 +601,27 @@
   }
 
   function renderMoment(index) {
-    if (!momentCards.length || !momentsImage || !momentsTitle || !momentsText || !momentsKicker || !momentsCount) return;
-    activeMomentIndex = ((index % momentCards.length) + momentCards.length) % momentCards.length;
-    const card = momentCards[activeMomentIndex];
-    const img = card.querySelector('img');
-    const src = card.getAttribute('data-moment-src') || (img && img.getAttribute('src')) || '';
-    const alt = card.getAttribute('data-moment-alt') || (img && img.getAttribute('alt')) || '';
-    const kicker = card.getAttribute('data-moment-kicker') || 'Gallery moment';
-    const title = card.getAttribute('data-moment-title') || alt || `Moment ${activeMomentIndex + 1}`;
+    if (!momentsImage || !momentsTitle || !momentsText || !momentsKicker || !momentsCount) return;
+    const items =
+      Array.isArray(activeMomentItems) && activeMomentItems.length
+        ? activeMomentItems
+        : momentCards.map(buildMomentItemFromCard);
+    if (!items.length) return;
+    activeMomentIndex = ((index % items.length) + items.length) % items.length;
+    const item = items[activeMomentIndex];
+    const src = item.src || '';
+    const alt = item.alt || '';
+    const kicker = item.kicker || 'Gallery moment';
+    const title = item.title || alt || `Moment ${activeMomentIndex + 1}`;
+    const text =
+      item.text ||
+      'A closer look at the atmosphere, plating rhythm, and visual language behind a Siler Chef evening.';
     momentsImage.src = src;
     momentsImage.alt = alt || title;
     momentsKicker.textContent = kicker;
     momentsTitle.textContent = title;
-    momentsText.textContent = 'A closer look at the atmosphere, plating rhythm, and visual language behind a Siler Chef evening.';
-    momentsCount.textContent = `${String(activeMomentIndex + 1).padStart(2, '0')} / ${String(momentCards.length).padStart(2, '0')}`;
+    momentsText.textContent = text;
+    momentsCount.textContent = `${String(activeMomentIndex + 1).padStart(2, '0')} / ${String(items.length).padStart(2, '0')}`;
     scrollMomentsPanelTop();
   }
 
@@ -574,6 +647,7 @@
     momentsOverlay.setAttribute('aria-hidden', 'true');
     momentsHideTimer = window.setTimeout(() => {
       momentsOverlay.hidden = true;
+      activeMomentItems = [];
       unlockViewport('moments');
       momentsHideTimer = null;
     }, 240);

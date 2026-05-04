@@ -1309,6 +1309,12 @@ final class Repository
             $content['site']['contact']['subtitle'] =
                 'Chef Siler · Reno, Nevada - serving Reno, Lake Tahoe, and the Bay Area.';
         }
+        if (in_array(($content['site']['contact']['facebookHref'] ?? ''), [
+            'https://www.facebook.com/silerchef',
+            'https://www.facebook.com/people/Siler-Chef',
+        ], true)) {
+            $content['site']['contact']['facebookHref'] = 'https://www.facebook.com/share/1Eea7fQpfV/?mibextid=wwXIfr';
+        }
 
         $occasionStat = (string) ($content['site']['stats']['occasionArchetypes'] ?? '');
         if ($occasionStat === '' || $occasionStat === '5') {
