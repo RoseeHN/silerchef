@@ -170,9 +170,6 @@
         const hit = /^https?:\/\//i.test(raw) ? raw : await probeImage(raw);
         if (hit) found.push(hit);
       }
-      if (found.length) {
-        return [...new Set(found)];
-      }
     }
     const fromGallery = await collectNumberedImages(`${base}/gallery`);
     fromGallery.forEach((u) => found.push(u));
