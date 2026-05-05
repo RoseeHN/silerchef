@@ -1296,7 +1296,25 @@ final class Repository
         }
         if (($content['site']['booking']['steps'][0]['body'] ?? '') === 'Share your event date, guest count, cuisine choice, and location.') {
             $content['site']['booking']['steps'][0]['body'] =
-                'Choose a date at least 2 days out, then send your location, guest count, cuisine, and dietary notes.';
+                'Choose a date at least 2 days out, then share your location, guest count, cuisine style, and dietary notes.';
+        }
+        if (($content['site']['booking']['steps'][1]['title'] ?? '') === 'We follow up') {
+            $content['site']['booking']['steps'][1]['title'] = 'We review the brief';
+        }
+        if (($content['site']['booking']['steps'][1]['body'] ?? '') === 'Our team reaches out by phone, email, or WhatsApp to confirm the fit.') {
+            $content['site']['booking']['steps'][1]['body'] =
+                'Chef Siler' . "\u{2019}" . 's team reviews the request and comes back with the right next step.';
+        }
+        if (($content['site']['booking']['steps'][2]['title'] ?? '') === 'Menu direction') {
+            $content['site']['booking']['steps'][2]['title'] = 'We shape the experience';
+        }
+        if (($content['site']['booking']['steps'][2]['body'] ?? '') === 'Chef Siler shapes the service flow and menu around your event.') {
+            $content['site']['booking']['steps'][2]['body'] =
+                'Menu direction, pacing, and service style are then tailored around your occasion.';
+        }
+        if (($content['site']['booking']['formSub'] ?? '') === 'Everything below goes directly to the private reservation dashboard.') {
+            $content['site']['booking']['formSub'] =
+                'Share the essentials below and Chef Siler' . "\u{2019}" . 's team will review your request and follow up personally.';
         }
         if (($content['site']['booking']['successText'] ?? '') === $legacyBookingSuccess) {
             $content['site']['booking']['successText'] =

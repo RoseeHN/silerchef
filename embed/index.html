@@ -1262,16 +1262,16 @@
             <form id="booking-form" class="booking-form" novalidate>
               <div class="booking-form__card">
                 <div class="booking-form__head">
-                  <p class="booking-form__eyebrow">Request details</p>
-                  <p id="booking-form-sub" class="booking-form__sub">Everything below goes directly to the private reservation dashboard.</p>
+                  <p class="booking-form__eyebrow">Reservation request</p>
+                  <p id="booking-form-sub" class="booking-form__sub">Share the essentials below and Chef Siler’s team will review your request and follow up personally.</p>
                 </div>
                 <label class="booking-field">
-                  <span>Event date</span>
+                  <span>Preferred event date</span>
                   <input name="preferredDate" type="date" required />
                 </label>
                 <label class="booking-field">
-                  <span>Location</span>
-                  <input name="eventLocation" type="text" required autocomplete="address-level2" maxlength="160" placeholder="Reno, NV or venue address" />
+                  <span>Event location</span>
+                  <input name="eventLocation" type="text" required autocomplete="address-level2" maxlength="160" placeholder="Home address or venue in Reno, Tahoe, or the Bay Area" />
                 </label>
                 <div class="booking-form__row booking-form__row--split">
                   <label class="booking-field">
@@ -1279,9 +1279,9 @@
                     <input name="guestCount" type="number" min="1" max="99" value="2" required />
                   </label>
                   <label class="booking-field">
-                    <span>Cuisine / concept</span>
+                    <span>Cuisine style</span>
                     <select name="cuisinePreference" required>
-                      <option value="">Select a cuisine</option>
+                      <option value="">Select a cuisine style</option>
                       <option value="American Cuisine">American Cuisine</option>
                       <option value="Italian Cuisine">Italian Cuisine</option>
                       <option value="Greek Cuisine">Greek Cuisine</option>
@@ -1293,7 +1293,7 @@
                 </div>
                 <div class="booking-field booking-field--allergens">
                   <span>Allergies &amp; intolerances</span>
-                  <p class="booking-allergy-hint">Select anything that must stay off the menu, then add any severity or extra detail below.</p>
+                  <p class="booking-allergy-hint">Flag anything that must stay off the menu, then share severity or substitution notes below.</p>
                   <div class="booking-allergy-grid" role="group" aria-label="Common allergens">
                     <label class="booking-allergy-label"
                       ><input type="checkbox" name="allergyFlag" value="dairy" /> Dairy / milk</label
@@ -1327,12 +1327,12 @@
                     name="allergyNotes"
                     rows="3"
                     maxlength="1200"
-                    placeholder="Tell us what should be avoided and how strict the allergy or intolerance is."
+                    placeholder="For example: shellfish allergy, dairy intolerance, no pork, gluten sensitivity."
                   ></textarea>
                 </label>
                 <label class="booking-field">
-                  <span>Description</span>
-                  <textarea name="notes" rows="3" maxlength="2000" placeholder="Tell us about the event, venue, style of service, and anything else we should know."></textarea>
+                  <span>Event details</span>
+                  <textarea name="notes" rows="3" maxlength="2000" placeholder="Tell us about the occasion, service style, venue notes, timing, or anything else we should know."></textarea>
                 </label>
                 <div class="booking-form__row booking-form__row--split">
                   <label class="booking-field">
@@ -1345,12 +1345,12 @@
                   </label>
                 </div>
                 <label class="booking-field">
-                  <span>Phone</span>
+                  <span>Best phone number</span>
                   <input name="phone" type="tel" required autocomplete="tel" placeholder="+1 (775) …" maxlength="40" />
                 </label>
                 <label class="booking-field">
-                  <span>Email</span>
-                  <input name="email" type="email" autocomplete="email" maxlength="320" />
+                  <span>Email address</span>
+                  <input name="email" type="email" autocomplete="email" maxlength="320" placeholder="name@example.com" />
                 </label>
                 <input name="preferredContact" type="hidden" value="any" />
                 <input name="preferredTime" type="hidden" value="" />
@@ -1366,7 +1366,7 @@
                     href="https://wa.me/17753896677"
                     target="_blank"
                     rel="noopener noreferrer"
-                    >Need a faster reply? Message us on WhatsApp.</a
+                    >Need a faster reply? Message Chef Siler on WhatsApp.</a
                   >
                 </p>
               </div>

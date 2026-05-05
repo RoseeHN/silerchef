@@ -144,18 +144,18 @@
       "steps": [
         {
           "title": "Send the request",
-          "body": "Choose a date at least 2 days out, then send your location, guest count, cuisine, and dietary notes."
+          "body": "Choose a date at least 2 days out, then share your location, guest count, cuisine style, and dietary notes."
         },
         {
-          "title": "We follow up",
-          "body": "Our team reaches out by phone, email, or WhatsApp to confirm the fit."
+          "title": "We review the brief",
+          "body": "Chef Siler’s team reviews the request and comes back with the right next step."
         },
         {
-          "title": "Menu direction",
-          "body": "Chef Siler shapes the service flow and menu around your event."
+          "title": "We shape the experience",
+          "body": "Menu direction, pacing, and service style are then tailored around your occasion."
         }
       ],
-      "formSub": "Everything below goes directly to the private reservation dashboard.",
+      "formSub": "Share the essentials below and Chef Siler’s team will review your request and follow up personally.",
       "successTitle": "Talebiniz alınmıştır.",
       "successText": "En kısa sürede tarafınızla iletişime geçilecektir.",
       "fallbackUrl": "https://wa.me/17753896677",
