@@ -3,35 +3,35 @@
     "hero": {
       "headline": "SilerChef: Global Flavors, Happy Tables, Unforgettable Moments.",
       "tagline": "Reno · Tahoe · Bay Area · Luxury in-home experiences",
-      "lede": "For hosts who want more than dinner, Siler Chef designs globally inspired menus, refined plating, and an effortless service flow that turns home entertaining into a true occasion.",
+      "lede": "Bringing the world’s most exquisite cuisines to your home for your most special occasions. Experience a unique fusion of professional culinary mastery and the joy of gathering together.",
       "floatingNorthEyebrow": "Chef-led private dining",
       "floatingNorthTitle": "Restaurant-level presence. At your table.",
       "floatingSouthEyebrow": "What’s included",
-      "floatingSouthTitle": "Custom menu arc, sourcing, service rhythm, and a polished finish",
+      "floatingSouthTitle": "Professional culinary mastery, global menus, and warm hospitality at home.",
       "proofChips": [
         "Luxury private chef dining",
         "Plated or family-style service",
         "Reno · Tahoe · Bay Area"
       ],
       "miniPrimaryEyebrow": "Why it lands",
-      "miniPrimaryTitle": "This feels like bringing the best seat in the city into your home.",
+      "miniPrimaryTitle": "A globally inspired chef experience designed for the nights your guests remember.",
       "miniSecondaryEyebrow": "Best for",
-      "miniSecondaryTitle": "Anniversaries, executive dinners, birthdays, and nights that deserve a real statement."
+      "miniSecondaryTitle": "Private dinners, celebrations, and chef-led tables with real five-star discipline."
     },
     "quote": {
       "text": "Every menu is a conversation - between season, setting, and the people at your table.",
       "cite": "Chef Siler"
     },
     "experience": {
-      "featuredEyebrow": "The Siler Difference",
-      "featuredTitle": "Not catering. A chef-led evening that changes the room.",
-      "featuredBody": "The strongest private-chef experiences feel cinematic from the first arrival bite to the last dessert finish. Siler Chef is built for hosts who want atmosphere, polish, and a night guests talk about after they leave.",
-      "hostingEyebrow": "Hosting payoff",
-      "hostingTitle": "High-touch, low-stress entertaining",
-      "hostingBody": "You keep the intimacy of home while the menu, pacing, and presentation carry the luxury.",
-      "guestEyebrow": "Guest impression",
-      "guestTitle": "A statement dinner with real personality",
-      "guestBody": "Global menus, elegant plating, and a custom rhythm designed around your occasion instead of a generic package."
+      "featuredEyebrow": "The invitation",
+      "featuredTitle": "Bringing the world’s most exquisite cuisines home.",
+      "featuredBody": "Siler Chef blends professional culinary mastery with the warmth and joy of gathering together, creating refined private dining for your most special occasions.",
+      "hostingEyebrow": "What hosts feel",
+      "hostingTitle": "A calm, polished evening",
+      "hostingBody": "Every course, timing choice, and guest touchpoint is designed to feel elevated without feeling stiff.",
+      "guestEyebrow": "What guests remember",
+      "guestTitle": "Global flavors, unforgettable moments",
+      "guestBody": "Menus carry international perspective, beautiful restraint, and the kind of finish people talk about after the night ends."
     },
     "pillars": [
       {
@@ -183,6 +183,30 @@
       "yelpHref": "https://www.yelp.com/biz/siler-chef-reno",
       "whatsappHref": "",
       "facebookHref": "https://www.facebook.com/share/1Eea7fQpfV/?mibextid=wwXIfr"
+    },
+    "chefStory": {
+      "eyebrow": "About the Chef",
+      "title": "Fikret Siler",
+      "subtitle": "Global Heritage, Local Expertise",
+      "intro": "My culinary journey began over a decade ago in the heart of Istanbul’s world-class hospitality scene. I refined my craft at some of the most prestigious institutions in the world, including the Ritz Carlton, Raffles Hotel, and the Four Seasons Bosphorus - a destination currently featured in the Michelin Guide. These high-pressure, five-star environments instilled in me a deep commitment to culinary discipline and precision.",
+      "craft": "My vision was truly shaped during an eight-year tenure at the legendary Vakko Patisserie. For two years, I had the rare honor of working alongside Chef Philippe Chatelain, recipient of the 1997 Meilleur Ouvrier de France (MOF) - the highest recognition for craftsmanship in France. Following this, I spent six years under the mentorship of Executive Coordinator Ghislain Gaille, a back-to-back Gault & Millau Golden Spoon winner. Under their guidance, I mastered the delicate balance of French pastry arts and the relentless pursuit of aesthetic perfection.",
+      "local": "In 2021, I brought this global heritage to Reno, Nevada. To bridge my international experience with the local community, I am currently finalizing my Associate Degree in Culinary Arts at Truckee Meadows Community College (TMCC). My professional path in Northern Nevada has included key roles at the Grand Sierra Resort, Edelweiss Pub as Pastry Chef, and my current position as Sous Chef at Butcher’s Kitchen Char B Que.",
+      "signature": "Through Siler Chef LLC, I offer a unique culinary synthesis: the refined techniques of MOF-trained masters, the meticulous standards of Michelin-caliber kitchens, and a deep appreciation for Reno’s local flavors. I do not just prepare a meal; I curate a five-star dining experience brought directly to your table.",
+      "closing": "Experience the artistry of a global chef, tailored for your kitchen.",
+      "stats": [
+        {
+          "label": "Istanbul foundation",
+          "value": "10+ years"
+        },
+        {
+          "label": "Vakko Patisserie",
+          "value": "8-year tenure"
+        },
+        {
+          "label": "Northern Nevada",
+          "value": "Since 2021"
+        }
+      ]
     }
   },
   "cuisineCards": [

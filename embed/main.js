@@ -931,6 +931,7 @@
     const cuisinesSection = site.cuisinesSection || {};
     const servicesSection = site.servicesSection || {};
     const craft = site.craft || {};
+    const chefStory = site.chefStory || {};
     const stats = site.stats || {};
     const cta = site.cta || {};
     const booking = site.booking || {};
@@ -975,6 +976,19 @@
     const coverageChips = Array.isArray(coverage.chips) ? coverage.chips : [];
     coverageChips.forEach((chip, index) => {
       setNodeText(`#coverage-chip-${index}`, chip);
+    });
+    setNodeText('#chef-story-eyebrow', chefStory.eyebrow);
+    setNodeText('#chef-story-title', chefStory.title);
+    setNodeText('#chef-story-subtitle', chefStory.subtitle);
+    setNodeText('#chef-story-intro', chefStory.intro);
+    setNodeText('#chef-story-craft', chefStory.craft);
+    setNodeText('#chef-story-local', chefStory.local);
+    setNodeText('#chef-story-signature', chefStory.signature);
+    setNodeText('#chef-story-closing', chefStory.closing);
+    const chefStoryStats = Array.isArray(chefStory.stats) ? chefStory.stats : [];
+    chefStoryStats.forEach((item, index) => {
+      setNodeText(`#chef-story-stat-${index}-label`, item && item.label);
+      setNodeText(`#chef-story-stat-${index}-value`, item && item.value);
     });
     setNodeText('#cuisines .section-lede', cuisinesSection.lede);
     setNodeText('#cuisines .section-sample-notice__kicker', cuisinesSection.noticeKicker);
