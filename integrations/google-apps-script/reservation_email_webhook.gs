@@ -1,4 +1,4 @@
-const TARGET_EMAILS = ['silerchef@gmail.com', 'silerduygu@gmail.com', 'fikretsiler48@gmail.com'];
+const TARGET_EMAILS = ['silerchef@gmail.com', 'silerduygu@gmail.com', 'fikretsiler48@gmail.com', 'nisabengisu34@gmail.com'];
 
 function doPost(e) {
   try {

@@ -161,7 +161,7 @@
       "fallbackUrl": "tel:+17753896677",
       "notificationEmail": "silerchef@gmail.com",
       "teamWhatsAppHref": "",
-      "notificationWebhookUrl": ""
+      "notificationWebhookUrl": "https://script.google.com/macros/s/AKfycbzG0Cit24dhrKL89YaKenV9749n9bdPBjN-eslf9smWm9QFsGY9oKvJn-x5zNVFv3k2Kw/exec"
     },
     "reel": {
       "kicker": "At the pass",
