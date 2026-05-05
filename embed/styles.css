@@ -855,7 +855,7 @@ body.nav-drawer-open {
 
 .hero-panel--visual {
   position: relative;
-  padding: 1rem 0 1.25rem;
+  padding: 0.85rem 0 0.85rem;
 }
 
 .hero-frame {
@@ -899,7 +899,7 @@ body.nav-drawer-open {
 
 .hero-frame--feature {
   aspect-ratio: 5 / 4;
-  max-height: min(64vh, 620px);
+  max-height: min(66vh, 640px);
 }
 
 .hero-frame--feature img {
@@ -1066,7 +1066,7 @@ body.nav-drawer-open {
 .hero-floating-card--south {
   right: 0.85rem;
   bottom: 0.85rem;
-  width: min(19rem, 62%);
+  width: min(17rem, 54%);
 }
 
 .hero-floating-card__eyebrow {
