@@ -93,7 +93,7 @@
     },
     "cta": {
       "headline": "Hold your night on the calendar",
-      "summary": "Choose a time, tell us about your occasion, and your request will land in the reservation desk for follow-up by phone, email, or WhatsApp."
+      "summary": "Choose a date, tell us about your occasion, and your request will land in the reservation desk for follow-up by phone or email."
     },
     "faq": {
       "eyebrow": "Questions clients already ask",
@@ -108,7 +108,7 @@
         {
           "eyebrow": "Reservation flow",
           "title": "How do reservation requests work?",
-          "body": "Guests send their event date, guest count, event location, preferred cuisine, and any dietary notes. The request goes into the private reservation dashboard, and follow-up happens by phone, email, or WhatsApp."
+          "body": "Guests send their event date, guest count, event location, preferred cuisine, and any dietary notes. The request goes into the private reservation dashboard, and follow-up happens by phone or email."
         },
         {
           "eyebrow": "Menus",
@@ -135,7 +135,7 @@
     "booking": {
       "kicker": "Reservation desk",
       "title": "Reserve your date",
-      "lede": "Tell us about your table - your request goes straight into the Siler Chef reservation desk, then we follow up by phone, email, or WhatsApp.",
+      "lede": "Tell us about your table - your request goes straight into the Siler Chef reservation desk, then we follow up by phone or email.",
       "highlights": [
         "Private chef planning",
         "Fast follow-up",
@@ -158,9 +158,9 @@
       "formSub": "Share the essentials below and Chef Siler’s team will review your request and follow up personally.",
       "successTitle": "Request received.",
       "successText": "Chef Siler’s team will review your request and contact you as soon as possible.",
-      "fallbackUrl": "https://wa.me/17753896677",
+      "fallbackUrl": "tel:+17753896677",
       "notificationEmail": "silerchef@gmail.com",
-      "teamWhatsAppHref": "https://wa.me/17753896677",
+      "teamWhatsAppHref": "",
       "notificationWebhookUrl": ""
     },
     "reel": {
@@ -181,7 +181,7 @@
       "location": "Reno, Nevada, USA",
       "instagramHref": "https://www.instagram.com/silerchef",
       "yelpHref": "https://www.yelp.com/biz/siler-chef-reno",
-      "whatsappHref": "https://wa.me/17753896677",
+      "whatsappHref": "",
       "facebookHref": "https://www.facebook.com/share/1Eea7fQpfV/?mibextid=wwXIfr"
     }
   },

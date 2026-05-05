@@ -1288,11 +1288,11 @@ final class Repository
         }
         if (($content['site']['cta']['summary'] ?? '') === $legacyCtaSummary) {
             $content['site']['cta']['summary'] =
-                'Choose a time, tell us about your occasion, and your request will land in the reservation desk for follow-up by phone, email, or WhatsApp.';
+                'Choose a date, tell us about your occasion, and your request will land in the reservation desk for follow-up by phone or email.';
         }
         if (($content['site']['booking']['lede'] ?? '') === $legacyBookingLede) {
             $content['site']['booking']['lede'] =
-                'Tell us about your table - your request goes straight into the Siler Chef reservation desk, then we follow up by phone, email, or WhatsApp.';
+                'Tell us about your table - your request goes straight into the Siler Chef reservation desk, then we follow up by phone or email.';
         }
         if (($content['site']['booking']['steps'][0]['body'] ?? '') === 'Share your event date, guest count, cuisine choice, and location.') {
             $content['site']['booking']['steps'][0]['body'] =
@@ -1340,15 +1340,23 @@ final class Repository
         }
 
         $fallbackUrl = trim((string) ($content['site']['booking']['fallbackUrl'] ?? ''));
+        $phoneHref = trim((string) ($content['site']['contact']['phoneHref'] ?? ''));
         $whatsAppUrl = trim((string) ($content['site']['contact']['whatsappHref'] ?? ''));
-        if ($fallbackUrl === '' || str_contains($fallbackUrl, '/book-online')) {
-            $content['site']['booking']['fallbackUrl'] = $whatsAppUrl !== '' ? $whatsAppUrl : '#contact';
+        if (
+            $fallbackUrl === ''
+            || str_contains($fallbackUrl, '/book-online')
+            || str_contains($fallbackUrl, 'wa.me')
+        ) {
+            $content['site']['booking']['fallbackUrl'] = $phoneHref !== '' ? $phoneHref : '#contact';
         }
         if (trim((string) ($content['site']['booking']['notificationEmail'] ?? '')) === '') {
             $content['site']['booking']['notificationEmail'] = trim((string) ($content['site']['contact']['email'] ?? ''));
         }
-        if (trim((string) ($content['site']['booking']['teamWhatsAppHref'] ?? '')) === '') {
-            $content['site']['booking']['teamWhatsAppHref'] = $whatsAppUrl;
+        if (str_contains(trim((string) ($content['site']['booking']['teamWhatsAppHref'] ?? '')), 'wa.me')) {
+            $content['site']['booking']['teamWhatsAppHref'] = '';
+        }
+        if (str_contains($whatsAppUrl, 'wa.me')) {
+            $content['site']['contact']['whatsappHref'] = '';
         }
         $content['site']['booking']['notificationWebhookUrl'] = trim((string) ($content['site']['booking']['notificationWebhookUrl'] ?? ''));
 

@@ -62,7 +62,7 @@ function route_api(string $path, string $method, Repository $repository, AdminAu
         $cta = $content['site']['cta'] ?? [];
         json_response(
             [
-                'url' => $booking['fallbackUrl'] ?? (($content['site']['contact']['whatsappHref'] ?? '') ?: '#contact'),
+                'url' => $booking['fallbackUrl'] ?? (($content['site']['contact']['phoneHref'] ?? '') ?: '#contact'),
                 'headline' => $cta['headline'] ?? ($booking['title'] ?? 'Reserve your date'),
                 'summary' => $cta['summary'] ?? ($booking['lede'] ?? 'Tell us about your table and we will confirm from our reservation desk.'),
             ]

@@ -1048,7 +1048,6 @@
     const contactSocialMap = {
       instagram: contact.instagramHref,
       yelp: contact.yelpHref,
-      whatsapp: contact.whatsappHref,
       facebook: contact.facebookHref,
     };
     document.querySelectorAll('a[data-contact-social]').forEach((el) => {
@@ -1459,7 +1458,7 @@
           const msg =
             (typeof data.detail === 'string' && data.detail) ||
             (typeof data.error === 'string' && data.error) ||
-            'Something went wrong. Try again or message us on WhatsApp below.';
+            'Something went wrong. Try again or call us directly below.';
           setBookingSubmitting(false);
           showBookingError(msg);
           return;
@@ -1519,24 +1518,6 @@
     });
   });
 
-  document.querySelectorAll('.social-tile--whatsapp').forEach((el) => {
-    el.addEventListener('click', () => {
-      trackEvent('whatsapp_click', {
-        placement: 'contact_social',
-        label: 'WhatsApp social tile',
-      });
-    });
-  });
-
-  document.querySelectorAll('.whatsapp-fab').forEach((el) => {
-    el.addEventListener('click', () => {
-      trackEvent('whatsapp_click', {
-        placement: 'floating_dock',
-        label: 'WhatsApp floating dock',
-      });
-    });
-  });
-
   document.querySelectorAll('a[href^="tel:"]').forEach((el) => {
     el.addEventListener('click', () => {
       trackEvent('contact_click', {
@@ -1560,9 +1541,10 @@
   const bookingFallbackLink = document.getElementById('booking-fallback-link');
   if (bookingFallbackLink) {
     bookingFallbackLink.addEventListener('click', () => {
-      trackEvent('whatsapp_click', {
+      trackEvent('contact_click', {
         placement: 'booking_fallback',
-        label: 'Booking fallback link',
+        target: 'phone',
+        label: 'Booking fallback phone',
       });
     });
   }
