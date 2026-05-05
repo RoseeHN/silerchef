@@ -1251,6 +1251,13 @@
     dateInput.min = getMinBookingDateValue(3);
   }
 
+  function syncBookingDateState() {
+    const dateField = bookingForm && bookingForm.querySelector('.booking-field--date');
+    const dateInput = bookingForm && bookingForm.querySelector('input[name="preferredDate"]');
+    if (!dateField || !dateInput) return;
+    dateField.classList.toggle('is-filled', !!dateInput.value);
+  }
+
   function resetBookingState() {
     if (!bookingForm || !bookingSuccess || !bookingError) return;
     if (bookingOverlay) bookingOverlay.classList.remove('is-success');
@@ -1276,9 +1283,18 @@
         'Chef Siler’s team will review your request and contact you as soon as possible.';
     }
     applyBookingDateRules();
+    syncBookingDateState();
     setBookingSubmitting(false);
   }
   applyBookingDateRules();
+  syncBookingDateState();
+
+  const bookingDateInput = bookingForm && bookingForm.querySelector('input[name="preferredDate"]');
+  if (bookingDateInput) {
+    ['input', 'change', 'blur'].forEach((eventName) => {
+      bookingDateInput.addEventListener(eventName, syncBookingDateState);
+    });
+  }
 
   function setBookingSubmitting(isSubmitting) {
     if (!bookingSubmitBtn) return;

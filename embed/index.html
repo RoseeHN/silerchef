@@ -1265,9 +1265,12 @@
                   <p class="booking-form__eyebrow">Reservation request</p>
                   <p id="booking-form-sub" class="booking-form__sub">Share the essentials below and Chef Siler’s team will review your request and follow up personally.</p>
                 </div>
-                <label class="booking-field">
+                <label class="booking-field booking-field--date">
                   <span>Preferred event date</span>
-                  <input name="preferredDate" type="date" required />
+                  <div class="booking-date-shell">
+                    <input name="preferredDate" type="date" required />
+                    <span class="booking-date-placeholder" aria-hidden="true">Select your event date</span>
+                  </div>
                 </label>
                 <div class="booking-form__row booking-form__row--split">
                   <label class="booking-field">

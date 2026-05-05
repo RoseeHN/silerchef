@@ -2838,6 +2838,10 @@ body.scroll-locked {
   color: rgba(243, 234, 209, 0.55);
 }
 
+.booking-date-shell {
+  position: relative;
+}
+
 .booking-field input,
 .booking-field select,
 .booking-field textarea {
@@ -2855,6 +2859,39 @@ body.scroll-locked {
     border-color 0.2s var(--ease),
     box-shadow 0.2s var(--ease),
     transform 0.2s var(--ease);
+}
+
+.booking-field--date input {
+  position: relative;
+  z-index: 1;
+}
+
+.booking-date-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding: 0.72rem 0.82rem;
+  color: rgba(243, 234, 209, 0.42);
+  font-size: 0.94rem;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  pointer-events: none;
+  transition: opacity 0.18s var(--ease);
+}
+
+.booking-field--date.is-filled .booking-date-placeholder,
+.booking-field--date:focus-within .booking-date-placeholder {
+  opacity: 0;
+}
+
+.booking-field--date:not(.is-filled) input::-webkit-datetime-edit {
+  color: transparent;
+}
+
+.booking-field--date:focus-within input::-webkit-datetime-edit,
+.booking-field--date.is-filled input::-webkit-datetime-edit {
+  color: var(--text);
 }
 
 .booking-field input:focus,
