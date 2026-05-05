@@ -2909,19 +2909,21 @@ body.scroll-locked {
 }
 
 .booking-allergy-label {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 0.6rem;
   font-size: 0.82rem;
   text-transform: none;
   letter-spacing: 0.02em;
   font-weight: 450;
   color: rgba(243, 234, 209, 0.86);
   cursor: pointer;
+  line-height: 1.35;
 }
 
 .booking-allergy-label input {
-  margin-top: 0.2rem;
+  margin: 0;
   flex-shrink: 0;
   width: 1.05rem;
   height: 1.05rem;
