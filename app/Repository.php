@@ -655,7 +655,7 @@ final class Repository
                     CURLOPT_POSTFIELDS => $body,
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_CONNECTTIMEOUT => 4,
-                    CURLOPT_TIMEOUT => 8,
+                    CURLOPT_TIMEOUT => 15,
                     CURLOPT_HEADER => false,
                     CURLOPT_FOLLOWLOCATION => true,
                     CURLOPT_MAXREDIRS => 5,
@@ -676,7 +676,7 @@ final class Repository
                 'method' => 'POST',
                 'header' => implode("\r\n", $headers) . "\r\n",
                 'content' => $body,
-                'timeout' => 8,
+                'timeout' => 15,
                 'ignore_errors' => true,
                 'follow_location' => 1,
                 'max_redirects' => 5,
@@ -706,7 +706,7 @@ final class Repository
                     CURLOPT_POSTFIELDS => $body,
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_CONNECTTIMEOUT => 4,
-                    CURLOPT_TIMEOUT => 8,
+                    CURLOPT_TIMEOUT => 15,
                     CURLOPT_HEADER => false,
                 ]
             );
