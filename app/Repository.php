@@ -1318,10 +1318,10 @@ final class Repository
         }
         if (($content['site']['booking']['successText'] ?? '') === $legacyBookingSuccess) {
             $content['site']['booking']['successText'] =
-                'En kısa sürede tarafınızla iletişime geçilecektir.';
+                'We will be in touch with you as soon as possible.';
         }
         if (($content['site']['booking']['successTitle'] ?? '') === 'Thank you - your request is in.') {
-            $content['site']['booking']['successTitle'] = 'Talebiniz alınmıştır.';
+            $content['site']['booking']['successTitle'] = 'Request received.';
         }
         if (($content['site']['contact']['subtitle'] ?? '') === $legacyContactSubtitle) {
             $content['site']['contact']['subtitle'] =

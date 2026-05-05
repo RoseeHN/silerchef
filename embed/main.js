@@ -1269,7 +1269,7 @@
       bookingSuccessMeta.innerHTML = '';
     }
     if (bookingSuccessText) {
-      bookingSuccessText.textContent = 'En kısa sürede tarafınızla iletişime geçilecektir.';
+      bookingSuccessText.textContent = 'We will be in touch with you as soon as possible.';
     }
     applyBookingDateRules();
     setBookingSubmitting(false);
@@ -1457,7 +1457,7 @@
         bookingForm.hidden = true;
         if (bookingSuccess) bookingSuccess.hidden = false;
         if (bookingSuccessText) {
-          bookingSuccessText.textContent = 'En kısa sürede tarafınızla iletişime geçilecektir.';
+          bookingSuccessText.textContent = 'We will be in touch with you as soon as possible.';
         }
         renderSuccessMeta(data);
         const bookingBody = bookingOverlay && bookingOverlay.querySelector('.booking-panel__body');

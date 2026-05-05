@@ -156,8 +156,8 @@
         }
       ],
       "formSub": "Share the essentials below and Chef Siler’s team will review your request and follow up personally.",
-      "successTitle": "Talebiniz alınmıştır.",
-      "successText": "En kısa sürede tarafınızla iletişime geçilecektir.",
+      "successTitle": "Request received.",
+      "successText": "We will be in touch with you as soon as possible.",
       "fallbackUrl": "https://wa.me/17753896677",
       "notificationEmail": "silerchef@gmail.com",
       "teamWhatsAppHref": "https://wa.me/17753896677",
