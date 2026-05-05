@@ -657,6 +657,8 @@ final class Repository
                     CURLOPT_CONNECTTIMEOUT => 4,
                     CURLOPT_TIMEOUT => 8,
                     CURLOPT_HEADER => false,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_MAXREDIRS => 5,
                 ]
             );
             $response = curl_exec($ch);
@@ -676,6 +678,8 @@ final class Repository
                 'content' => $body,
                 'timeout' => 8,
                 'ignore_errors' => true,
+                'follow_location' => 1,
+                'max_redirects' => 5,
             ],
         ]);
         $response = @file_get_contents($url, false, $context);
