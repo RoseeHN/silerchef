@@ -1272,7 +1272,8 @@
       bookingSuccessMeta.innerHTML = '';
     }
     if (bookingSuccessText) {
-      bookingSuccessText.textContent = 'We will be in touch with you as soon as possible.';
+      bookingSuccessText.textContent =
+        'Chef Siler’s team will review your request and contact you as soon as possible.';
     }
     applyBookingDateRules();
     setBookingSubmitting(false);
@@ -1297,33 +1298,10 @@
     if (bookingBody) bookingBody.scrollTo({ top: bookingError.offsetTop - 24, behavior: 'smooth' });
   }
 
-  function formatAlertStatus(alert) {
-    const status = String((alert && alert.status) || '').toLowerCase();
-    if (status === 'sent' || status === 'saved') return 'ready';
-    if (status === 'configured') return 'ready';
-    if (status === 'queued') return 'queued';
-    if (status === 'skipped') return 'skipped';
-    if (status === 'unconfigured') return 'not configured yet';
-    if (status === 'failed') return 'needs setup';
-    return status || 'pending';
-  }
-
   function renderSuccessMeta(data) {
     if (!bookingSuccessMeta) return;
-    const alerts = data && typeof data === 'object' ? data.alerts || {} : {};
-    const items = [];
-    if (data && data.reservationId) {
-      items.push(`<p><strong>Reference:</strong> ${String(data.reservationId)}</p>`);
-    }
-    items.push('<p><strong>Dashboard:</strong> request saved successfully.</p>');
-    if (alerts.email) {
-      items.push(`<p><strong>Email alert:</strong> ${formatAlertStatus(alerts.email)}.</p>`);
-    }
-    if (alerts.teamWhatsApp) {
-      items.push(`<p><strong>WhatsApp alert:</strong> ${formatAlertStatus(alerts.teamWhatsApp)}.</p>`);
-    }
-    bookingSuccessMeta.innerHTML = items.join('');
-    bookingSuccessMeta.hidden = items.length === 0;
+    bookingSuccessMeta.innerHTML = '';
+    bookingSuccessMeta.hidden = true;
   }
 
   function setBookingOpen(open) {
@@ -1474,7 +1452,8 @@
         if (bookingOverlay) bookingOverlay.classList.add('is-success');
         if (bookingSuccess) bookingSuccess.hidden = false;
         if (bookingSuccessText) {
-          bookingSuccessText.textContent = 'We will be in touch with you as soon as possible.';
+          bookingSuccessText.textContent =
+            'Chef Siler’s team will review your request and contact you as soon as possible.';
         }
         renderSuccessMeta(data);
         const bookingBody = bookingOverlay && bookingOverlay.querySelector('.booking-panel__body');
