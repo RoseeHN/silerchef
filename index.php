@@ -95,9 +95,9 @@ function route_api(string $path, string $method, Repository $repository, AdminAu
             json_response(['error' => 'validation', 'detail' => 'Please add the event location, date, guest count, and preferred cuisine.'], 400);
         }
         $pacific = new DateTimeZone('America/Los_Angeles');
-        $minDate = (new DateTimeImmutable('today', $pacific))->modify('+2 days')->format('Y-m-d');
+        $minDate = (new DateTimeImmutable('today', $pacific))->modify('+3 days')->format('Y-m-d');
         if ($preferredDate < $minDate) {
-            json_response(['error' => 'validation', 'detail' => 'Please choose a date at least 2 days from today.'], 400);
+            json_response(['error' => 'validation', 'detail' => 'Please choose a date at least 3 days from today.'], 400);
         }
 
         $availability = $repository->getAvailability();

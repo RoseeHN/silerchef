@@ -1236,7 +1236,7 @@
   const bookingDoneBtn = bookingOverlay && bookingOverlay.querySelector('.booking-done');
   let bookingHideTimer = null;
 
-  function getMinBookingDateValue(offsetDays = 2) {
+  function getMinBookingDateValue(offsetDays = 3) {
     const now = new Date();
     const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offsetDays);
     const year = next.getFullYear();
@@ -1248,7 +1248,7 @@
   function applyBookingDateRules() {
     const dateInput = bookingForm && bookingForm.querySelector('input[name="preferredDate"]');
     if (!dateInput) return;
-    dateInput.min = getMinBookingDateValue(2);
+    dateInput.min = getMinBookingDateValue(3);
   }
 
   function resetBookingState() {
@@ -1342,12 +1342,20 @@
       });
       const bookingBody = bookingOverlay.querySelector('.booking-panel__body');
       if (bookingBody) bookingBody.scrollTop = 0;
-      const first = bookingForm && bookingForm.querySelector('input[name="firstName"]');
+      const bookingShell = bookingOverlay.querySelector('.booking-panel__shell');
+      if (bookingShell) bookingShell.scrollTop = 0;
+      const first = bookingForm && bookingForm.querySelector('input[name="preferredDate"]');
       requestAnimationFrame(() => {
         if (bookingPanel) bookingPanel.focus();
-        window.setTimeout(() => {
-          if (first) first.focus();
-        }, 140);
+        const shouldFocusField =
+          typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+            ? !window.matchMedia('(max-width: 780px)').matches
+            : true;
+        if (shouldFocusField) {
+          window.setTimeout(() => {
+            if (first) first.focus();
+          }, 140);
+        }
       });
       return;
     }
@@ -1431,10 +1439,10 @@
         showBookingError(blockedMsg);
         return;
       }
-      const minBookingDate = getMinBookingDateValue(2);
+      const minBookingDate = getMinBookingDateValue(3);
       if (payload.preferredDate && payload.preferredDate < minBookingDate) {
         setBookingSubmitting(false);
-        showBookingError('Please choose a date at least 2 days from today.');
+        showBookingError('Please choose a date at least 3 days from today.');
         return;
       }
       try {
