@@ -1273,7 +1273,7 @@ final class Repository
             ? $content['site']['hero']
             : [];
         if (($hero['headline'] ?? '') === $legacyHeroHeadline) {
-            $content['site']['hero']['headline'] = 'Private Chef Dining That Feels Like the Best Table in the City';
+            $content['site']['hero']['headline'] = 'SilerChef: Global Flavors, Happy Tables, Unforgettable Moments.';
         }
         if (($hero['tagline'] ?? '') === $legacyHeroTagline) {
             $content['site']['hero']['tagline'] = 'Reno · Tahoe · Bay Area · Luxury in-home experiences';
