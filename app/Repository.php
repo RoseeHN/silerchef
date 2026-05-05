@@ -749,14 +749,8 @@ final class Repository
             'Reservation ID: ' . (string) ($reservation['id'] ?? '-'),
             'Created at: ' . (string) ($reservation['createdAt'] ?? gmdate('c')),
             '',
-            'Guest: ' . trim(((string) ($customer['firstName'] ?? '')) . ' ' . ((string) ($customer['lastName'] ?? ''))),
-            'Email: ' . (((string) ($customer['email'] ?? '')) !== '' ? (string) $customer['email'] : '-'),
-            'Phone: ' . ((string) ($customer['phone'] ?? '') !== '' ? (string) $customer['phone'] : '-'),
-            'Event location: ' . ((string) ($request['eventLocation'] ?? '') !== '' ? (string) $request['eventLocation'] : '-'),
-            'Preferred contact: ' . ucfirst((string) ($request['preferredContact'] ?? 'any')),
-            '',
             'Preferred date: ' . ((string) ($request['preferredDate'] ?? '') !== '' ? (string) $request['preferredDate'] : '-'),
-            'Preferred time: ' . ((string) ($request['preferredTime'] ?? '') !== '' ? (string) $request['preferredTime'] : '-'),
+            'Event location: ' . ((string) ($request['eventLocation'] ?? '') !== '' ? (string) $request['eventLocation'] : '-'),
             'Guests: ' . ((string) ($request['guestCount'] ?? '') !== '' ? (string) $request['guestCount'] : '-'),
             'Cuisine: ' . ((string) ($request['cuisinePreference'] ?? '') !== '' ? (string) $request['cuisinePreference'] : '-'),
             'Allergies / intolerances: ' . ((string) ($request['allergyNotes'] ?? '') !== '' ? (string) $request['allergyNotes'] : '-'),
@@ -764,6 +758,9 @@ final class Repository
             'Notes:',
             ((string) ($request['notes'] ?? '') !== '' ? (string) $request['notes'] : '-'),
             '',
+            'Guest: ' . trim(((string) ($customer['firstName'] ?? '')) . ' ' . ((string) ($customer['lastName'] ?? ''))),
+            'Phone: ' . ((string) ($customer['phone'] ?? '') !== '' ? (string) $customer['phone'] : '-'),
+            'Email: ' . (((string) ($customer['email'] ?? '')) !== '' ? (string) $customer['email'] : '-'),
             'Open the Siler Chef admin panel to review and follow up.',
         ];
 
@@ -778,12 +775,13 @@ final class Repository
 
         $lines = [
             'New Siler Chef reservation request',
-            'Guest: ' . ($name !== '' ? $name : 'Guest request'),
             'Date: ' . (((string) ($request['preferredDate'] ?? '')) !== '' ? (string) $request['preferredDate'] : '-'),
-            'Time: ' . (((string) ($request['preferredTime'] ?? '')) !== '' ? (string) $request['preferredTime'] : '-'),
+            'Location: ' . (((string) ($request['eventLocation'] ?? '')) !== '' ? (string) $request['eventLocation'] : '-'),
             'Guests: ' . (((string) ($request['guestCount'] ?? '')) !== '' ? (string) $request['guestCount'] : '-'),
             'Cuisine: ' . (((string) ($request['cuisinePreference'] ?? '')) !== '' ? (string) $request['cuisinePreference'] : '-'),
-            'Location: ' . (((string) ($request['eventLocation'] ?? '')) !== '' ? (string) $request['eventLocation'] : '-'),
+            'Allergies: ' . (((string) ($request['allergyNotes'] ?? '')) !== '' ? (string) $request['allergyNotes'] : '-'),
+            'Notes: ' . (((string) ($request['notes'] ?? '')) !== '' ? (string) $request['notes'] : '-'),
+            'Guest: ' . ($name !== '' ? $name : 'Guest request'),
             'Phone: ' . (((string) ($customer['phone'] ?? '')) !== '' ? (string) $customer['phone'] : '-'),
             'Email: ' . (((string) ($customer['email'] ?? '')) !== '' ? (string) $customer['email'] : '-'),
         ];
@@ -791,15 +789,6 @@ final class Repository
         $zipCode = trim((string) ($request['zipCode'] ?? ''));
         if ($zipCode !== '') {
             $lines[] = 'ZIP: ' . $zipCode;
-        }
-
-        $allergyNotes = trim((string) ($request['allergyNotes'] ?? ''));
-        if ($allergyNotes !== '') {
-            $lines[] = 'Allergies: ' . $allergyNotes;
-        }
-        $notes = trim((string) ($request['notes'] ?? ''));
-        if ($notes !== '') {
-            $lines[] = 'Notes: ' . $notes;
         }
 
         return implode("\n", $lines);
@@ -1305,9 +1294,16 @@ final class Repository
             $content['site']['booking']['lede'] =
                 'Tell us about your table - your request goes straight into the Siler Chef reservation desk, then we follow up by phone, email, or WhatsApp.';
         }
+        if (($content['site']['booking']['steps'][0]['body'] ?? '') === 'Share your event date, guest count, cuisine choice, and location.') {
+            $content['site']['booking']['steps'][0]['body'] =
+                'Choose a date at least 2 days out, then send your location, guest count, cuisine, and dietary notes.';
+        }
         if (($content['site']['booking']['successText'] ?? '') === $legacyBookingSuccess) {
             $content['site']['booking']['successText'] =
-                'Your request is now in the Siler Chef dashboard. We’ll follow up shortly by phone, email, or WhatsApp to confirm details.';
+                'En kısa sürede tarafınızla iletişime geçilecektir.';
+        }
+        if (($content['site']['booking']['successTitle'] ?? '') === 'Thank you - your request is in.') {
+            $content['site']['booking']['successTitle'] = 'Talebiniz alınmıştır.';
         }
         if (($content['site']['contact']['subtitle'] ?? '') === $legacyContactSubtitle) {
             $content['site']['contact']['subtitle'] =

@@ -1236,24 +1236,19 @@
   const bookingDoneBtn = bookingOverlay && bookingOverlay.querySelector('.booking-done');
   let bookingHideTimer = null;
 
-  function populatePreferredTimes() {
-    const select = bookingForm && bookingForm.querySelector('select[name="preferredTime"]');
-    if (!select || select.options.length > 2) return;
-    const formatLabel = (hour24, minute) => {
-      const suffix = hour24 >= 12 ? 'PM' : 'AM';
-      const hour12 = hour24 % 12 || 12;
-      return `${hour12}:${String(minute).padStart(2, '0')} ${suffix}`;
-    };
-    for (let hour = 11; hour <= 22; hour += 1) {
-      [0, 30].forEach((minute) => {
-        if (hour === 22 && minute > 0) return;
-        const value = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
-        const option = document.createElement('option');
-        option.value = value;
-        option.textContent = formatLabel(hour, minute);
-        select.appendChild(option);
-      });
-    }
+  function getMinBookingDateValue(offsetDays = 2) {
+    const now = new Date();
+    const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offsetDays);
+    const year = next.getFullYear();
+    const month = String(next.getMonth() + 1).padStart(2, '0');
+    const day = String(next.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function applyBookingDateRules() {
+    const dateInput = bookingForm && bookingForm.querySelector('input[name="preferredDate"]');
+    if (!dateInput) return;
+    dateInput.min = getMinBookingDateValue(2);
   }
 
   function resetBookingState() {
@@ -1261,8 +1256,10 @@
     bookingForm.reset();
     bookingForm.hidden = false;
     bookingForm.querySelector('input[name="guestCount"]').value = '2';
-    const preferredContact = bookingForm.querySelector('select[name="preferredContact"]');
+    const preferredContact = bookingForm.querySelector('input[name="preferredContact"]');
     if (preferredContact) preferredContact.value = 'any';
+    const preferredTime = bookingForm.querySelector('input[name="preferredTime"]');
+    if (preferredTime) preferredTime.value = '';
     bookingSuccess.hidden = true;
     bookingError.hidden = true;
     bookingError.classList.remove('is-visible');
@@ -1272,12 +1269,12 @@
       bookingSuccessMeta.innerHTML = '';
     }
     if (bookingSuccessText) {
-      bookingSuccessText.textContent =
-        'Your request is now in the Siler Chef dashboard. We’ll follow up shortly by phone, email, or WhatsApp to confirm details.';
+      bookingSuccessText.textContent = 'En kısa sürede tarafınızla iletişime geçilecektir.';
     }
+    applyBookingDateRules();
     setBookingSubmitting(false);
   }
-  populatePreferredTimes();
+  applyBookingDateRules();
 
   function setBookingSubmitting(isSubmitting) {
     if (!bookingSubmitBtn) return;
@@ -1433,6 +1430,12 @@
         showBookingError(blockedMsg);
         return;
       }
+      const minBookingDate = getMinBookingDateValue(2);
+      if (payload.preferredDate && payload.preferredDate < minBookingDate) {
+        setBookingSubmitting(false);
+        showBookingError('Please choose a date at least 2 days from today.');
+        return;
+      }
       try {
         const res = await fetch(getReservationPostUrl(), {
           method: 'POST',
@@ -1454,8 +1457,7 @@
         bookingForm.hidden = true;
         if (bookingSuccess) bookingSuccess.hidden = false;
         if (bookingSuccessText) {
-          bookingSuccessText.textContent =
-            'Your request has been saved. Chef Fikret will review it from the reservation desk and follow up by phone, email, or WhatsApp.';
+          bookingSuccessText.textContent = 'En kısa sürede tarafınızla iletişime geçilecektir.';
         }
         renderSuccessMeta(data);
         const bookingBody = bookingOverlay && bookingOverlay.querySelector('.booking-panel__body');

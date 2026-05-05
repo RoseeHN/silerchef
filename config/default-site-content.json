@@ -144,7 +144,7 @@
       "steps": [
         {
           "title": "Send the request",
-          "body": "Share your event date, guest count, cuisine choice, and location."
+          "body": "Choose a date at least 2 days out, then send your location, guest count, cuisine, and dietary notes."
         },
         {
           "title": "We follow up",
@@ -156,8 +156,8 @@
         }
       ],
       "formSub": "Everything below goes directly to the private reservation dashboard.",
-      "successTitle": "Thank you - your request is in.",
-      "successText": "Your request is now in the Siler Chef dashboard. We’ll follow up shortly by phone, email, or WhatsApp to confirm details.",
+      "successTitle": "Talebiniz alınmıştır.",
+      "successText": "En kısa sürede tarafınızla iletişime geçilecektir.",
       "fallbackUrl": "https://wa.me/17753896677",
       "notificationEmail": "silerchef@gmail.com",
       "teamWhatsAppHref": "https://wa.me/17753896677",

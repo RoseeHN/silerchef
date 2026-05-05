@@ -1265,60 +1265,21 @@
                   <p class="booking-form__eyebrow">Request details</p>
                   <p id="booking-form-sub" class="booking-form__sub">Everything below goes directly to the private reservation dashboard.</p>
                 </div>
-                <div class="booking-form__row booking-form__row--split">
-                  <label class="booking-field">
-                    <span>First name</span>
-                    <input name="firstName" type="text" required autocomplete="given-name" maxlength="80" />
-                  </label>
-                  <label class="booking-field">
-                    <span>Last name</span>
-                    <input name="lastName" type="text" required autocomplete="family-name" maxlength="80" />
-                  </label>
-                </div>
                 <label class="booking-field">
-                  <span>Email (recommended for confirmations)</span>
-                  <input name="email" type="email" autocomplete="email" maxlength="320" />
+                  <span>Event date</span>
+                  <input name="preferredDate" type="date" required />
                 </label>
                 <label class="booking-field">
-                  <span>Phone</span>
-                  <input name="phone" type="tel" required autocomplete="tel" placeholder="+1 (775) …" maxlength="40" />
+                  <span>Location</span>
+                  <input name="eventLocation" type="text" required autocomplete="address-level2" maxlength="160" placeholder="Reno, NV or venue address" />
                 </label>
                 <div class="booking-form__row booking-form__row--split">
                   <label class="booking-field">
-                    <span>Event location</span>
-                    <input name="eventLocation" type="text" required autocomplete="address-level2" maxlength="160" placeholder="Reno, NV or venue address" />
-                  </label>
-                  <label class="booking-field">
-                    <span>Preferred follow-up</span>
-                    <select name="preferredContact">
-                      <option value="any">Any method</option>
-                      <option value="phone">Phone call</option>
-                      <option value="email">Email</option>
-                      <option value="whatsapp">WhatsApp</option>
-                      <option value="text">Text message</option>
-                    </select>
-                  </label>
-                </div>
-                <div class="booking-form__row booking-form__row--split">
-                  <label class="booking-field">
-                    <span>Preferred date</span>
-                    <input name="preferredDate" type="date" required />
-                  </label>
-                  <label class="booking-field">
-                    <span>Preferred time</span>
-                    <select name="preferredTime" id="booking-preferred-time">
-                      <option value="">Select a time</option>
-                      <option value="flexible">I am flexible</option>
-                    </select>
-                  </label>
-                </div>
-                <div class="booking-form__row booking-form__row--split">
-                  <label class="booking-field">
-                    <span>Guests</span>
+                    <span>Guest count</span>
                     <input name="guestCount" type="number" min="1" max="99" value="2" required />
                   </label>
                   <label class="booking-field">
-                    <span>Preferred cuisine</span>
+                    <span>Cuisine / concept</span>
                     <select name="cuisinePreference" required>
                       <option value="">Select a cuisine</option>
                       <option value="American Cuisine">American Cuisine</option>
@@ -1331,8 +1292,8 @@
                   </label>
                 </div>
                 <div class="booking-field booking-field--allergens">
-                  <span>Food allergies &amp; intolerances</span>
-                  <p class="booking-allergy-hint">Tick anything that must stay off the menu, then describe severity or substitutes below.</p>
+                  <span>Allergies &amp; intolerances</span>
+                  <p class="booking-allergy-hint">Select anything that must stay off the menu, then add any severity or extra detail below.</p>
                   <div class="booking-allergy-grid" role="group" aria-label="Common allergens">
                     <label class="booking-allergy-label"
                       ><input type="checkbox" name="allergyFlag" value="dairy" /> Dairy / milk</label
@@ -1361,18 +1322,38 @@
                   </div>
                 </div>
                 <label class="booking-field">
-                  <span>Allergy details &amp; ingredients to avoid</span>
+                  <span>Allergy details</span>
                   <textarea
                     name="allergyNotes"
                     rows="3"
                     maxlength="1200"
-                    placeholder="E.g. anaphylactic to shellfish · mild lactose intolerance · kosher/halal • vegan…"
+                    placeholder="Tell us what should be avoided and how strict the allergy or intolerance is."
                   ></textarea>
                 </label>
                 <label class="booking-field">
-                  <span>Occasion &amp; extra notes</span>
-                  <textarea name="notes" rows="3" maxlength="2000" placeholder="Birthday, anniversary, kitchen notes, pacing, special requests…"></textarea>
+                  <span>Description</span>
+                  <textarea name="notes" rows="3" maxlength="2000" placeholder="Tell us about the event, venue, style of service, and anything else we should know."></textarea>
                 </label>
+                <div class="booking-form__row booking-form__row--split">
+                  <label class="booking-field">
+                    <span>First name</span>
+                    <input name="firstName" type="text" required autocomplete="given-name" maxlength="80" />
+                  </label>
+                  <label class="booking-field">
+                    <span>Last name</span>
+                    <input name="lastName" type="text" required autocomplete="family-name" maxlength="80" />
+                  </label>
+                </div>
+                <label class="booking-field">
+                  <span>Phone</span>
+                  <input name="phone" type="tel" required autocomplete="tel" placeholder="+1 (775) …" maxlength="40" />
+                </label>
+                <label class="booking-field">
+                  <span>Email</span>
+                  <input name="email" type="email" autocomplete="email" maxlength="320" />
+                </label>
+                <input name="preferredContact" type="hidden" value="any" />
+                <input name="preferredTime" type="hidden" value="" />
                 <p id="booking-error" class="booking-error" role="alert" hidden></p>
                 <div class="booking-actions">
                   <button type="submit" class="btn btn-primary" data-booking-submit>
@@ -1393,9 +1374,9 @@
             <div id="booking-success" class="booking-success" hidden>
               <div class="booking-success__card">
                 <p class="booking-success__kicker">Request received</p>
-                <p class="booking-success__title gold-text">Thank you — your request is in.</p>
+                <p class="booking-success__title gold-text">Talebiniz alınmıştır.</p>
                 <p class="booking-success__text" data-booking-success-text>
-                  Your request is now in the Siler Chef dashboard. We’ll follow up shortly by phone, email, or WhatsApp to confirm details.
+                  En kısa sürede tarafınızla iletişime geçilecektir.
                 </p>
                 <div class="booking-success__meta" data-booking-success-meta hidden></div>
                 <button type="button" class="btn btn-primary booking-done">Done</button>
