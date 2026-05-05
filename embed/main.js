@@ -1264,6 +1264,17 @@
     bookingForm.hidden = false;
     const hiddenLocation = bookingForm.querySelector('input[name="eventLocation"]');
     if (hiddenLocation) hiddenLocation.value = '';
+    const serviceArea = bookingForm.querySelector('select[name="serviceArea"]');
+    if (serviceArea) serviceArea.value = '';
+    const eventLocationDetail = bookingForm.querySelector('input[name="eventLocationDetail"]');
+    if (eventLocationDetail) eventLocationDetail.value = '';
+    const zipCode = bookingForm.querySelector('input[name="zipCode"]');
+    if (zipCode) zipCode.value = '';
+    const allergyNotes = bookingForm.querySelector('textarea[name="allergyNotes"]');
+    if (allergyNotes) allergyNotes.value = '';
+    const notes = bookingForm.querySelector('textarea[name="notes"]');
+    if (notes) notes.value = '';
+    bookingForm.querySelectorAll('input[name="allergyFlag"]').forEach((box) => { box.checked = false; });
     bookingForm.querySelector('input[name="guestCount"]').value = '2';
     const preferredContact = bookingForm.querySelector('input[name="preferredContact"]');
     if (preferredContact) preferredContact.value = 'any';

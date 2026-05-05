@@ -1325,13 +1325,16 @@
                   <textarea
                     name="allergyNotes"
                     rows="3"
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="sentences"
                     maxlength="1200"
                     placeholder="For example: shellfish allergy, dairy intolerance, no pork, gluten sensitivity."
                   ></textarea>
                 </label>
                 <label class="booking-field">
                   <span>Event details</span>
-                  <textarea name="notes" rows="3" maxlength="2000" placeholder="Tell us about the occasion, service style, venue notes, timing, or anything else we should know."></textarea>
+                  <textarea name="notes" rows="3" maxlength="2000" autocomplete="off" autocorrect="off" autocapitalize="sentences" placeholder="Tell us about the occasion, service style, venue notes, timing, or anything else we should know."></textarea>
                 </label>
                 <div class="booking-form__row booking-form__row--split">
                   <label class="booking-field">
@@ -1359,13 +1362,6 @@
                     <span data-booking-submit-label>Submit request</span>
                   </button>
                 </div>
-                <p class="booking-fallback">
-                  <a
-                    id="booking-fallback-link"
-                    href="tel:+17753896677"
-                    >Need a faster reply? Call Chef Siler directly.</a
-                  >
-                </p>
               </div>
             </form>
             <div id="booking-success" class="booking-success" hidden>

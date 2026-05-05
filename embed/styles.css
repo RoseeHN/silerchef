@@ -2998,19 +2998,6 @@ body.scroll-locked {
   filter: saturate(0.85);
 }
 
-.booking-fallback {
-  margin: 0;
-  font-size: 0.8rem;
-  color: rgba(243, 234, 209, 0.45);
-  line-height: 1.55;
-}
-
-.booking-fallback a {
-  color: rgba(197, 160, 89, 0.85);
-  text-decoration: underline;
-  text-underline-offset: 0.12em;
-}
-
 .booking-success {
   display: grid;
 }
