@@ -1253,6 +1253,7 @@
 
   function resetBookingState() {
     if (!bookingForm || !bookingSuccess || !bookingError) return;
+    if (bookingOverlay) bookingOverlay.classList.remove('is-success');
     bookingForm.reset();
     bookingForm.hidden = false;
     bookingForm.querySelector('input[name="guestCount"]').value = '2';
@@ -1455,6 +1456,7 @@
           return;
         }
         bookingForm.hidden = true;
+        if (bookingOverlay) bookingOverlay.classList.add('is-success');
         if (bookingSuccess) bookingSuccess.hidden = false;
         if (bookingSuccessText) {
           bookingSuccessText.textContent = 'We will be in touch with you as soon as possible.';
@@ -1462,6 +1464,10 @@
         renderSuccessMeta(data);
         const bookingBody = bookingOverlay && bookingOverlay.querySelector('.booking-panel__body');
         if (bookingBody) bookingBody.scrollTo({ top: 0, behavior: 'smooth' });
+        const bookingShell = bookingOverlay && bookingOverlay.querySelector('.booking-panel__shell');
+        if (bookingShell && typeof bookingShell.scrollTo === 'function') {
+          bookingShell.scrollTo({ top: 0, behavior: 'smooth' });
+        }
         trackEvent('reservation_submit', {
           placement: 'booking_form',
         });

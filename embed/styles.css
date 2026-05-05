@@ -2772,6 +2772,11 @@ body.scroll-locked {
   min-height: 100%;
 }
 
+.booking-form[hidden],
+.booking-success[hidden] {
+  display: none !important;
+}
+
 .booking-form__card,
 .booking-success__card {
   display: grid;
@@ -2971,6 +2976,14 @@ body.scroll-locked {
   display: grid;
 }
 
+.booking-overlay.is-success .booking-panel__intro {
+  display: none;
+}
+
+.booking-overlay.is-success .booking-panel__body {
+  padding-top: 1rem;
+}
+
 .booking-success__title {
   font-family: var(--font-display);
   font-size: clamp(1.4rem, 2.2vw, 1.75rem);
@@ -3150,6 +3163,21 @@ body.scroll-locked {
     min-height: 0;
     overflow: visible;
     padding: 0.9rem 1rem calc(env(safe-area-inset-bottom, 0px) + 1rem);
+  }
+
+  .booking-overlay.is-success .booking-panel {
+    height: auto;
+    min-height: 0;
+  }
+
+  .booking-overlay.is-success .booking-panel__shell {
+    display: block;
+    height: auto;
+    overflow: visible;
+  }
+
+  .booking-overlay.is-success .booking-panel__body {
+    padding-top: 1rem;
   }
 
   .booking-field {
