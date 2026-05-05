@@ -200,6 +200,19 @@ function route_api(string $path, string $method, Repository $repository, AdminAu
         json_response(['ok' => true, 'reservation' => $updated]);
     }
 
+    if (preg_match('#^/api/admin/reservations/([^/]+)$#', $path, $matches) && $method === 'DELETE') {
+        require_admin($auth);
+        $id = trim((string) ($matches[1] ?? ''));
+        if ($id === '') {
+            json_response(['error' => 'missing_id'], 400);
+        }
+        $deleted = $repository->deleteReservation($id);
+        if (!$deleted) {
+            json_response(['error' => 'not_found'], 404);
+        }
+        json_response(['ok' => true, 'deletedId' => $id]);
+    }
+
     json_response(['error' => 'not_found'], 404);
 }
 

@@ -914,10 +914,75 @@ body.admin-simple-mode .editor-microcopy--advanced {
 }
 
 .reservation-card {
-  padding: 1rem;
+  padding: 0.9rem;
   background: rgba(17, 15, 17, 0.92);
   border: 1px solid rgba(197, 160, 89, 0.16);
   border-radius: 16px;
+}
+
+.reservation-card.is-expanded {
+  border-color: rgba(197, 160, 89, 0.28);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
+}
+
+.reservation-summary {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.reservation-summary__main {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.reservation-summary__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.7rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.reservation-summary__facts span {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.58rem;
+  border-radius: 999px;
+  background: rgba(197, 160, 89, 0.07);
+  border: 1px solid rgba(197, 160, 89, 0.12);
+}
+
+.reservation-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(197, 160, 89, 0.16);
+  color: var(--gold-1);
+  font-size: 0.84rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.reservation-details {
+  display: grid;
+  gap: 0.95rem;
+  padding-top: 0.95rem;
+  margin-top: 0.95rem;
+  border-top: 1px solid rgba(197, 160, 89, 0.12);
 }
 
 .reservation-head {
@@ -1343,11 +1408,20 @@ body.admin-auth-pending .admin-main::before {
   }
 
   .reservation-actions select,
-  .reservation-actions .primary-button {
+  .reservation-actions .primary-button,
+  .reservation-actions .danger-button {
     width: 100%;
   }
 
   .reservation-note {
     min-height: 120px;
+  }
+
+  .reservation-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .reservation-toggle {
+    width: 100%;
   }
 }

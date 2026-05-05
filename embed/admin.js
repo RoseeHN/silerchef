@@ -10,6 +10,7 @@
     selectedServiceSlug: '',
     reservationSearch: '',
     reservationStatusFilter: 'all',
+    reservationExpandedId: null,
     simpleMode: true,
     sidebarOpen: false,
     editorPanels: {
@@ -1549,6 +1550,13 @@
         `;
       }
     }
+    if (state.reservationExpandedId && !reservations.some((row) => row.id === state.reservationExpandedId)) {
+      state.reservationExpandedId = reservations[0] ? reservations[0].id : null;
+    }
+    if (!state.reservationExpandedId && reservations[0]) {
+      state.reservationExpandedId = reservations[0].id;
+    }
+
     reservations.forEach((row) => {
       const rq = row.request || {};
       const allergyChecklist =
@@ -1569,31 +1577,53 @@
       if (rq.notes) requestLines.push(`Notes: ${esc(rq.notes)}`);
 
       const notificationSummary = summarizeReservationNotifications(row.notifications || {});
+      const isExpanded = state.reservationExpandedId === row.id;
       const card = document.createElement('article');
-      card.className = 'reservation-card';
+      card.className = `reservation-card${isExpanded ? ' is-expanded' : ''}`;
       card.innerHTML = `
-        <div class="reservation-head">
-          <div>
-            <h3 class="reservation-title">${esc(row.customer.firstName)} ${esc(row.customer.lastName)}</h3>
-            <div class="reservation-meta">
-              <span>${esc(row.customer.email || 'No email provided')}</span>
-              <span>${esc(row.customer.phone || 'No phone')}</span>
-              <span>${esc(formatDateTime(row.createdAt))}</span>
+        <button class="reservation-summary" type="button" aria-expanded="${isExpanded ? 'true' : 'false'}">
+          <div class="reservation-summary__main">
+            <div class="reservation-head">
+              <div>
+                <h3 class="reservation-title">${esc(row.customer.firstName)} ${esc(row.customer.lastName)}</h3>
+                <div class="reservation-meta">
+                  <span>${esc(formatDateTime(row.createdAt))}</span>
+                  <span>${esc(rq.preferredDate || 'No date')}</span>
+                  <span>${esc(rq.guestCount == null ? 'Guest count missing' : `${rq.guestCount} guests`)}</span>
+                </div>
+              </div>
+              <span class="reservation-chip">${esc(row.status)}</span>
+            </div>
+            <div class="reservation-summary__facts">
+              <span>${esc(rq.cuisinePreference || 'Cuisine not selected')}</span>
+              <span>${esc(rq.eventLocation || 'Location missing')}</span>
+              <span>${esc(row.customer.phone || row.customer.email || 'No contact details')}</span>
             </div>
           </div>
-          <span class="reservation-chip">${esc(row.status)}</span>
-        </div>
-        <div class="reservation-grid">
-          <div>
-            <p class="panel-kicker">Request details</p>
-            <p class="reservation-body">${requestLines.join('\n')}</p>
-          </div>
-          <div>
-            <p class="panel-kicker">Reservation workflow</p>
-            <p class="reservation-body">Managed inside the private Siler Chef reservation dashboard.\nReservation ID: ${esc(row.id || '-')}\nFollow-up happens from this panel by phone, email, or WhatsApp.\nAlerts: ${esc(notificationSummary)}</p>
+          <span class="reservation-toggle">${isExpanded ? 'Hide details' : 'View details'}</span>
+        </button>
+        <div class="reservation-details" ${isExpanded ? '' : 'hidden'}>
+          <div class="reservation-grid">
+            <div>
+              <p class="panel-kicker">Request details</p>
+              <p class="reservation-body">${requestLines.join('\n')}</p>
+            </div>
+            <div>
+              <p class="panel-kicker">Reservation workflow</p>
+              <p class="reservation-body">Managed inside the private Siler Chef reservation dashboard.\nReservation ID: ${esc(row.id || '-')}\nFollow-up happens from this panel by phone or email.\nAlerts: ${esc(notificationSummary)}</p>
+            </div>
           </div>
         </div>
       `;
+
+      const summaryButton = card.querySelector('.reservation-summary');
+      const detailsShell = card.querySelector('.reservation-details');
+      if (summaryButton && detailsShell) {
+        summaryButton.addEventListener('click', () => {
+          state.reservationExpandedId = isExpanded ? null : row.id;
+          renderReservations();
+        });
+      }
 
       const contactRow = document.createElement('div');
       contactRow.className = 'reservation-contact';
@@ -1621,16 +1651,6 @@
         callLink.textContent = 'Call guest';
         quickActions.appendChild(callLink);
 
-        const waDigits = normalizePhoneForWhatsApp(row.customer.phone);
-        if (waDigits) {
-          const waLink = document.createElement('a');
-          waLink.className = 'ghost-link reservation-quick-link';
-          waLink.href = `https://wa.me/${waDigits}`;
-          waLink.target = '_blank';
-          waLink.rel = 'noopener noreferrer';
-          waLink.textContent = 'WhatsApp guest';
-          quickActions.appendChild(waLink);
-        }
       }
 
       const contactHelp = document.createElement('p');
@@ -1640,7 +1660,7 @@
 
       contactRow.appendChild(quickActions);
       contactRow.appendChild(contactHelp);
-      card.appendChild(contactRow);
+      detailsShell.appendChild(contactRow);
 
       const actions = document.createElement('div');
       actions.className = 'reservation-actions';
@@ -1688,10 +1708,41 @@
         }
       });
 
-      card.appendChild(noteInput);
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'danger-button';
+      deleteBtn.textContent = 'Delete reservation';
+      deleteBtn.addEventListener('click', async () => {
+        const guestName = `${row.customer.firstName || ''} ${row.customer.lastName || ''}`.trim() || 'this reservation';
+        const ok = window.confirm(`Delete ${guestName}? This cannot be undone.`);
+        if (!ok) return;
+        deleteBtn.disabled = true;
+        saveBtn.disabled = true;
+        try {
+          const res = await apiFetch(`/api/admin/reservations/${row.id}`, {
+            method: 'DELETE',
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error(data.detail || data.error || 'Unable to delete reservation');
+          state.bootstrap.reservations = (state.bootstrap.reservations || []).filter((item) => item.id !== row.id);
+          if (state.reservationExpandedId === row.id) {
+            state.reservationExpandedId = null;
+          }
+          renderReservations();
+          updateSummary();
+        } catch (err) {
+          alert(err.message || 'Unable to delete reservation');
+        } finally {
+          deleteBtn.disabled = false;
+          saveBtn.disabled = false;
+        }
+      });
+
+      detailsShell.appendChild(noteInput);
       actions.appendChild(statusSelect);
       actions.appendChild(saveBtn);
-      card.appendChild(actions);
+      actions.appendChild(deleteBtn);
+      detailsShell.appendChild(actions);
       container.appendChild(card);
     });
   }

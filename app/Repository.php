@@ -207,6 +207,13 @@ final class Repository
         return $this->findReservation($id);
     }
 
+    public function deleteReservation(string $id): bool
+    {
+        $stmt = $this->pdo->prepare('DELETE FROM reservations WHERE id = :id');
+        $stmt->execute([':id' => $id]);
+        return $stmt->rowCount() > 0;
+    }
+
     public function trackSiteEvent(array $payload): void
     {
         $eventName = trim((string) ($payload['event'] ?? ''));
