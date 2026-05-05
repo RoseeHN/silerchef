@@ -51,10 +51,24 @@ function doPost(e) {
     ].join('\n');
 
     const htmlBody =
-      '<div style="font-family:Arial,sans-serif;color:#1f1a16;line-height:1.6">' +
-      '<h2 style="margin:0 0 12px;color:#8c6a2c">New Siler Chef reservation</h2>' +
-      '<p style="margin:0 0 18px">A new reservation request has been created on <strong>silerchef.com</strong>.</p>' +
-      '<table style="border-collapse:collapse;width:100%;max-width:760px">' +
+      '<div style="margin:0;padding:28px 0;background:#120f0d;font-family:Helvetica,Arial,sans-serif;color:#f5eee3">' +
+      '<div style="max-width:760px;margin:0 auto;padding:0 18px">' +
+      '<div style="background:linear-gradient(145deg,#231c18 0%,#151210 100%);border:1px solid rgba(202,164,91,0.24);border-radius:28px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.38)">' +
+      '<div style="padding:28px 30px 18px;border-bottom:1px solid rgba(202,164,91,0.16);background:radial-gradient(circle at top left,rgba(202,164,91,0.18),transparent 42%)">' +
+      '<div style="font-size:11px;letter-spacing:0.28em;text-transform:uppercase;color:#caa45b;margin-bottom:14px">Siler Chef Reservation Desk</div>' +
+      '<h1 style="margin:0;font-family:Georgia,Times New Roman,serif;font-size:34px;line-height:1.1;color:#f3e7cf">New private dining request</h1>' +
+      '<p style="margin:14px 0 0;color:#d5c9b7;font-size:15px;line-height:1.7">A new reservation has been submitted through <strong style="color:#f4eddc">silerchef.com</strong>. Review the request, confirm the fit, and follow up with the guest.</p>' +
+      '</div>' +
+      '<div style="padding:24px 30px 8px">' +
+      '<div style="margin-bottom:18px">' +
+      chip(fullName) +
+      chip(preferredDate) +
+      chip(preferredTime) +
+      chip(String(guestCount) + ' guests') +
+      chip(cuisine) +
+      '</div>' +
+      '<div style="background:#171311;border:1px solid rgba(202,164,91,0.14);border-radius:22px;padding:18px 18px 8px">' +
+      '<table style="border-collapse:separate;border-spacing:0 10px;width:100%">' +
       row('Reservation ID', reservationId) +
       row('Created at', createdAt) +
       row('Guest', fullName) +
@@ -70,7 +84,14 @@ function doPost(e) {
       row('Allergies / intolerances', allergies) +
       row('Notes', notes) +
       '</table>' +
-      '<p style="margin:18px 0 0"><a href="https://www.silerchef.com/admin" style="display:inline-block;padding:10px 16px;background:#c5a059;color:#151311;text-decoration:none;border-radius:999px;font-weight:700">Open admin panel</a></p>' +
+      '</div>' +
+      '<div style="padding:22px 0 10px">' +
+      '<a href="https://www.silerchef.com/admin" style="display:inline-block;padding:14px 22px;background:linear-gradient(135deg,#f0dfb0 0%,#caa45b 100%);color:#151311;text-decoration:none;border-radius:999px;font-weight:700;letter-spacing:0.04em">Open admin panel</a>' +
+      '<p style="margin:16px 0 0;color:#9f9383;font-size:13px;line-height:1.6">This alert was sent automatically from the Siler Chef reservation system. The admin dashboard remains the source of truth for all reservation records.</p>' +
+      '</div>' +
+      '</div>' +
+      '</div>' +
+      '</div>' +
       '</div>';
 
     MailApp.sendEmail({
@@ -97,13 +118,21 @@ function doPost(e) {
 function row(label, value) {
   return (
     '<tr>' +
-    '<td style="padding:8px 12px;border:1px solid #e5dcc9;background:#f7f2e8;font-weight:700;width:220px">' +
+    '<td style="padding:12px 14px;border:1px solid rgba(202,164,91,0.14);background:#221c17;color:#caa45b;font-weight:700;width:220px;border-radius:14px 0 0 14px;vertical-align:top">' +
     escapeHtml(label) +
     '</td>' +
-    '<td style="padding:8px 12px;border:1px solid #e5dcc9">' +
+    '<td style="padding:12px 14px;border:1px solid rgba(202,164,91,0.14);background:#171311;color:#f5eee3;border-radius:0 14px 14px 0;vertical-align:top">' +
     escapeHtml(String(value || '-')) +
     '</td>' +
     '</tr>'
+  );
+}
+
+function chip(value) {
+  return (
+    '<span style="display:inline-block;margin:0 10px 10px 0;padding:10px 14px;border-radius:999px;border:1px solid rgba(202,164,91,0.18);background:#171311;color:#f3e7cf;font-size:12px;letter-spacing:0.06em;text-transform:uppercase">' +
+    escapeHtml(String(value || '-')) +
+    '</span>'
   );
 }
 
