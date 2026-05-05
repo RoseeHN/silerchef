@@ -1256,6 +1256,8 @@
     if (bookingOverlay) bookingOverlay.classList.remove('is-success');
     bookingForm.reset();
     bookingForm.hidden = false;
+    const hiddenLocation = bookingForm.querySelector('input[name="eventLocation"]');
+    if (hiddenLocation) hiddenLocation.value = '';
     bookingForm.querySelector('input[name="guestCount"]').value = '2';
     const preferredContact = bookingForm.querySelector('input[name="preferredContact"]');
     if (preferredContact) preferredContact.value = 'any';
@@ -1417,12 +1419,17 @@
       setBookingSubmitting(true);
       const fd = new FormData(bookingForm);
       const guestRaw = fd.get('guestCount');
+      const serviceArea = String(fd.get('serviceArea') || '').trim();
+      const eventLocationDetail = String(fd.get('eventLocationDetail') || '').trim();
+      const combinedLocation = [serviceArea, eventLocationDetail].filter(Boolean).join(' — ');
+      const hiddenLocation = bookingForm.querySelector('input[name="eventLocation"]');
+      if (hiddenLocation) hiddenLocation.value = combinedLocation;
       const payload = {
         firstName: fd.get('firstName'),
         lastName: fd.get('lastName'),
         email: fd.get('email') || '',
         phone: fd.get('phone') || '',
-        eventLocation: fd.get('eventLocation') || '',
+        eventLocation: combinedLocation,
         zipCode: fd.get('zipCode') || '',
         preferredDate: fd.get('preferredDate') || '',
         preferredTime: fd.get('preferredTime') || '',

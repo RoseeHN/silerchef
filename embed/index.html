@@ -1269,10 +1269,36 @@
                   <span>Preferred event date</span>
                   <input name="preferredDate" type="date" required />
                 </label>
-                <label class="booking-field">
-                  <span>Event location</span>
-                  <input name="eventLocation" type="text" required autocomplete="address-level2" maxlength="160" placeholder="Home address or venue in Reno, Tahoe, or the Bay Area" />
-                </label>
+                <div class="booking-form__row booking-form__row--split">
+                  <label class="booking-field">
+                    <span>Service area</span>
+                    <select name="serviceArea" required>
+                      <option value="">Select your region</option>
+                      <option value="Reno / Sparks">Reno / Sparks</option>
+                      <option value="Lake Tahoe / Incline Village">Lake Tahoe / Incline Village</option>
+                      <option value="Truckee / North Lake Tahoe">Truckee / North Lake Tahoe</option>
+                      <option value="South Lake Tahoe">South Lake Tahoe</option>
+                      <option value="San Francisco">San Francisco</option>
+                      <option value="East Bay">East Bay</option>
+                      <option value="Peninsula / South Bay">Peninsula / South Bay</option>
+                      <option value="Marin / Napa / Sonoma">Marin / Napa / Sonoma</option>
+                      <option value="Sacramento">Sacramento</option>
+                      <option value="Other USA location">Other USA location</option>
+                    </select>
+                  </label>
+                  <label class="booking-field">
+                    <span>Venue / city details</span>
+                    <input
+                      name="eventLocationDetail"
+                      type="text"
+                      required
+                      autocomplete="address-level2"
+                      maxlength="160"
+                      placeholder="Home, venue name, neighborhood, or city"
+                    />
+                  </label>
+                </div>
+                <input name="eventLocation" type="hidden" value="" />
                 <div class="booking-form__row booking-form__row--split">
                   <label class="booking-field">
                     <span>Guest count</span>
