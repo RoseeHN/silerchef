@@ -65,12 +65,11 @@
     },
     reservations: {
       kicker: 'Reservation desk',
-      title: 'Turn incoming requests into fast, high-touch follow-up',
-      note: 'This view is about response speed, clear status management, and making it easy to call, email, or WhatsApp the guest right away.',
-      badges: ['Guest pipeline', 'Follow-up', 'Status tracking'],
+      title: 'Incoming requests, kept simple',
+      note: 'See new requests, open the details you need, and keep follow-up status clear.',
+      badges: [],
       actions: [
-        { type: 'button', label: 'Review requests', jump: 'reservations' },
-        { type: 'link', label: 'Open contact section', href: '#contact' },
+        { type: 'button', label: 'Refresh requests', jump: 'reservations' },
       ],
     },
     analytics: {
@@ -356,7 +355,7 @@
       reservations.filter((row) => row.status === 'pending').length
     );
     byId('summary-pageviews').textContent = formatCount(overview.pageViews || 0);
-    byId('summary-whatsapp').textContent = formatCount(overview.whatsappClicks || 0);
+    byId('summary-whatsapp').textContent = formatCount(overview.reservationSubmits || 0);
   }
 
   function getTopRow(rows) {
@@ -383,6 +382,10 @@
 
   function renderOverviewFrame(config) {
     const overview = config || TAB_COPY.homepage;
+    const contentRoot = byId('dashboard-content');
+    if (contentRoot) {
+      contentRoot.setAttribute('data-active-tab', state.activeTab);
+    }
     byId('overview-kicker').textContent = overview.kicker;
     byId('overview-title').textContent = overview.title;
     byId('overview-note').textContent = overview.note;
@@ -615,10 +618,9 @@
           <h3>How the team responds</h3>
           <div class="utility-specs">
             <div class="utility-spec"><span>Email alerts</span><strong>${esc(booking.notificationEmail || 'Dashboard only')}</strong></div>
-            <div class="utility-spec"><span>WhatsApp</span><strong>${esc(formatRouteLabel(booking.teamWhatsAppHref))}</strong></div>
-            <div class="utility-spec"><span>Fallback CTA</span><strong>${esc(booking.fallbackUrl ? 'Ready' : 'Missing')}</strong></div>
+            <div class="utility-spec"><span>Phone route</span><strong>${esc(booking.fallbackUrl ? 'Ready' : 'Missing')}</strong></div>
           </div>
-          <p class="utility-note">The desk should feel immediate: request stored, guest visible, follow-up channel obvious.</p>
+          <p class="utility-note">The desk should feel immediate: request stored, guest visible, and the next action obvious.</p>
         `;
       }
 
@@ -640,7 +642,7 @@
           <h3>Current reservation momentum</h3>
           <ul class="utility-list">
             <li>${esc(overview.reservationSubmits ? `${formatCount(overview.reservationSubmits)} reservation submit${overview.reservationSubmits === 1 ? '' : 's'} tracked.` : 'No reservation submits tracked yet.')}</li>
-            <li>${esc(overview.whatsappClicks ? `${formatCount(overview.whatsappClicks)} WhatsApp click${overview.whatsappClicks === 1 ? '' : 's'} indicate direct contact intent.` : 'No WhatsApp clicks tracked yet.')}</li>
+            <li>${esc(overview.bookingOpens ? `${formatCount(overview.bookingOpens)} booking open${overview.bookingOpens === 1 ? '' : 's'} tracked.` : 'No booking opens tracked yet.')}</li>
           </ul>
           <p class="utility-note">Last tracked event: ${esc(formatDateTime(recentActivity.lastEventAt))}</p>
         `;

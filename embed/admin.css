@@ -396,6 +396,24 @@ label span,
   margin-top: 0.8rem;
 }
 
+.dashboard-content[data-active-tab='reservations'] .panel--overview {
+  padding-bottom: 1.15rem;
+}
+
+.dashboard-content[data-active-tab='reservations'] .overview-hero {
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+.dashboard-content[data-active-tab='reservations'] .overview-badges,
+.dashboard-content[data-active-tab='reservations'] .dashboard-utility-grid {
+  display: none;
+}
+
+.dashboard-content[data-active-tab='reservations'] .overview-actions {
+  margin-top: 0.25rem;
+}
+
 .overview-badge {
   display: inline-flex;
   align-items: center;
