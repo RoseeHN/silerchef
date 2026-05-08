@@ -7,7 +7,9 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "photos": "node scripts/distribute-photos.mjs"
+    "photos": "node scripts/distribute-photos.mjs",
+    "optimize-media": "node scripts/optimize-embed-media.mjs",
+    "optimize-video": "node scripts/optimize-embed-media.mjs --video-only"
   },
   "engines": {
     "node": ">=18"
@@ -15,5 +17,8 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "sharp": "^0.33.5"
   }
 }

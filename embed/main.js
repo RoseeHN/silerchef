@@ -371,39 +371,11 @@
     root.querySelectorAll('.observe').forEach((el) => io.observe(el));
   }
 
-  let stripScrollHandler = null;
-  let stripAutoplayTimer = null;
-  let dockInteractionCleanup = null;
   let lockedScrollY = 0;
   let activeModalLock = '';
 
-  function clearAutoplayTimer() {
-    if (stripAutoplayTimer) {
-      clearInterval(stripAutoplayTimer);
-      stripAutoplayTimer = null;
-    }
-  }
-
-  function teardownDockListeners() {
-    if (dockInteractionCleanup) {
-      dockInteractionCleanup();
-      dockInteractionCleanup = null;
-    }
-  }
-
   function resetCarouselTimers() {
-    clearAutoplayTimer();
-    teardownDockListeners();
-  }
-
-  /** Centers a thumbnail inside the horizontal strip only — avoids scrollIntoView scrolling the modal vertically. */
-  function scrollThumbIntoStrip(stripEl, thumb, behavior) {
-    if (!stripEl || !thumb) return;
-    const maxScroll = Math.max(0, stripEl.scrollWidth - stripEl.clientWidth);
-    const thumbCenter = thumb.offsetLeft + thumb.offsetWidth / 2;
-    let left = thumbCenter - stripEl.clientWidth / 2;
-    left = Math.max(0, Math.min(maxScroll, left));
-    stripEl.scrollTo({ left, behavior: behavior || 'smooth' });
+    /* Detail gallery uses CSS marquee + static hero; nothing to clear */
   }
 
   function setupCarousel(heroEl, stripEl, urls) {
@@ -412,16 +384,10 @@
     const heroWrap = heroEl.parentElement;
     heroEl.removeAttribute('src');
     stripEl.innerHTML = '';
-    const prevBtn = document.querySelector('.detail-strip-prev');
-    const nextBtn = document.querySelector('.detail-strip-next');
-
-    if (stripScrollHandler && prevBtn && nextBtn) {
-      prevBtn.removeEventListener('click', stripScrollHandler.prev);
-      nextBtn.removeEventListener('click', stripScrollHandler.next);
-      stripScrollHandler = null;
-    }
+    stripEl.className = 'detail-marquee__slider';
 
     const dock = document.querySelector('.detail-gallery-dock');
+    const marqueeRoot = document.getElementById('detail-marquee');
 
     if (!urls.length) {
       heroEl.alt = '';
@@ -431,6 +397,7 @@
         heroWrap.style.removeProperty('--detail-hero-bg');
       }
       if (dock) dock.hidden = true;
+      if (marqueeRoot) marqueeRoot.classList.add('detail-marquee--static');
       return;
     }
 
@@ -440,7 +407,7 @@
     if (heroWrap) {
       heroWrap.classList.remove('is-empty');
     }
-    heroEl.decoding = 'async';
+    heroEl.decoding = 'sync';
     if ('fetchPriority' in heroEl) {
       heroEl.fetchPriority = 'high';
     }
@@ -464,15 +431,9 @@
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    function scheduleAutoplay() {
-      clearAutoplayTimer();
-      if (urls.length <= 1 || prefersReduced) return;
-      stripAutoplayTimer = window.setInterval(() => {
-        goToIndex(currentIdx + 1, true);
-      }, 4600);
-    }
+    const runMarquee = urls.length > 1 && !prefersReduced;
 
-    function goToIndex(idx, scrollThumb) {
+    function goToIndex(idx) {
       const n = urls.length;
       currentIdx = ((idx % n) + n) % n;
       heroEl.src = urls[currentIdx];
@@ -482,83 +443,66 @@
         const bgUrl = urls[currentIdx].replace(/(["'()\\])/g, '\\$1');
         heroWrap.style.setProperty('--detail-hero-bg', `url("${bgUrl}")`);
       }
-      const thumbs = stripEl.querySelectorAll('.detail-thumb');
-      thumbs.forEach((t, i) => {
-        t.classList.toggle('is-active', i === currentIdx);
+      stripEl.querySelectorAll('.detail-thumb').forEach((t) => {
+        const ti = Number(t.dataset.thumbIndex);
+        t.classList.toggle('is-active', ti === currentIdx);
       });
-      if (scrollThumb && thumbs[currentIdx]) {
-        scrollThumbIntoStrip(stripEl, thumbs[currentIdx], 'smooth');
-      }
     }
 
     heroEl.style.cursor = 'zoom-in';
     heroEl.onclick = () => openMomentsLightbox(lightboxItems, currentIdx);
 
-    urls.forEach((url, idx) => {
+    function makeThumb(idx) {
+      const url = urls[idx];
       const dish = galleryTitleForUrl(url);
       const b = document.createElement('button');
       b.type = 'button';
+      b.dataset.thumbIndex = String(idx);
       b.className = 'detail-thumb' + (idx === 0 ? ' is-active' : '');
       b.setAttribute('aria-label', dish ? `Show ${dish}` : 'Show image ' + (idx + 1));
       const im = document.createElement('img');
       im.src = url;
       im.alt = dish || '';
-      im.loading = 'lazy';
+      im.loading = idx < 12 ? 'eager' : 'lazy';
       im.decoding = 'async';
-      im.sizes = '124px';
+      im.sizes = '140px';
       b.appendChild(im);
       b.addEventListener('click', () => {
-        goToIndex(idx, true);
+        goToIndex(idx);
         openMomentsLightbox(lightboxItems, idx);
-        scheduleAutoplay();
       });
       b.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
-          goToIndex(idx, true);
+          goToIndex(idx);
           openMomentsLightbox(lightboxItems, idx);
         }
       });
-      stripEl.appendChild(b);
-    });
-
-    goToIndex(0, false);
-
-    const scrollAmount = () => Math.min(stripEl.clientWidth * 0.85, 280);
-
-    function scrollStrip(dir) {
-      stripEl.scrollBy({ left: dir * scrollAmount(), behavior: 'smooth' });
+      return b;
     }
 
-    stripScrollHandler = {
-      prev: () => scrollStrip(-1),
-      next: () => scrollStrip(1),
-    };
-    if (prevBtn && nextBtn) {
-      prevBtn.addEventListener('click', stripScrollHandler.prev);
-      nextBtn.addEventListener('click', stripScrollHandler.next);
+    const seq1 = document.createElement('div');
+    seq1.className = 'detail-marquee__seq';
+    urls.forEach((_, idx) => seq1.appendChild(makeThumb(idx)));
+
+    stripEl.appendChild(seq1);
+
+    if (runMarquee) {
+      const seq2 = document.createElement('div');
+      seq2.className = 'detail-marquee__seq';
+      seq2.setAttribute('aria-hidden', 'true');
+      urls.forEach((_, idx) => seq2.appendChild(makeThumb(idx)));
+      stripEl.appendChild(seq2);
+      const secPerImg = 2.4;
+      const dur = Math.min(100, Math.max(26, urls.length * secPerImg));
+      stripEl.style.setProperty('--detail-marquee-duration', `${dur}s`);
+      if (marqueeRoot) marqueeRoot.classList.remove('detail-marquee--static');
+    } else {
+      stripEl.style.removeProperty('--detail-marquee-duration');
+      if (marqueeRoot) marqueeRoot.classList.add('detail-marquee--static');
     }
 
-    scheduleAutoplay();
-
-    if (dock && urls.length > 1 && !prefersReduced) {
-      const pause = () => {
-        clearAutoplayTimer();
-      };
-      const resume = () => {
-        scheduleAutoplay();
-      };
-      dock.addEventListener('mouseenter', pause);
-      dock.addEventListener('mouseleave', resume);
-      dock.addEventListener('focusin', pause);
-      dock.addEventListener('focusout', resume);
-      dockInteractionCleanup = () => {
-        dock.removeEventListener('mouseenter', pause);
-        dock.removeEventListener('mouseleave', resume);
-        dock.removeEventListener('focusin', pause);
-        dock.removeEventListener('focusout', resume);
-      };
-    }
+    goToIndex(0);
   }
 
   const overlay = document.getElementById('detail-overlay');

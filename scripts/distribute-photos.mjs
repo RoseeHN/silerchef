@@ -74,6 +74,22 @@ const ALL_GALLERY_TARGETS = [...CUISINE_TARGETS, ...SERVICE_TARGETS];
 const IMAGE_EXT = /\.(jpe?g|png|webp)$/i;
 const VIDEO_EXT = /\.(mp4|mov|webm|m4v)$/i;
 
+function isVideoOptSidecar(name) {
+  return /\.opt\.(mp4|mov|webm|m4v)$/i.test(name);
+}
+
+/** Numbered video clips only (excludes e.g. 01.opt.mp4 sidecars). */
+function listBaseVideos(vdir) {
+  if (!fs.existsSync(vdir)) return [];
+  return fs.readdirSync(vdir).filter((f) => VIDEO_EXT.test(f) && !isVideoOptSidecar(f));
+}
+
+function optSidecarForVideo(name) {
+  const ext = path.extname(name);
+  const base = name.slice(0, -ext.length);
+  return `${base}.opt${ext}`;
+}
+
 function loadManifestFile() {
   try {
     const raw = fs.readFileSync(MANIFEST_PATH, 'utf8');
@@ -167,7 +183,7 @@ function inferMissingManifestTitles() {
 
   walkFilesRecursive(
     DEST,
-    (n) => VIDEO_EXT.test(n),
+    (n) => VIDEO_EXT.test(n) && !isVideoOptSidecar(n),
     (full) => {
       const key = manifestKeyFromDestAbs(full);
       if (manifest.videos[key]) return;
@@ -301,6 +317,62 @@ function sortNumeric(names) {
     const nb = parseInt(String(b).replace(/\D/g, ''), 10) || 0;
     return na - nb;
   });
+}
+
+/** Same-size duplicate clips → keep lowest numeric stem; remove extras and matching *.opt.* */
+function dedupeVideosBySize(vdir) {
+  if (!fs.existsSync(vdir)) return 0;
+  const files = listBaseVideos(vdir);
+  const bySize = new Map();
+  for (const f of files) {
+    const sz = fs.statSync(path.join(vdir, f)).size;
+    if (!bySize.has(sz)) bySize.set(sz, []);
+    bySize.get(sz).push(f);
+  }
+  let removed = 0;
+  for (const group of bySize.values()) {
+    if (group.length < 2) continue;
+    const sorted = sortNumeric(group);
+    for (let i = 1; i < sorted.length; i++) {
+      const f = sorted[i];
+      fs.unlinkSync(path.join(vdir, f));
+      const opt = path.join(vdir, optSidecarForVideo(f));
+      if (fs.existsSync(opt)) fs.unlinkSync(opt);
+      removed += 1;
+    }
+  }
+  return removed;
+}
+
+/** Normalize clips to 01.ext … NN.ext (+ 01.opt.ext when present). */
+function renumberVideoFolder(vdir) {
+  if (!fs.existsSync(vdir)) return;
+  const files = sortNumeric(listBaseVideos(vdir));
+  if (files.length === 0) return;
+  const tmp = path.join(vdir, '__vtmp');
+  ensureDir(tmp);
+  const meta = files.map((f) => {
+    const ext = path.extname(f);
+    return {
+      ext,
+      hasOpt: fs.existsSync(path.join(vdir, optSidecarForVideo(f))),
+    };
+  });
+  files.forEach((f, i) => {
+    fs.renameSync(path.join(vdir, f), path.join(tmp, `b${i}${meta[i].ext}`));
+    if (meta[i].hasOpt) {
+      fs.renameSync(path.join(vdir, optSidecarForVideo(f)), path.join(tmp, `o${i}${meta[i].ext}`));
+    }
+  });
+  meta.forEach((m, i) => {
+    const num = String(i + 1).padStart(2, '0');
+    fs.renameSync(path.join(tmp, `b${i}${m.ext}`), path.join(vdir, `${num}${m.ext}`));
+    const oSrc = path.join(tmp, `o${i}${m.ext}`);
+    if (fs.existsSync(oSrc)) {
+      fs.renameSync(oSrc, path.join(vdir, `${num}.opt${m.ext}`));
+    }
+  });
+  fs.rmdirSync(tmp);
 }
 
 function sortBasenames(paths) {
@@ -540,6 +612,9 @@ function patchIndexHtml({ wroteCraft, momentCount }) {
 function migrateMisplacedByFilename() {
   const moves = [];
   for (const rel of ALL_GALLERY_TARGETS) {
+    // Cuisine folders follow the website media folder ("american cuisine", …). Do not
+    // re-route by filename — keywords like "cheesecake" or "cruller" would steal assets.
+    if (rel.startsWith('cuisines/')) continue;
     const gdir = path.join(DEST, rel, 'gallery');
     if (!fs.existsSync(gdir)) continue;
     for (const f of listGalleryImages(gdir)) {
@@ -644,9 +719,7 @@ function appendFromWebsite() {
     if (!vpaths.length) continue;
     const vdir = path.join(DEST, rel, 'videos');
     ensureDir(vdir);
-    const vExisting = fs.existsSync(vdir)
-      ? fs.readdirSync(vdir).filter((f) => VIDEO_EXT.test(f))
-      : [];
+    const vExisting = fs.existsSync(vdir) ? listBaseVideos(vdir) : [];
     let vidx = maxNumberedIndex(vdir, vExisting);
     const seenVidBasenames = new Set();
     const copiedVids = [];
@@ -660,7 +733,7 @@ function appendFromWebsite() {
       vidAdded += 1;
     }
     if (copiedVids.length) {
-      const allV = sortNumeric(fs.readdirSync(vdir).filter((f) => VIDEO_EXT.test(f)));
+      const allV = sortNumeric(listBaseVideos(vdir));
       const nc = copiedVids.length;
       for (let i = 0; i < nc; i++) {
         const fname = allV[allV.length - nc + i];
@@ -671,6 +744,15 @@ function appendFromWebsite() {
           source: path.basename(src),
         };
       }
+    }
+  }
+
+  for (const rel of CUISINE_TARGETS) {
+    const vdir = path.join(DEST, rel, 'videos');
+    const removed = dedupeVideosBySize(vdir);
+    renumberVideoFolder(vdir);
+    if (removed > 0) {
+      console.log('Video dedupe:', rel, 'removed', removed, 'duplicate(s)');
     }
   }
 
