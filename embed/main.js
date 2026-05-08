@@ -165,9 +165,11 @@
     const m = galleryManifestCache;
     if (!m || !url) return '';
     const key = normalizeGalleryAssetKey(url);
-    const img = m.images && m.images[key];
+    const keyBaseMp4 = /\.opt\.mp4$/i.test(key) ? key.replace(/\.opt\.mp4$/i, '.mp4') : key;
+    const img = m.images && (m.images[key] || (keyBaseMp4 !== key ? m.images[keyBaseMp4] : null));
     if (img && img.title) return img.title;
-    const vid = m.videos && m.videos[key];
+    const vid =
+      m.videos && (m.videos[key] || (keyBaseMp4 !== key ? m.videos[keyBaseMp4] : null));
     if (vid && vid.title) return vid.title;
     return '';
   }
