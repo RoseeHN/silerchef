@@ -202,6 +202,7 @@
       referrerpolicy="no-referrer"
     />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="gallery.css" />
     <link rel="icon" type="image/png" href="images/brand/silerchef-logo.png" />
   </head>
   <body>
@@ -233,7 +234,8 @@
           <ul>
             <li><a href="#home">Home</a></li>
             <li><a href="#cuisines">Cuisines</a></li>
-            <li><a href="#moments">Gallery</a></li>
+            <li><a href="#video-gallery">Videos</a></li>
+            <li><a href="#moments">Photos</a></li>
             <li><a href="#services">Services &amp; Occasions</a></li>
             <li><a href="#contact">Contact</a></li>
             <li class="site-nav__cta-mobile">
@@ -614,10 +616,124 @@
                 At Siler Chef, true luxury lives in the details. Every element is hand-crafted from scratch, from long-fermented breads to freshly spun frozen desserts, honoring traditional technique while delivering a polished private-dining experience at home.
               </p>
               <div class="module-split-actions">
-                <a class="btn btn-ghost" href="#moments">See the gallery</a>
-                <a class="btn btn-ghost" href="/gallery">Open full archive</a>
-                <a class="btn btn-ghost" href="#cuisines">View sample menus</a>
+                <a class="btn btn-ghost" href="#video-gallery">Video gallery</a>
+                <a class="btn btn-ghost" href="#moments">Photo moments</a>
+                <a class="btn btn-ghost" href="/gallery">Full archive</a>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="video-gallery" class="module module--video-gallery observe" aria-labelledby="home-video-gallery-title">
+          <div class="shell">
+            <header class="section-head section-head--premium">
+              <p class="section-eyebrow">Motion</p>
+              <h2 id="home-video-gallery-title" class="gold-text">Video gallery</h2>
+              <p class="section-lede">
+                Prep, fire, and pastry in motion — inline playback on phones, the same reels as the full gallery archive.
+              </p>
+            </header>
+            <div class="gallery-strip">
+              <div class="gallery-videos">
+                <article class="video-card">
+                  <div class="video-card__media">
+                    <video
+                      controls
+                      muted
+                      playsinline
+                      webkit-playsinline
+                      disableremoteplayback
+                      preload="metadata"
+                      poster="images/gallery-curated/posters/01-6f3dd371cb81478db17cbcd94472dae5.jpg"
+                      src="images/gallery-curated/videos/01-6f3dd371cb81478db17cbcd94472dae5.mp4"
+                    ></video>
+                  </div>
+                  <div class="video-card__meta">
+                    <span>Pastry bench</span>
+                    <strong>Quiet production before service</strong>
+                    <p>Clean repetition, pastry rhythm, and a softer luxury note that balances the fire-heavy side of the brand.</p>
+                  </div>
+                </article>
+                <article class="video-card">
+                  <div class="video-card__media">
+                    <video
+                      controls
+                      muted
+                      playsinline
+                      webkit-playsinline
+                      disableremoteplayback
+                      preload="metadata"
+                      poster="images/gallery-curated/posters/02-img-3927.jpg"
+                      src="images/gallery-curated/videos/02-img-3927.mp4"
+                    ></video>
+                  </div>
+                  <div class="video-card__meta">
+                    <span>Fire &amp; smoke</span>
+                    <strong>Outdoor heat, direct texture</strong>
+                    <p>One of the strongest “chef in motion” clips for premium casual events and open-flame dinners.</p>
+                  </div>
+                </article>
+                <article class="video-card">
+                  <div class="video-card__media">
+                    <video
+                      controls
+                      muted
+                      playsinline
+                      webkit-playsinline
+                      disableremoteplayback
+                      preload="metadata"
+                      poster="images/gallery-curated/posters/03-img-4367.jpg"
+                      src="images/gallery-curated/videos/03-img-4367.mp4"
+                    ></video>
+                  </div>
+                  <div class="video-card__meta">
+                    <span>Chef at work</span>
+                    <strong>Smoker-side prep with a stronger service feel</strong>
+                    <p>Real kitchen movement instead of only plated stills.</p>
+                  </div>
+                </article>
+                <article class="video-card">
+                  <div class="video-card__media">
+                    <video
+                      controls
+                      muted
+                      playsinline
+                      webkit-playsinline
+                      disableremoteplayback
+                      preload="metadata"
+                      poster="images/gallery-curated/posters/04-img-4368.jpg"
+                      src="images/gallery-curated/videos/04-img-4368.mp4"
+                    ></video>
+                  </div>
+                  <div class="video-card__meta">
+                    <span>Production line</span>
+                    <strong>Extended pastry sequence</strong>
+                    <p>Craft and repetition behind the finished table.</p>
+                  </div>
+                </article>
+                <article class="video-card">
+                  <div class="video-card__media">
+                    <video
+                      controls
+                      muted
+                      playsinline
+                      webkit-playsinline
+                      disableremoteplayback
+                      preload="metadata"
+                      poster="images/gallery-curated/posters/05-49847c0891a34c0083cbf223c3464865.jpg"
+                      src="images/gallery-curated/videos/05-49847c0891a34c0083cbf223c3464865.mp4"
+                    ></video>
+                  </div>
+                  <div class="video-card__meta">
+                    <span>Close texture</span>
+                    <strong>Fire detail without losing polish</strong>
+                    <p>Depth, caramelization, and real craft in frame.</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+            <div class="module-split-actions module-split-actions--center">
+              <a class="btn btn-ghost" href="/gallery#video-gallery">Full video archive</a>
             </div>
           </div>
         </section>
@@ -1030,11 +1146,16 @@
               </figure>
             </div>
             <div class="moments-footnote">
-              <span class="moments-footnote__label">Curated gallery</span>
-              <p>Each frame is there to show tone, plating language, and how the evening feels in motion — not just the dish itself.</p>
+              <span class="moments-footnote__label">Curated photos</span>
+              <p>
+                Still frames show tone and plating language. For playable reels, use the
+                <a href="#video-gallery">Video gallery</a> above or the
+                <a href="/gallery#video-gallery">full archive</a>.
+              </p>
             </div>
             <div class="module-split-actions">
-              <a class="btn btn-ghost" href="/gallery">Open full gallery</a>
+              <a class="btn btn-ghost" href="/gallery#photo-gallery">Open photo library</a>
+              <a class="btn btn-ghost" href="/gallery#video-gallery">Open video archive</a>
             </div>
           </div>
         </section>

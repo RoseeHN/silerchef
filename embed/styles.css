@@ -4265,6 +4265,21 @@ body.scroll-locked {
   background: linear-gradient(180deg, transparent, rgba(197, 160, 89, 0.04) 40%, transparent);
 }
 
+.module--video-gallery {
+  padding: clamp(2rem, 5vw, 3.25rem) 0;
+  border-top: 1px solid rgba(197, 160, 89, 0.12);
+  border-bottom: 1px solid rgba(197, 160, 89, 0.08);
+}
+
+.module--video-gallery .gallery-strip {
+  margin-top: clamp(0.5rem, 2vw, 1rem);
+}
+
+.module-split-actions--center {
+  justify-content: center;
+  margin-top: clamp(1rem, 3vw, 1.75rem);
+}
+
 .module--gallery-shimmer {
   padding: clamp(2rem, 5vw, 3.75rem) 0;
   position: relative;
