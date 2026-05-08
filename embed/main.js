@@ -1111,7 +1111,7 @@
             name: 'Siler Chef',
             alternateName: ['SilerChef', 'Chef Siler'],
             url: 'https://www.silerchef.com/',
-            image: 'https://www.silerchef.com/images/services-and-occasions/chef-education/hero.jpg',
+            image: 'https://www.silerchef.com/images/homepage/hero-01.jpg',
             logo: 'https://www.silerchef.com/images/brand/silerchef-logo.png',
             description: 'Private chef services for Reno, Lake Tahoe, and the Bay Area: custom menus, plated and family-style service, private events, and chef-led lessons.',
             telephone: contact.phone || '+1-775-389-6677',
@@ -1582,6 +1582,25 @@
     placement: 'page_load',
   });
 
+  (function initHeroRotator() {
+    const root = document.querySelector('.hero-rotator');
+    if (!root) return;
+    const slides = root.querySelectorAll('.hero-rotator__slide');
+    if (slides.length < 2) return;
+    const reduce =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) {
+      slides.forEach((s, i) => s.classList.toggle('is-active', i === 0));
+      return;
+    }
+    let idx = 0;
+    window.setInterval(() => {
+      idx = (idx + 1) % slides.length;
+      slides.forEach((s, j) => s.classList.toggle('is-active', j === idx));
+    }, 6500);
+  })();
+
   (function initChefReel() {
     const section = document.getElementById('reel');
     const video = document.getElementById('chef-reel-video');
@@ -1637,8 +1656,19 @@
     video.autoplay = true;
     video.loop = true;
     video.playsInline = true;
+    if ('disableRemotePlayback' in video) {
+      video.disableRemotePlayback = true;
+    }
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
     video.preload = 'metadata';
     video.load();
+
+    function reelSectionIntersectsViewport() {
+      const rect = section.getBoundingClientRect();
+      const vh = window.innerHeight || 0;
+      return rect.bottom > 0 && rect.top < vh;
+    }
 
     observer = new IntersectionObserver(
       (entries) => {
@@ -1653,6 +1683,18 @@
       { threshold: 0.15, rootMargin: '0px 0px -6% 0px' }
     );
     observer.observe(section);
+
+    document.addEventListener(
+      'visibilitychange',
+      () => {
+        if (document.visibilityState !== 'visible' || reduce.matches) return;
+        if (!videoReady || section.classList.contains('cinematic--fallback')) return;
+        if (reelSectionIntersectsViewport()) {
+          video.play().catch(() => {});
+        }
+      },
+      false
+    );
 
     if (btn) {
       btn.addEventListener('click', () => {

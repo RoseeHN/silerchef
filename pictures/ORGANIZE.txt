@@ -42,3 +42,23 @@ Notes:
 - Direct on-site booking (outside Wix Bookings) is separate scope / pricing.
 - To change which file goes to which folder, edit scripts/distribute-photos.mjs
   (classify function) and run npm run photos again.
+
+--- Matching photos to cuisines and to section headings (blocks) ---
+
+EN:
+- Automated bucket: filenames in silerchef.com pictures / are classified into
+  embed/images/cuisines/<slug>/gallery/ via scripts/distribute-photos.mjs.
+- Manual tweak: replace or reorder 01.jpg, 02.jpg, … inside a cuisine folder,
+  then re-run npm run photos only if you are regenerating from the source folder.
+- Detail sheet headings come from embed/data.js: each cuisine or service entry has
+  `blocks`: every block has `title` (the heading), `image` (thumbnail beside it),
+  and `items`. Set `image` to a gallery path such as cuisineBlockImage(slug, N) or
+  a full URL — order of blocks maps 1:1 to headings on the site.
+TR (özet):
+- Fotoğraflar klasörlere classify() ile veya doğrudan embed/images/cuisines/…/
+  gallery/ altında 01.jpg, 02.jpg sırasıyla yerleştirilir; npm run photos bu
+  yapıyı kaynak klasörden yeniden üretir.
+- Mutfağa (cuisine) özel küçük resim ve galeri: ilgili slug klasörü.
+- “Başlıklara dağıtmak”: embed/data.js içindeki blocks dizisi — her elemanın
+  `title` metni başlık, `image` alanı o başlığın yanındaki fotoğraf yoludur;
+  sıra, sitedeki blok sırasıyla aynıdır.
