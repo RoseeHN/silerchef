@@ -4271,6 +4271,16 @@ body.scroll-locked {
   border-bottom: 1px solid rgba(197, 160, 89, 0.08);
 }
 
+.module--video-gallery--spotlight {
+  padding: clamp(2.35rem, 5.5vw, 4rem) 0;
+  border-top: 1px solid rgba(197, 160, 89, 0.16);
+  border-bottom: 1px solid rgba(197, 160, 89, 0.12);
+  background:
+    radial-gradient(ellipse 88% 58% at 50% -18%, rgba(212, 188, 106, 0.12), transparent 58%),
+    radial-gradient(ellipse 52% 42% at 92% 85%, rgba(197, 160, 89, 0.06), transparent 48%),
+    linear-gradient(185deg, rgba(26, 22, 24, 0.97), rgba(12, 11, 12, 0.99));
+}
+
 .module--video-gallery .gallery-strip {
   margin-top: clamp(0.5rem, 2vw, 1rem);
 }

@@ -1,0 +1,791 @@
+{
+  "version": 1,
+  "images": {
+    "images/cuisines/american-cuisine/gallery/01.jpg": {
+      "title": "8 Hours Smoked Pork But",
+      "source": "8 hours smoked pork but.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/02.jpg": {
+      "title": "8 Hours Smoked Pork Butt 2",
+      "source": "8 hours smoked pork butt 2.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/03.jpg": {
+      "title": "8 Hours Smoked Pork Butt 4",
+      "source": "8 hours smoked pork butt 4.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/04.jpg": {
+      "title": "8 Hours Smoked Pork Butt",
+      "source": "8 hours smoked pork butt.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/05.jpg": {
+      "title": "Assorted Buttermilk Donut 2",
+      "source": "assorted buttermilk donut 2.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/06.jpg": {
+      "title": "Assorted Buttermilk Donuts",
+      "source": "assorted buttermilk donuts.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/07.jpg": {
+      "title": "Assorted Glaze Donuts",
+      "source": "assorted glaze donuts.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/08.jpg": {
+      "title": "Assorted Tea Cakes",
+      "source": "assorted tea cakes.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/09.jpg": {
+      "title": "Chocolate Caramel Crauquant Cake",
+      "source": "chocolate caramel crauquant cake.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/10.jpg": {
+      "title": "Chocolate Crouqant Cake",
+      "source": "chocolate crouqant cake.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/11.jpg": {
+      "title": "Chocolate Mirror Glaze Entremet With Macaron",
+      "source": "Chocolate Mirror Glaze Entremet with Macaron.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/12.jpg": {
+      "title": "Christmas Cookies",
+      "source": "christmas cookies.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/13.jpg": {
+      "title": "Cinnamon Twist Donut",
+      "source": "cinnamon twist donut.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/14.jpg": {
+      "title": "Fraiser 2",
+      "source": "fraiser 2.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/15.jpg": {
+      "title": "Fraiser Almond Cake",
+      "source": "fraiser almond cake.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/16.jpg": {
+      "title": "Framboise Opera",
+      "source": "Framboise Opera.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/17.jpg": {
+      "title": "French Cruller Donut",
+      "source": "french cruller donut.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/18.jpg": {
+      "title": "Mango Cheesecake",
+      "source": "mango cheesecake.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/19.jpg": {
+      "title": "Mango Vanilla Mirror Glaze Cheesecake",
+      "source": "mango vanilla mirror glaze cheesecake.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/20.jpg": {
+      "title": "Opera Cakes",
+      "source": "opera cakes.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/21.jpg": {
+      "title": "Rainbow Cake 2",
+      "source": "rainbow cake 2.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/22.jpg": {
+      "title": "Rainbow Cake",
+      "source": "rainbow cake.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/23.jpg": {
+      "title": "Raspberry Macaroons",
+      "source": "raspberry macaroons.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/24.jpg": {
+      "title": "Red Berry Chocolate Cake",
+      "source": "red berry chocolate cake.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/25.jpg": {
+      "title": "Rose Raspberry Macaroon",
+      "source": "rose raspberry macaroon.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/26.jpg": {
+      "title": "Saint Honore Cake",
+      "source": "saint honore cake.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/27.jpg": {
+      "title": "Slow Smoked Brisket",
+      "source": "slow smoked brisket.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/28.jpg": {
+      "title": "Slow Smooked Brisket",
+      "source": "slow smooked brisket.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/29.jpg": {
+      "title": "Smoked Tri Tip 3",
+      "source": "smoked tri tip 3.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/30.jpg": {
+      "title": "Smoked Tri Tip 4",
+      "source": "smoked tri tip 4.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/31.jpg": {
+      "title": "Smoked Tri Tip 5",
+      "source": "smoked tri tip 5.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/32.jpg": {
+      "title": "Smoked Tri Tip",
+      "source": "smoked tri tip.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/33.jpg": {
+      "title": "Smoked Tri Tip2",
+      "source": "smoked tri tip2.jpeg"
+    },
+    "images/cuisines/american-cuisine/gallery/34.jpg": {
+      "title": "Vanilla Chocolate Wedding Cake",
+      "source": "vanilla chocolate wedding cake.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/01.jpg": {
+      "title": "Assorted Cakes",
+      "source": "assorted cakes.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/02.jpg": {
+      "title": "Assorted Croissant 2",
+      "source": "assorted croissant 2.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/03.jpg": {
+      "title": "Assorted Croissant 3",
+      "source": "assorted croissant 3.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/04.jpg": {
+      "title": "Assorted Croissant",
+      "source": "assorted croissant.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/05.jpg": {
+      "title": "Assorted Eclairs",
+      "source": "assorted eclairs.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/06.jpg": {
+      "title": "Assorted Individual Cakes 2",
+      "source": "assorted individual cakes 2.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/07.jpg": {
+      "title": "Assorted Individual Cakes",
+      "source": "assorted individual cakes.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/08.jpg": {
+      "title": "Assorted Macaroons",
+      "source": "assorted macaroons.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/09.jpg": {
+      "title": "Caramel Coffe Au Millefeuille 2",
+      "source": "caramel coffe au millefeuille 2.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/10.jpg": {
+      "title": "Caramel Coffe Au Millefeuille",
+      "source": "caramel coffe au millefeuille.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/11.jpg": {
+      "title": "Caramel Vanilla Millefeuille",
+      "source": "caramel vanilla millefeuille.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/12.jpg": {
+      "title": "Coconut Raspberry Cake",
+      "source": "coconut raspberry cake.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/13.jpg": {
+      "title": "Fathers Day Special Cake",
+      "source": "fathers day special cake.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/14.jpg": {
+      "title": "French Dinner Plate 1",
+      "source": "french dinner plate 1.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/15.jpg": {
+      "title": "French Flan Pastry",
+      "source": "french flan pastry.jpg"
+    },
+    "images/cuisines/french-cuisine/gallery/16.jpg": {
+      "title": "Fruit Tarte 2",
+      "source": "fruit tarte 2.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/17.jpg": {
+      "title": "Fruit Tarte",
+      "source": "fruit tarte.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/18.jpg": {
+      "title": "Pistachio Croissant 2",
+      "source": "pistachio croissant 2.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/19.jpg": {
+      "title": "Pistachio Croissant",
+      "source": "pistachio croissant.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/20.jpg": {
+      "title": "Pistachio Eclair",
+      "source": "pistachio eclair.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/21.jpg": {
+      "title": "Plain Croissaint",
+      "source": "plain croissaint.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/22.jpg": {
+      "title": "Raspberry Jelly Macaroon",
+      "source": "raspberry jelly macaroon.jpg"
+    },
+    "images/cuisines/french-cuisine/gallery/23.jpg": {
+      "title": "Raspberry Macaroon",
+      "source": "raspberry macaroon.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/24.jpg": {
+      "title": "Strawberry Glazed Tarte",
+      "source": "strawberry glazed tarte.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/25.jpg": {
+      "title": "Strawberry Glazed Tarte",
+      "source": "strawberry glazed tarte.jpg"
+    },
+    "images/cuisines/french-cuisine/gallery/26.jpg": {
+      "title": "Vanilla Chocolate Individual Cake 2",
+      "source": "vanilla chocolate individual cake 2.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/27.jpg": {
+      "title": "Vanilla Chocolate Individual Cake",
+      "source": "vanilla chocolate individual cake.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/28.jpg": {
+      "title": "Vanilla Choux Au Craquelin",
+      "source": "vanilla choux au craquelin.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/29.jpg": {
+      "title": "Vanilla Choux Craquelin",
+      "source": "vanilla choux craquelin.jpg"
+    },
+    "images/cuisines/french-cuisine/gallery/30.jpg": {
+      "title": "Vanilla Mascarpone Baba Au Rhum",
+      "source": "vanilla mascarpone Baba au Rhum.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/31.jpg": {
+      "title": "Vanilla Mascarpone Raspberry Cake",
+      "source": "vanilla mascarpone raspberry cake.jpeg"
+    },
+    "images/cuisines/french-cuisine/gallery/32.jpg": {
+      "title": "Vanilla Raspberry Eclair",
+      "source": "vanilla raspberry eclair.jpeg"
+    },
+    "images/cuisines/greek-cuisine/gallery/01.jpg": {
+      "title": "C48ce732 3a79 438e 8cd0 5bb81cbd408e",
+      "source": "c48ce732-3a79-438e-8cd0-5bb81cbd408e.jpg"
+    },
+    "images/cuisines/greek-cuisine/gallery/02.jpg": {
+      "title": "Ccda15b7 1ddb 4f89 A3d8 C24ca3d9075a",
+      "source": "ccda15b7-1ddb-4f89-a3d8-c24ca3d9075a.jpg"
+    },
+    "images/cuisines/greek-cuisine/gallery/03.jpg": {
+      "title": "F89708b0 Ce29 453c 9b1f 0c108e34c597",
+      "source": "f89708b0-ce29-453c-9b1f-0c108e34c597.jpg"
+    },
+    "images/cuisines/greek-cuisine/gallery/04.jpg": {
+      "title": "Kalamata Food 2",
+      "source": "Kalamata - Food-2.jpg"
+    },
+    "images/cuisines/greek-cuisine/gallery/05.jpg": {
+      "title": "Kalamata Food 7",
+      "source": "Kalamata - Food-7.jpg"
+    },
+    "images/cuisines/greek-cuisine/gallery/06.jpg": {
+      "title": "Kalamata Food 9",
+      "source": "Kalamata - Food-9.jpg"
+    },
+    "images/cuisines/greek-cuisine/gallery/07.jpg": {
+      "title": "Kalamata Food 13",
+      "source": "Kalamata - Food-13.jpg"
+    },
+    "images/cuisines/greek-cuisine/gallery/08.jpg": {
+      "title": "Kalamata Food 22",
+      "source": "Kalamata - Food-22.jpg"
+    },
+    "images/cuisines/greek-cuisine/gallery/09.jpg": {
+      "title": "Kalamata Food 27",
+      "source": "Kalamata - Food-27.jpg"
+    },
+    "images/cuisines/greek-cuisine/gallery/10.jpg": {
+      "title": "Kalamata Food 45",
+      "source": "Kalamata - Food-45.jpg"
+    },
+    "images/cuisines/greek-cuisine/gallery/11.jpg": {
+      "title": "Kalamata Food 46",
+      "source": "Kalamata - Food-46.jpg"
+    },
+    "images/cuisines/greek-cuisine/gallery/12.jpg": {
+      "title": "Kalamata Food 48",
+      "source": "Kalamata - Food-48.jpg"
+    },
+    "images/cuisines/greek-cuisine/gallery/13.jpg": {
+      "title": "Kalamata Food 52",
+      "source": "Kalamata - Food-52.jpg"
+    },
+    "images/cuisines/greek-cuisine/gallery/14.jpg": {
+      "title": "Kalamata Food 55",
+      "source": "Kalamata - Food-55.jpg"
+    },
+    "images/cuisines/greek-cuisine/gallery/15.jpg": {
+      "title": "Kalamata Food 58",
+      "source": "Kalamata - Food-58.jpg"
+    },
+    "images/cuisines/greek-cuisine/gallery/16.jpg": {
+      "title": "Kalamata Food 68",
+      "source": "Kalamata - Food-68.jpg"
+    },
+    "images/cuisines/italian-cuisine/gallery/01.jpg": {
+      "title": "Birthday Cake",
+      "source": "birthday cake.jpeg"
+    },
+    "images/cuisines/italian-cuisine/gallery/02.jpg": {
+      "title": "Buche De Noel 1",
+      "source": "buche de noel 1.jpg"
+    },
+    "images/cuisines/italian-cuisine/gallery/03.jpg": {
+      "title": "Buche De Noel Chocolate Caramel",
+      "source": "Buche de Noel Chocolate caramel.jpeg"
+    },
+    "images/cuisines/italian-cuisine/gallery/04.jpg": {
+      "title": "Buche De Noel Raspberry Lemon",
+      "source": "buche de noel raspberry lemon.jpeg"
+    },
+    "images/cuisines/italian-cuisine/gallery/05.jpg": {
+      "title": "Buche De Noel Trio Chocolate",
+      "source": "buche de noel trio chocolate.jpeg"
+    },
+    "images/cuisines/italian-cuisine/gallery/06.jpg": {
+      "title": "Cavolfiore Fritti",
+      "source": "cavolfiore fritti.jpeg"
+    },
+    "images/cuisines/italian-cuisine/gallery/07.jpg": {
+      "title": "Chicken Spinach Homemade Pasta 2",
+      "source": "chicken spinach homemade pasta 2.jpeg"
+    },
+    "images/cuisines/italian-cuisine/gallery/08.jpg": {
+      "title": "Chicken Spinach Homemade Pasta",
+      "source": "chicken spinach homemade pasta.jpeg"
+    },
+    "images/cuisines/italian-cuisine/gallery/09.jpg": {
+      "title": "Galette De Rois 2",
+      "source": "galette de rois 2.jpeg"
+    },
+    "images/cuisines/italian-cuisine/gallery/10.jpg": {
+      "title": "Galette De Rois 3",
+      "source": "galette de rois 3.jpeg"
+    },
+    "images/cuisines/italian-cuisine/gallery/11.jpg": {
+      "title": "Galette De Rois",
+      "source": "galette de rois.jpeg"
+    },
+    "images/cuisines/italian-cuisine/gallery/12.jpg": {
+      "title": "Garden Pizza 2",
+      "source": "garden pizza 2.jpeg"
+    },
+    "images/cuisines/italian-cuisine/gallery/13.jpg": {
+      "title": "Garden Pizza",
+      "source": "garden pizza.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/01.jpg": {
+      "title": "Berry Entremet Bar",
+      "source": "Berry Entremet Bar.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/02.jpg": {
+      "title": "Blueberry Muffin",
+      "source": "blueberry muffin.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/03.jpg": {
+      "title": "Caramel Apple Bande",
+      "source": "caramel apple bande.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/04.jpg": {
+      "title": "Coffe Chocolate Truffle Cake",
+      "source": "coffe chocolate truffle cake.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/05.jpg": {
+      "title": "Coffee Caramel Bûche De Noël",
+      "source": "coffee caramel Bûche de Noël.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/06.jpg": {
+      "title": "Dark Chocolate Cake",
+      "source": "dark chocolate cake.jpg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/07.jpg": {
+      "title": "Green Salsa Creamy Scallop 2",
+      "source": "green salsa creamy scallop 2.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/08.jpg": {
+      "title": "Green Salsa Creamy Scallop",
+      "source": "green salsa creamy scallop.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/09.jpg": {
+      "title": "Key Lime Merenque Cake 2",
+      "source": "key lime merenque cake 2.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/10.jpg": {
+      "title": "Key Lime Merenque Cake",
+      "source": "key lime merenque cake.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/11.jpg": {
+      "title": "Kung Pao Chicken",
+      "source": "Kung Pao Chicken.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/12.jpg": {
+      "title": "Lemon Chicken Picatta Homemade Pasta",
+      "source": "lemon chicken picatta homemade pasta.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/13.jpg": {
+      "title": "Lemon Lime Merenque Cake",
+      "source": "lemon lime merenque cake.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/14.jpg": {
+      "title": "Lemon Tea Cake 2",
+      "source": "lemon tea cake 2.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/15.jpg": {
+      "title": "Lemon Tea Cake",
+      "source": "lemon tea cake.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/16.jpg": {
+      "title": "Patacones",
+      "source": "patacones.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/17.jpg": {
+      "title": "Petit Fours",
+      "source": "petit fours.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/18.jpg": {
+      "title": "Pistachio Vanilla Tea Cake",
+      "source": "pistachio vanilla tea cake.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/19.jpg": {
+      "title": "Red Sauce Penne Shrimp Pasta",
+      "source": "red sauce penne shrimp pasta.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/20.jpg": {
+      "title": "Spaghetti Chicken Kung Pao",
+      "source": "spaghetti chicken kung pao.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/21.jpg": {
+      "title": "Spaghetti Ckicken Kung Pao 2",
+      "source": "spaghetti ckicken kung pao 2.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/22.jpg": {
+      "title": "Strawberry Coconut Cake",
+      "source": "strawberry coconut cake.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/23.jpg": {
+      "title": "Strawberry Liche Framboise Cake 2",
+      "source": "strawberry liche framboise cake 2.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/24.jpg": {
+      "title": "Strawberry Liche Framboise Cake",
+      "source": "strawberry liche framboise cake.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/25.jpg": {
+      "title": "Strawberry Mousse Entremet With Mirror Glaze And Rocher Base",
+      "source": "Strawberry Mousse Entremet with Mirror Glaze and Rocher Base.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/26.jpg": {
+      "title": "Tarte Fine Aux Pommes",
+      "source": "Tarte Fine aux Pommes.jpeg"
+    },
+    "images/cuisines/middle-eastern-cuisine/gallery/27.jpg": {
+      "title": "Trio Chocolate Cake",
+      "source": "trio chocolate cake.jpeg"
+    },
+    "images/cuisines/turkish-cuisine/gallery/01.jpg": {
+      "title": "Chocolate Mirror Glaze Log",
+      "source": "Chocolate Mirror Glaze Log.jpeg"
+    },
+    "images/cuisines/turkish-cuisine/gallery/02.jpg": {
+      "title": "Kalamata Food 15",
+      "source": "Kalamata - Food-15.jpg"
+    },
+    "images/cuisines/turkish-cuisine/gallery/03.jpg": {
+      "title": "Kalamata Food 19",
+      "source": "Kalamata - Food-19.jpg"
+    },
+    "images/cuisines/turkish-cuisine/gallery/04.jpg": {
+      "title": "Kalamata Food 24",
+      "source": "Kalamata - Food-24.jpg"
+    },
+    "images/cuisines/turkish-cuisine/gallery/05.jpg": {
+      "title": "Kalamata Food 30",
+      "source": "Kalamata - Food-30.jpg"
+    },
+    "images/cuisines/turkish-cuisine/gallery/06.jpg": {
+      "title": "Kalamata Food 47",
+      "source": "Kalamata - Food-47.jpg"
+    },
+    "images/cuisines/turkish-cuisine/gallery/07.jpg": {
+      "title": "Kalamata Food 60",
+      "source": "Kalamata - Food-60.jpg"
+    },
+    "images/cuisines/turkish-cuisine/gallery/08.jpg": {
+      "title": "Kalamata Food 63",
+      "source": "Kalamata - Food-63.jpg"
+    },
+    "images/cuisines/turkish-cuisine/gallery/09.jpg": {
+      "title": "Pistachio Raspberry Tarte",
+      "source": "pistachio raspberry tarte.jpg"
+    },
+    "images/homepage/hero-01.jpg": {
+      "title": "French Madeleine",
+      "source": "french madeleine.jpeg"
+    },
+    "images/homepage/hero-02.jpg": {
+      "title": "Mango Cheesecake 1",
+      "source": "mango cheesecake 1.jpeg"
+    },
+    "images/homepage/hero-03.jpg": {
+      "title": "Merenque",
+      "source": "merenque.jpeg"
+    },
+    "images/services-and-occasions/chef-education/hero.jpg": {
+      "title": "French Madeleine",
+      "source": "french madeleine.jpeg"
+    },
+    "images/brand/business-card.jpg": {
+      "title": "Business Card",
+      "source": "business-card.jpg"
+    },
+    "images/brand/silerchef-logo.png": {
+      "title": "Silerchef Logo",
+      "source": "silerchef-logo.png"
+    },
+    "images/cuisines/american-cuisine/hero.jpg": {
+      "title": "Hero",
+      "source": "hero.jpg"
+    },
+    "images/cuisines/american-cuisine/thumb.jpg": {
+      "title": "Thumb",
+      "source": "thumb.jpg"
+    },
+    "images/cuisines/french-cuisine/hero.jpg": {
+      "title": "Hero",
+      "source": "hero.jpg"
+    },
+    "images/cuisines/french-cuisine/thumb.jpg": {
+      "title": "Thumb",
+      "source": "thumb.jpg"
+    },
+    "images/cuisines/greek-cuisine/hero.jpg": {
+      "title": "Hero",
+      "source": "hero.jpg"
+    },
+    "images/cuisines/greek-cuisine/thumb.jpg": {
+      "title": "Thumb",
+      "source": "thumb.jpg"
+    },
+    "images/cuisines/italian-cuisine/hero.jpg": {
+      "title": "Hero",
+      "source": "hero.jpg"
+    },
+    "images/cuisines/italian-cuisine/thumb.jpg": {
+      "title": "Thumb",
+      "source": "thumb.jpg"
+    },
+    "images/cuisines/middle-eastern-cuisine/hero.jpg": {
+      "title": "Hero",
+      "source": "hero.jpg"
+    },
+    "images/cuisines/middle-eastern-cuisine/thumb.jpg": {
+      "title": "Thumb",
+      "source": "thumb.jpg"
+    },
+    "images/cuisines/turkish-cuisine/hero.jpg": {
+      "title": "Hero",
+      "source": "hero.jpg"
+    },
+    "images/cuisines/turkish-cuisine/thumb.jpg": {
+      "title": "Thumb",
+      "source": "thumb.jpg"
+    },
+    "images/gallery-curated/photos/01-83a4c077-2caf-4be5-996e-e4996de4fb79.jpg": {
+      "title": "83a4c077 2caf 4be5 996e E4996de4fb79",
+      "source": "01-83a4c077-2caf-4be5-996e-e4996de4fb79.jpg"
+    },
+    "images/gallery-curated/photos/02-kalamata-food-13.jpg": {
+      "title": "Kalamata Food 13",
+      "source": "02-kalamata-food-13.jpg"
+    },
+    "images/gallery-curated/photos/03-kalamata-food-17.jpg": {
+      "title": "Kalamata Food 17",
+      "source": "03-kalamata-food-17.jpg"
+    },
+    "images/gallery-curated/photos/04-kalamata-food-21.jpg": {
+      "title": "Kalamata Food 21",
+      "source": "04-kalamata-food-21.jpg"
+    },
+    "images/gallery-curated/photos/05-kalamata-food-29.jpg": {
+      "title": "Kalamata Food 29",
+      "source": "05-kalamata-food-29.jpg"
+    },
+    "images/gallery-curated/photos/06-kalamata-food-34.jpg": {
+      "title": "Kalamata Food 34",
+      "source": "06-kalamata-food-34.jpg"
+    },
+    "images/gallery-curated/photos/07-kalamata-food-4.jpg": {
+      "title": "Kalamata Food 4",
+      "source": "07-kalamata-food-4.jpg"
+    },
+    "images/gallery-curated/photos/08-kalamata-food-43.jpg": {
+      "title": "Kalamata Food 43",
+      "source": "08-kalamata-food-43.jpg"
+    },
+    "images/gallery-curated/photos/09-kalamata-food-47.jpg": {
+      "title": "Kalamata Food 47",
+      "source": "09-kalamata-food-47.jpg"
+    },
+    "images/gallery-curated/photos/10-kalamata-food-50.jpg": {
+      "title": "Kalamata Food 50",
+      "source": "10-kalamata-food-50.jpg"
+    },
+    "images/gallery-curated/photos/11-kalamata-food-58.jpg": {
+      "title": "Kalamata Food 58",
+      "source": "11-kalamata-food-58.jpg"
+    },
+    "images/gallery-curated/photos/12-kalamata-food-61.jpg": {
+      "title": "Kalamata Food 61",
+      "source": "12-kalamata-food-61.jpg"
+    },
+    "images/gallery-curated/photos/13-kalamata-food-69.jpg": {
+      "title": "Kalamata Food 69",
+      "source": "13-kalamata-food-69.jpg"
+    },
+    "images/gallery-curated/photos/14-ccda15b7-1ddb-4f89-a3d8-c24ca3d9075a.jpg": {
+      "title": "Ccda15b7 1ddb 4f89 A3d8 C24ca3d9075a",
+      "source": "14-ccda15b7-1ddb-4f89-a3d8-c24ca3d9075a.jpg"
+    },
+    "images/gallery-curated/photos/homepage-moment-01.jpg": {
+      "title": "Homepage Moment 01",
+      "source": "homepage-moment-01.jpg"
+    },
+    "images/gallery-curated/posters/01-6f3dd371cb81478db17cbcd94472dae5.jpg": {
+      "title": "6f3dd371cb81478db17cbcd94472dae5",
+      "source": "01-6f3dd371cb81478db17cbcd94472dae5.jpg"
+    },
+    "images/gallery-curated/posters/02-img-3927.jpg": {
+      "title": "Img 3927",
+      "source": "02-img-3927.jpg"
+    },
+    "images/gallery-curated/posters/03-img-4367.jpg": {
+      "title": "Img 4367",
+      "source": "03-img-4367.jpg"
+    },
+    "images/gallery-curated/posters/04-img-4368.jpg": {
+      "title": "Img 4368",
+      "source": "04-img-4368.jpg"
+    },
+    "images/gallery-curated/posters/05-49847c0891a34c0083cbf223c3464865.jpg": {
+      "title": "49847c0891a34c0083cbf223c3464865",
+      "source": "05-49847c0891a34c0083cbf223c3464865.jpg"
+    },
+    "images/homepage/craft-split.jpg": {
+      "title": "Craft Split",
+      "source": "craft-split.jpg"
+    },
+    "images/services-and-occasions/anniversary-celebrations/hero.jpg": {
+      "title": "Hero",
+      "source": "hero.jpg"
+    },
+    "images/services-and-occasions/anniversary-celebrations/thumb.jpg": {
+      "title": "Thumb",
+      "source": "thumb.jpg"
+    },
+    "images/services-and-occasions/birthday-events/hero.jpg": {
+      "title": "Hero",
+      "source": "hero.jpg"
+    },
+    "images/services-and-occasions/birthday-events/thumb.jpg": {
+      "title": "Thumb",
+      "source": "thumb.jpg"
+    },
+    "images/services-and-occasions/chef-education/thumb.jpg": {
+      "title": "Thumb",
+      "source": "thumb.jpg"
+    },
+    "images/services-and-occasions/family-dinners/hero.jpg": {
+      "title": "Hero",
+      "source": "hero.jpg"
+    },
+    "images/services-and-occasions/family-dinners/thumb.jpg": {
+      "title": "Thumb",
+      "source": "thumb.jpg"
+    },
+    "images/services-and-occasions/special-events/hero.jpg": {
+      "title": "Hero",
+      "source": "hero.jpg"
+    },
+    "images/services-and-occasions/special-events/thumb.jpg": {
+      "title": "Thumb",
+      "source": "thumb.jpg"
+    },
+    "images/services-and-occasions/special-occasion-dining/hero.jpg": {
+      "title": "Hero",
+      "source": "hero.jpg"
+    },
+    "images/services-and-occasions/special-occasion-dining/thumb.jpg": {
+      "title": "Thumb",
+      "source": "thumb.jpg"
+    },
+    "images/source-library/silerchef-may-2026-drop/french-flan-pastry.jpg": {
+      "title": "French Flan Pastry",
+      "source": "french-flan-pastry.jpg"
+    },
+    "images/source-library/silerchef-may-2026-drop/french-madeleine.jpeg": {
+      "title": "French Madeleine",
+      "source": "french-madeleine.jpeg"
+    },
+    "images/source-library/silerchef-may-2026-drop/tarte-fine-aux-pommes.jpeg": {
+      "title": "Tarte Fine Aux Pommes",
+      "source": "tarte-fine-aux-pommes.jpeg"
+    }
+  },
+  "videos": {
+    "images/cuisines/american-cuisine/videos/488885.mp4": {
+      "title": "Sliced Brisket",
+      "source": "sliced brisket.mp4"
+    },
+    "images/cuisines/american-cuisine/videos/488886.mp4": {
+      "title": "Smoke Briskets 2",
+      "source": "smoke briskets 2.mp4"
+    },
+    "images/cuisines/american-cuisine/videos/488887.mp4": {
+      "title": "Smoke Briskets",
+      "source": "smoke briskets.mp4"
+    },
+    "images/cuisines/american-cuisine/videos/488888.mp4": {
+      "title": "Smoked Tri Tip 5",
+      "source": "smoked tri tip 5.mp4"
+    },
+    "images/cuisines/french-cuisine/videos/155555.mp4": {
+      "title": "Space Theme Cake",
+      "source": "space theme cake.mp4"
+    },
+    "images/video/chef-reel.mp4": {
+      "title": "Glazing Mango Cheese Cake",
+      "source": "glazing mango cheese cake.mp4"
+    },
+    "images/gallery-curated/videos/01-6f3dd371cb81478db17cbcd94472dae5.mp4": {
+      "title": "6f3dd371cb81478db17cbcd94472dae5",
+      "source": "01-6f3dd371cb81478db17cbcd94472dae5.mp4"
+    },
+    "images/gallery-curated/videos/02-img-3927.mp4": {
+      "title": "Img 3927",
+      "source": "02-img-3927.mp4"
+    },
+    "images/gallery-curated/videos/03-img-4367.mp4": {
+      "title": "Img 4367",
+      "source": "03-img-4367.mp4"
+    },
+    "images/gallery-curated/videos/04-img-4368.mp4": {
+      "title": "Img 4368",
+      "source": "04-img-4368.mp4"
+    },
+    "images/gallery-curated/videos/05-49847c0891a34c0083cbf223c3464865.mp4": {
+      "title": "49847c0891a34c0083cbf223c3464865",
+      "source": "05-49847c0891a34c0083cbf223c3464865.mp4"
+    },
+    "images/video/chef-reel.mov": {
+      "title": "Chef Reel",
+      "source": "chef-reel.mov"
+    }
+  }
+}

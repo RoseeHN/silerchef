@@ -5,6 +5,9 @@
  *    then patch embed/index.html for craft + Moments photo URLs when outputs exist.
  *
  * Run from repo root: npm run photos
+ *
+ * Writes embed/images/gallery-manifest.json: titles derived from source filenames
+ * (humanized) for gallery images/videos, homepage hero/moments, and reel.
  */
 import fs from 'fs';
 import path from 'path';
@@ -12,8 +15,10 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
+const EMBED_ROOT = path.join(ROOT, 'embed');
 const WEBSITE_MEDIA = path.join(ROOT, 'website pictures and videos ');
 const DEST = path.join(ROOT, 'embed/images');
+const MANIFEST_PATH = path.join(DEST, 'gallery-manifest.json');
 
 const FOLDER_TO_REL = {
   'american cuisine': 'cuisines/american-cuisine',
@@ -48,6 +53,115 @@ const ALL_GALLERY_TARGETS = [...CUISINE_TARGETS, ...SERVICE_TARGETS];
 
 const IMAGE_EXT = /\.(jpe?g|png|webp)$/i;
 const VIDEO_EXT = /\.(mp4|mov|webm|m4v)$/i;
+
+function loadManifestFile() {
+  try {
+    const raw = fs.readFileSync(MANIFEST_PATH, 'utf8');
+    const j = JSON.parse(raw);
+    return {
+      version: typeof j.version === 'number' ? j.version : 1,
+      images: j.images && typeof j.images === 'object' ? { ...j.images } : {},
+      videos: j.videos && typeof j.videos === 'object' ? { ...j.videos } : {},
+    };
+  } catch {
+    return { version: 1, images: {}, videos: {} };
+  }
+}
+
+let manifest = loadManifestFile();
+
+/** Turn "smoke_briskets-1.jpeg" into a short display title (filename-led). */
+function humanizeSourceFilename(basename) {
+  const stem = basename.replace(/\.[^.]+$/i, '');
+  if (!stem.trim()) return 'Media';
+  const cleaned = stem
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return cleaned
+    .split(' ')
+    .map((w) => {
+      if (!w) return '';
+      if (/^\d+$/.test(w)) return w;
+      return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+    })
+    .filter(Boolean)
+    .join(' ');
+}
+
+function manifestKeyFromDestAbs(absPathUnderEmbedImages) {
+  const rel = path.relative(EMBED_ROOT, absPathUnderEmbedImages).replace(/\\/g, '/');
+  return rel;
+}
+
+function setManifestImage(relKey, sourceAbsPath) {
+  const base = path.basename(sourceAbsPath);
+  manifest.images[relKey] = {
+    title: humanizeSourceFilename(base),
+    source: base,
+  };
+}
+
+function setManifestVideo(relKey, sourceAbsPath) {
+  const base = path.basename(sourceAbsPath);
+  manifest.videos[relKey] = {
+    title: humanizeSourceFilename(base),
+    source: base,
+  };
+}
+
+/**
+ * Fill manifest entries for files already on disk when no title exists yet.
+ * Skips purely numeric stems (e.g. 01.jpg). Strips leading NN- on curated names.
+ */
+function inferMissingManifestTitles() {
+  function inferFromBasename(basename) {
+    const stem = basename.replace(/\.[^.]+$/i, '');
+    if (!/[^\d]/.test(stem)) return null;
+    let rest = stem;
+    const m = rest.match(/^\d{1,2}[-_](.+)$/);
+    if (m && m[1] && /[a-zA-Z]/.test(m[1])) rest = m[1];
+    if (!/[a-zA-Z]/.test(rest)) return null;
+    return humanizeSourceFilename(rest + path.extname(basename));
+  }
+
+  function walkFilesRecursive(dir, pred, fn) {
+    if (!fs.existsSync(dir)) return;
+    for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, ent.name);
+      if (ent.isDirectory()) walkFilesRecursive(full, pred, fn);
+      else if (pred(ent.name)) fn(full, ent.name);
+    }
+  }
+
+  walkFilesRecursive(
+    DEST,
+    (n) => /\.(jpe?g|png|webp)$/i.test(n),
+    (full) => {
+      const key = manifestKeyFromDestAbs(full);
+      if (manifest.images[key]) return;
+      const title = inferFromBasename(path.basename(full));
+      if (title) manifest.images[key] = { title, source: path.basename(full) };
+    }
+  );
+
+  walkFilesRecursive(
+    DEST,
+    (n) => VIDEO_EXT.test(n),
+    (full) => {
+      const key = manifestKeyFromDestAbs(full);
+      if (manifest.videos[key]) return;
+      const title = inferFromBasename(path.basename(full));
+      if (title) manifest.videos[key] = { title, source: path.basename(full) };
+    }
+  );
+}
+
+function writeGalleryManifest() {
+  inferMissingManifestTitles();
+  fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2) + '\n');
+  console.log('Wrote', path.relative(ROOT, MANIFEST_PATH));
+}
 
 function ensureDir(d) {
   fs.mkdirSync(d, { recursive: true });
@@ -296,6 +410,9 @@ function distributeHomepageFolder() {
       const destBase = path.join(DEST, 'homepage', `hero-0${slot}`);
       copyImage(src, destBase);
       used.add(src);
+      const ext = path.extname(src).toLowerCase();
+      const heroName = ext === '.png' ? `hero-0${slot}.png` : `hero-0${slot}.jpg`;
+      setManifestImage(`images/homepage/${heroName}`, src);
       console.log(`Homepage hero rotator hero-0${slot}.jpg ←`, path.basename(src));
     }
     const first = trio.find((t) => t.slot === 1) || trio[0];
@@ -303,6 +420,7 @@ function distributeHomepageFolder() {
       const heroDestDir = path.join(DEST, 'services-and-occasions/chef-education');
       ensureDir(heroDestDir);
       copyImage(first.src, path.join(heroDestDir, 'hero'));
+      setManifestImage('images/services-and-occasions/chef-education/hero.jpg', first.src);
       console.log('Homepage hero (SEO / reel still) → chef-education/hero.jpg ←', path.basename(first.src));
     }
   }
@@ -313,6 +431,9 @@ function distributeHomepageFolder() {
     copyImage(craftSrc, path.join(DEST, 'homepage/craft-split'));
     used.add(craftSrc);
     wroteCraft = true;
+    const craftExt = path.extname(craftSrc).toLowerCase();
+    const craftFile = craftExt === '.png' ? 'craft-split.png' : 'craft-split.jpg';
+    setManifestImage(`images/homepage/${craftFile}`, craftSrc);
     console.log('Homepage craft split → homepage/craft-split.jpg ←', path.basename(craftSrc));
   }
 
@@ -320,6 +441,7 @@ function distributeHomepageFolder() {
   if (reelSrc) {
     ensureDir(path.join(DEST, 'video'));
     fs.copyFileSync(reelSrc, path.join(DEST, 'video/chef-reel.mp4'));
+    setManifestVideo('images/video/chef-reel.mp4', reelSrc);
     console.log('Homepage reel → video/chef-reel.mp4 ←', path.basename(reelSrc));
   } else {
     const movOnly = videos.filter((v) => /\.mov$/i.test(path.basename(v)));
@@ -334,7 +456,11 @@ function distributeHomepageFolder() {
   ensureDir(momentDir);
   let mi = 1;
   for (const src of sortBasenames(images.filter((p) => !used.has(p)))) {
-    copyImage(src, path.join(momentDir, `homepage-moment-${String(mi).padStart(2, '0')}`));
+    const momentBase = path.join(momentDir, `homepage-moment-${String(mi).padStart(2, '0')}`);
+    copyImage(src, momentBase);
+    const ext = path.extname(src).toLowerCase();
+    const fn = ext === '.png' ? `homepage-moment-${String(mi).padStart(2, '0')}.png` : `homepage-moment-${String(mi).padStart(2, '0')}.jpg`;
+    setManifestImage(`images/gallery-curated/photos/${fn}`, src);
     mi += 1;
     momentCount += 1;
   }
@@ -457,6 +583,7 @@ function appendFromWebsite() {
     ensureDir(galleryDir);
     const existingNames = galleryBasenamesSet(galleryDir);
     let idx = maxNumberedIndex(galleryDir, listGalleryImages(galleryDir));
+    const copiedSrcs = [];
 
     for (const src of paths) {
       const bn = path.basename(src).toLowerCase();
@@ -468,9 +595,23 @@ function appendFromWebsite() {
       const n = String(idx).padStart(2, '0');
       copyImage(src, path.join(galleryDir, n));
       existingNames.add(bn);
+      copiedSrcs.push(src);
       imgAdded += 1;
     }
     if (paths.length) renumberGallery(rel);
+    if (copiedSrcs.length) {
+      const files = sortNumeric(listGalleryImages(galleryDir));
+      const newCount = copiedSrcs.length;
+      for (let i = 0; i < newCount; i++) {
+        const fname = files[files.length - newCount + i];
+        const key = `images/${rel}/gallery/${fname}`;
+        const src = copiedSrcs[i];
+        manifest.images[key] = {
+          title: humanizeSourceFilename(path.basename(src)),
+          source: path.basename(src),
+        };
+      }
+    }
 
     const vpaths = sortBasenames(videoBuckets[rel] || []);
     if (!vpaths.length) continue;
@@ -481,13 +622,28 @@ function appendFromWebsite() {
       : [];
     let vidx = maxNumberedIndex(vdir, vExisting);
     const seenVidBasenames = new Set();
+    const copiedVids = [];
     for (const src of vpaths) {
       const bn = path.basename(src).toLowerCase();
       if (seenVidBasenames.has(bn)) continue;
       seenVidBasenames.add(bn);
       vidx += 1;
       copyVideoNumbered(src, vdir, vidx);
+      copiedVids.push(src);
       vidAdded += 1;
+    }
+    if (copiedVids.length) {
+      const allV = sortNumeric(fs.readdirSync(vdir).filter((f) => VIDEO_EXT.test(f)));
+      const nc = copiedVids.length;
+      for (let i = 0; i < nc; i++) {
+        const fname = allV[allV.length - nc + i];
+        const key = `images/${rel}/videos/${fname}`;
+        const src = copiedVids[i];
+        manifest.videos[key] = {
+          title: humanizeSourceFilename(path.basename(src)),
+          source: path.basename(src),
+        };
+      }
     }
   }
 
@@ -517,3 +673,5 @@ for (const rel of CUISINE_TARGETS) {
     : 0;
   if (n === 0) console.warn('Still empty:', rel);
 }
+
+writeGalleryManifest();

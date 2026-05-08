@@ -109,6 +109,75 @@
     return out;
   }
 
+  let galleryManifestCache = null;
+  let galleryManifestPromise = null;
+
+  function normalizeGalleryAssetKey(url) {
+    if (!url || typeof url !== 'string') return '';
+    const trimmed = url.trim().split('#')[0];
+    try {
+      const abs =
+        /^https?:\/\//i.test(trimmed) || trimmed.startsWith('//')
+          ? trimmed.startsWith('//')
+            ? `${window.location.protocol}${trimmed}`
+            : trimmed
+          : new URL(trimmed, window.location.href).href;
+      const u = new URL(abs);
+      let p = u.pathname || '';
+      if (p.startsWith('/')) p = p.slice(1);
+      return p;
+    } catch {
+      let p = trimmed.replace(/^\.\//, '');
+      if (p.startsWith('/')) p = p.slice(1);
+      const q = p.indexOf('?');
+      if (q !== -1) p = p.slice(0, q);
+      return p;
+    }
+  }
+
+  async function loadGalleryManifest() {
+    if (galleryManifestCache) return galleryManifestCache;
+    if (!galleryManifestPromise) {
+      galleryManifestPromise = fetch('images/gallery-manifest.json', { cache: 'no-store' })
+        .then((r) => (r.ok ? r.json() : { version: 1, images: {}, videos: {} }))
+        .catch(() => ({ version: 1, images: {}, videos: {} }))
+        .then((data) => {
+          galleryManifestCache = data && typeof data === 'object' ? data : { version: 1, images: {}, videos: {} };
+          if (!galleryManifestCache.images) galleryManifestCache.images = {};
+          if (!galleryManifestCache.videos) galleryManifestCache.videos = {};
+          return galleryManifestCache;
+        });
+    }
+    return galleryManifestPromise;
+  }
+
+  function galleryTitleForUrl(url) {
+    const m = galleryManifestCache;
+    if (!m || !url) return '';
+    const key = normalizeGalleryAssetKey(url);
+    const img = m.images && m.images[key];
+    if (img && img.title) return img.title;
+    const vid = m.videos && m.videos[key];
+    if (vid && vid.title) return vid.title;
+    return '';
+  }
+
+  function applyManifestToMomentImages() {
+    document.querySelectorAll('[data-moment-card] img[src]').forEach((img) => {
+      const t = galleryTitleForUrl(img.getAttribute('src'));
+      if (t) img.setAttribute('alt', t);
+    });
+  }
+
+  function applyManifestToVideoElements() {
+    document.querySelectorAll('video[src]').forEach((v) => {
+      const t = galleryTitleForUrl(v.getAttribute('src'));
+      if (!t) return;
+      v.setAttribute('title', t);
+      if (!v.getAttribute('aria-label')) v.setAttribute('aria-label', t);
+    });
+  }
+
   function pad2(n) {
     return String(n).padStart(2, '0');
   }
@@ -222,7 +291,7 @@
         fig.className = 'meal-card__photo';
         const img = document.createElement('img');
         img.src = block.image;
-        img.alt = '';
+        img.alt = galleryTitleForUrl(block.image) || '';
         img.loading = 'lazy';
         img.decoding = 'async';
         img.sizes = '(max-width: 520px) 72px, 108px';
@@ -367,13 +436,19 @@
     }
 
     let currentIdx = 0;
-    const lightboxItems = urls.map((url, idx) => ({
-      src: url,
-      alt: `Gallery image ${idx + 1}`,
-      kicker: detailKicker && detailKicker.textContent ? detailKicker.textContent : 'Gallery moment',
-      title: detailTitle && detailTitle.textContent ? `${detailTitle.textContent} · Image ${idx + 1}` : `Gallery image ${idx + 1}`,
-      text: detailIntro && detailIntro.textContent ? detailIntro.textContent : 'A closer look at this menu direction and its visual language.',
-    }));
+    const sectionName = detailTitle && detailTitle.textContent ? detailTitle.textContent.trim() : '';
+    const lightboxItems = urls.map((url, idx) => {
+      const dish = galleryTitleForUrl(url);
+      const fallback = `Gallery image ${idx + 1}`;
+      const primaryTitle = dish || fallback;
+      return {
+        src: url,
+        alt: primaryTitle,
+        kicker: detailKicker && detailKicker.textContent ? detailKicker.textContent : 'Gallery moment',
+        title: sectionName ? `${sectionName} · ${primaryTitle}` : primaryTitle,
+        text: detailIntro && detailIntro.textContent ? detailIntro.textContent : 'A closer look at this menu direction and its visual language.',
+      };
+    });
 
     const prefersReduced =
       typeof window.matchMedia === 'function' &&
@@ -391,7 +466,8 @@
       const n = urls.length;
       currentIdx = ((idx % n) + n) % n;
       heroEl.src = urls[currentIdx];
-      heroEl.alt = 'Gallery image ' + (currentIdx + 1);
+      const dish = galleryTitleForUrl(urls[currentIdx]);
+      heroEl.alt = dish || 'Gallery image ' + (currentIdx + 1);
       if (heroWrap) {
         const bgUrl = urls[currentIdx].replace(/(["'()\\])/g, '\\$1');
         heroWrap.style.setProperty('--detail-hero-bg', `url("${bgUrl}")`);
@@ -409,13 +485,14 @@
     heroEl.onclick = () => openMomentsLightbox(lightboxItems, currentIdx);
 
     urls.forEach((url, idx) => {
+      const dish = galleryTitleForUrl(url);
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'detail-thumb' + (idx === 0 ? ' is-active' : '');
-      b.setAttribute('aria-label', 'Show image ' + (idx + 1));
+      b.setAttribute('aria-label', dish ? `Show ${dish}` : 'Show image ' + (idx + 1));
       const im = document.createElement('img');
       im.src = url;
-      im.alt = '';
+      im.alt = dish || '';
       im.loading = 'lazy';
       im.decoding = 'async';
       im.sizes = '124px';
@@ -506,8 +583,9 @@
     window.scrollTo(0, lockedScrollY);
   }
 
-  function openDetail(kind, slug, title) {
+  async function openDetail(kind, slug, title) {
     if (!overlay || !detailTitle || !detailIntro || !detailBlocks || !detailHero || !detailStrip) return;
+    await loadGalleryManifest();
     const baseFolder = kind === 'cuisine' ? 'images/cuisines' : 'images/services-and-occasions';
     const copy = getCopy(kind, slug);
     trackEvent(kind === 'cuisine' ? 'cuisine_open' : 'service_open', {
@@ -763,6 +841,11 @@
   mountHub('cuisines-mount', CUISINES, 'cuisine', 'images/cuisines', { layout: 'cuisine-premium' });
   mountHub('services-mount', SERVICES, 'service', 'images/services-and-occasions', { layout: 'service-premium' });
   bindMomentsGallery();
+
+  loadGalleryManifest().then(() => {
+    applyManifestToMomentImages();
+    applyManifestToVideoElements();
+  });
 
   if (detailClose) detailClose.addEventListener('click', closeDetail);
   const backdropEl = overlay && overlay.querySelector('.detail-backdrop');
