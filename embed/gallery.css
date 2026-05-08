@@ -145,10 +145,18 @@
   color: var(--text-muted);
 }
 
+/* Flex — avoids an empty grid cell when the reel count isn’t a multiple of 3 (e.g. 5 clips). */
 .gallery-videos {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
   gap: 1rem;
+}
+
+.gallery-strip--video .video-card {
+  flex: 1 1 280px;
+  max-width: min(380px, 100%);
 }
 
 .video-card {
@@ -207,10 +215,18 @@
   color: var(--text-muted);
 }
 
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+/* Flex — last row stays centered when card count isn’t a multiple of the column count (e.g. 14 photos). */
+.gallery-strip--photos .gallery-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
   gap: 1rem;
+}
+
+.gallery-strip--photos .gallery-card {
+  flex: 1 1 240px;
+  max-width: min(320px, 100%);
 }
 
 .gallery-card {
@@ -270,10 +286,13 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1rem 1.05rem;
+  margin-top: clamp(1.35rem, 3.5vw, 2rem);
+  padding: clamp(1rem, 2.5vw, 1.25rem) clamp(1.05rem, 2.5vw, 1.35rem);
   border: 1px solid rgba(197, 160, 89, 0.16);
   border-radius: calc(var(--radius) + 2px);
-  background: rgba(17, 15, 17, 0.85);
+  background:
+    linear-gradient(135deg, rgba(197, 160, 89, 0.06), transparent 48%),
+    rgba(17, 15, 17, 0.88);
 }
 
 .gallery-note p {
@@ -402,9 +421,14 @@
     grid-template-columns: 1fr;
   }
 
-  .gallery-videos,
-  .gallery-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .gallery-strip--photos .gallery-card {
+    flex: 1 1 220px;
+    max-width: min(300px, 100%);
+  }
+
+  .gallery-strip--video .video-card {
+    max-width: min(440px, 100%);
+    flex: 1 1 260px;
   }
 }
 
@@ -415,10 +439,18 @@
     display: grid;
   }
 
-  .gallery-hero__stats,
-  .gallery-videos,
-  .gallery-grid {
+  .gallery-hero__stats {
     grid-template-columns: 1fr;
+  }
+
+  .gallery-strip--photos .gallery-card {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .gallery-strip--video .video-card {
+    flex: 1 1 100%;
+    max-width: 100%;
   }
 
   .gallery-lightbox__panel {

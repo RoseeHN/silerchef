@@ -1,6 +1,9 @@
 (() => {
   document.documentElement.classList.add('is-embed');
 
+  const yearEl = document.getElementById('y');
+  if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
   const nav = document.getElementById('site-nav');
   const toggle = document.querySelector('.nav-toggle');
 

@@ -5148,10 +5148,65 @@ body.scroll-locked {
     0 18px 50px rgba(0, 0, 0, 0.28);
 }
 
+.experience-tile--visual {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  isolation: isolate;
+}
+
+.experience-tile__media {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.experience-tile__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.02);
+}
+
+.experience-tile__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    185deg,
+    rgba(8, 7, 8, 0.15) 0%,
+    rgba(10, 9, 10, 0.42) 38%,
+    rgba(8, 7, 8, 0.88) 78%,
+    rgba(5, 4, 5, 0.96) 100%
+  );
+}
+
+.experience-tile__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.65rem;
+  align-content: end;
+  padding: 1.35rem 1.35rem 1.45rem;
+  min-height: clamp(17rem, 32vw, 22rem);
+}
+
+.experience-tile--visual .experience-tile__inner {
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.65);
+}
+
+.experience-tile--featured.experience-tile--visual .experience-tile__inner {
+  min-height: clamp(19rem, 36vw, 26rem);
+}
+
 .experience-tile--featured {
   background:
     linear-gradient(160deg, rgba(197, 160, 89, 0.16), rgba(34, 29, 31, 0.94) 32%, rgba(13, 12, 13, 0.98) 100%);
   border-color: rgba(212, 188, 106, 0.24);
+}
+
+.experience-tile--visual.experience-tile--featured {
+  background: transparent;
 }
 
 .experience-tile__eyebrow {
@@ -5191,6 +5246,10 @@ body.scroll-locked {
 
   .experience-tile--featured {
     grid-column: 1 / -1;
+  }
+
+  .experience-tile__inner {
+    min-height: clamp(15rem, 42vw, 20rem);
   }
 }
 
@@ -5350,17 +5409,108 @@ body.scroll-locked {
 }
 
 
-/* --- Chef story band --- */
+/* --- Chef story band (portfolio layout) --- */
 .chef-story-band {
   position: relative;
   margin: 0 0 clamp(1.5rem, 4vw, 2.5rem);
 }
 
-.chef-story-band__grid {
+.chef-story-portfolio {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) repeat(2, minmax(0, 0.82fr));
-  gap: 1rem;
+  gap: clamp(1rem, 2.5vw, 1.35rem);
+}
+
+.chef-story-spotlight {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: clamp(1rem, 2.5vw, 1.35rem);
   align-items: stretch;
+}
+
+.chef-story-spotlight__visual {
+  margin: 0;
+  min-height: clamp(16rem, 42vw, 28rem);
+  border-radius: calc(var(--radius) + 8px);
+  overflow: hidden;
+  border: 1px solid rgba(197, 160, 89, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 248, 235, 0.06),
+    0 24px 70px rgba(0, 0, 0, 0.35);
+}
+
+.chef-story-spotlight__visual img {
+  width: 100%;
+  height: 100%;
+  min-height: clamp(16rem, 42vw, 28rem);
+  display: block;
+  object-fit: cover;
+}
+
+.chef-story-panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 2.5vw, 1.35rem);
+  align-items: stretch;
+}
+
+.chef-story-panel {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  border-radius: calc(var(--radius) + 6px);
+  overflow: hidden;
+  border: 1px solid rgba(197, 160, 89, 0.18);
+  background: rgba(12, 11, 12, 0.55);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.26);
+}
+
+.chef-story-panel__media {
+  margin: 0;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
+.chef-story-panel__media img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.chef-story-panel__content.chef-story-card {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: linear-gradient(180deg, rgba(22, 19, 21, 0.98), rgba(11, 10, 11, 0.99));
+}
+
+.chef-story-signature-strip {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  align-items: stretch;
+}
+
+.chef-story-signature-strip__media {
+  margin: 0;
+  min-height: clamp(14rem, 28vw, 22rem);
+}
+
+.chef-story-signature-strip__media img {
+  width: 100%;
+  height: 100%;
+  min-height: clamp(14rem, 28vw, 22rem);
+  display: block;
+  object-fit: cover;
+}
+
+.chef-story-signature-strip__copy {
+  display: grid;
+  gap: 0.85rem;
+  align-content: center;
+  padding: clamp(1.25rem, 3vw, 1.75rem) clamp(1.25rem, 3vw, 1.85rem);
+  background: linear-gradient(165deg, rgba(26, 22, 24, 0.98), rgba(10, 9, 10, 0.99));
 }
 
 .chef-story-card {
@@ -5374,13 +5524,13 @@ body.scroll-locked {
 }
 
 .chef-story-card--lead {
-  grid-column: span 1;
-  background: linear-gradient(155deg, rgba(197, 160, 89, 0.18), rgba(34, 29, 31, 0.94) 28%, rgba(12, 11, 12, 0.99) 100%);
+  margin: 0;
+  background: linear-gradient(155deg, rgba(197, 160, 89, 0.14), rgba(34, 29, 31, 0.94) 22%, rgba(12, 11, 12, 0.99) 100%);
   border-color: rgba(212, 188, 106, 0.24);
 }
 
-.chef-story-card--signature {
-  grid-column: span 2;
+.chef-story-card--signature.chef-story-signature-strip {
+  border-color: rgba(197, 160, 89, 0.22);
 }
 
 .chef-story-card__eyebrow, .chef-story-card__kicker {
@@ -5451,31 +5601,57 @@ body.scroll-locked {
 }
 
 @media (max-width: 980px) {
-  .chef-story-band__grid {
-    grid-template-columns: 1fr 1fr;
+  .chef-story-spotlight {
+    grid-template-columns: 1fr;
   }
-  .chef-story-card--lead,
-  .chef-story-card--signature {
-    grid-column: 1 / -1;
+
+  .chef-story-spotlight__visual {
+    min-height: clamp(14rem, 52vw, 22rem);
+    order: -1;
+  }
+
+  .chef-story-spotlight__visual img {
+    min-height: clamp(14rem, 52vw, 22rem);
+  }
+
+  .chef-story-panels {
+    grid-template-columns: 1fr;
+  }
+
+  .chef-story-signature-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .chef-story-signature-strip__media {
+    min-height: clamp(12rem, 44vw, 18rem);
+    order: -1;
+  }
+
+  .chef-story-signature-strip__media img {
+    min-height: clamp(12rem, 44vw, 18rem);
   }
 }
 
 @media (max-width: 640px) {
-  .chef-story-band__grid {
-    grid-template-columns: 1fr;
+  .chef-story-portfolio {
     gap: 0.85rem;
   }
+
   .chef-story-card,
-  .chef-story-card--lead,
-  .chef-story-card--signature {
-    grid-column: auto;
+  .chef-story-card--lead {
     padding: 1.15rem 1rem 1.2rem;
   }
+
   .chef-story-stats {
     grid-template-columns: 1fr;
   }
+
   .chef-story-card__body {
     font-size: 0.98rem;
     line-height: 1.72;
+  }
+
+  .chef-story-signature-strip__copy {
+    padding: 1.1rem 1rem 1.2rem;
   }
 }
