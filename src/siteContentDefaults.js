@@ -99,7 +99,7 @@ const DEFAULT_SITE_CONTENT = {
       secondaryHref: '#cuisines',
     },
     stats: {
-      cuisinePortfolios: '5',
+      cuisinePortfolios: '6',
       occasionArchetypes: '5',
       chefExperience: '1',
     },
@@ -140,27 +140,33 @@ const DEFAULT_SITE_CONTENT = {
       tagline: 'Refined comfort, premium cuts, and contemporary private dining.',
     },
     {
+      slug: 'french-cuisine',
+      title: 'French Cuisine',
+      no: '02',
+      tagline: 'Classical technique, pastry artistry, and polished Gallic refinement.',
+    },
+    {
       slug: 'italian-cuisine',
       title: 'Italian Cuisine',
-      no: '02',
+      no: '03',
       tagline: 'Artisanal soul, regional warmth, and elegant Mediterranean pacing.',
     },
     {
       slug: 'greek-cuisine',
       title: 'Greek Cuisine',
-      no: '03',
+      no: '04',
       tagline: 'Aegean clarity, bright herbs, citrus, and coastal refinement.',
     },
     {
       slug: 'turkish-cuisine',
       title: 'Turkish Cuisine',
-      no: '04',
+      no: '05',
       tagline: 'Ottoman references, Anatolian depth, and modern luxury plating.',
     },
     {
       slug: 'middle-eastern-cuisine',
       title: 'Global Fusion',
-      no: '05',
+      no: '06',
       tagline: 'Borderless flavor pairings with precise fine-dining execution.',
     },
   ],
@@ -273,6 +279,90 @@ const DEFAULT_SITE_CONTENT = {
             item(
               'Grand Finale',
               'Warm Georgia Peach & Pecan Cobbler - A buttery, hand-folded crust served with house-spun bourbon vanilla bean gelato and a dash of cinnamon dust.'
+            ),
+          ],
+        },
+      ],
+    },
+    'french-cuisine': {
+      intro:
+        'Three classical French menu directions built around sauce discipline, seasonal refinement, and pastry-forward elegance.',
+      blocks: [
+        {
+          title: 'Set 1 · Belle Époque',
+          image: cuisineBlockImage('french-cuisine', 1),
+          items: [
+            item(
+              'Appetizer',
+              'Marinated Salmon Gravlax - Citrus-dill cure, caper berries, crème fraîche, and rye crostini.'
+            ),
+            item(
+              'The Bakery',
+              'Pain au Levain & Cultured Butter - Long-fermentation sourdough pullman with flaky Maldon salt and cultured Normandy butter.'
+            ),
+            item(
+              'Intermezzo',
+              'Champagne & Pear Sorbet - Bright orchard pear with a delicate sparkle and restrained sweetness.'
+            ),
+            item(
+              'Main Entree',
+              'Roasted Duck Breast à l’Orange - Lacquered skin, Grand Marnier jus, roasted endive, and pommes fondant.'
+            ),
+            item(
+              'Grand Finale',
+              'Dark Chocolate Soufflé - Valrhona ganache heart, Tahitian vanilla anglaise, and candied hazelnut.'
+            ),
+          ],
+        },
+        {
+          title: 'Set 2 · Lyon & Burgundy',
+          image: cuisineBlockImage('french-cuisine', 2),
+          items: [
+            item(
+              'Appetizer',
+              'Escargots de Bourgogne - Garlic-herb butter, parsley crumb, and toasted brioche soldiers.'
+            ),
+            item(
+              'The Bakery',
+              'Comté & Black Pepper Fougasse - Hand-stretched olive oil dough with aged Comté pockets.'
+            ),
+            item(
+              'Intermezzo',
+              'Sorbet Cassis - Cassis-champagne palate bridge before the rich main.'
+            ),
+            item(
+              'Main Entree',
+              'Beef Tenderloin au Poivre Vert - Cognac cream, pommes purée Robuchon-style, and glazed spring vegetables.'
+            ),
+            item(
+              'Grand Finale',
+              'Tarte Tatin Moderne - Caramelized apple rosette, Isigny crème fraîche, and Calvados caramel.'
+            ),
+          ],
+        },
+        {
+          title: 'Set 3 · Pastry Atelier',
+          image: cuisineBlockImage('french-cuisine', 3),
+          items: [
+            item(
+              'Appetizer',
+              'Velouté of Sunchoke - White truffle oil, crispy sage, and parmesan tuile.'
+            ),
+            item(
+              'The Bakery',
+              'Brioche Feuilletée - Laminated butter brioche with fleur de sel and whipped honey butter.'
+            ),
+            item(
+              'Intermezzo',
+              'Lemon Verbena Sorbet - Clean herbal lift before the flagship course.'
+            ),
+            item(
+              'Main Entree',
+              'Sole Meunière Elevated - Brown butter capers, lemon supremes, haricots verts, and pommes vapeur.'
+            ),
+            item(
+              'Grand Finale',
+              'Saint-Honoré Reimagined - Choux ring, light caramel, Chantilly, and Tahitian vanilla chantilly.'
             ),
           ],
         },

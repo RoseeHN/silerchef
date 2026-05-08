@@ -9,27 +9,33 @@
       tagline: 'Refined comfort, premium cuts, and contemporary private dining.',
     },
     {
+      slug: 'french-cuisine',
+      title: 'French Cuisine',
+      no: '02',
+      tagline: 'Classical technique, pastry artistry, and polished Gallic refinement.',
+    },
+    {
       slug: 'italian-cuisine',
       title: 'Italian Cuisine',
-      no: '02',
+      no: '03',
       tagline: 'Artisanal soul, regional warmth, and elegant Mediterranean pacing.',
     },
     {
       slug: 'greek-cuisine',
       title: 'Greek Cuisine',
-      no: '03',
+      no: '04',
       tagline: 'Aegean clarity, bright herbs, citrus, and coastal refinement.',
     },
     {
       slug: 'turkish-cuisine',
       title: 'Turkish Cuisine',
-      no: '04',
+      no: '05',
       tagline: 'Ottoman references, Anatolian depth, and modern luxury plating.',
     },
     {
       slug: 'middle-eastern-cuisine',
       title: 'Global Fusion',
-      no: '05',
+      no: '06',
       tagline: 'Borderless flavor pairings with precise fine-dining execution.',
     },
   ];
