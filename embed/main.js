@@ -148,7 +148,7 @@
   async function loadGalleryManifest() {
     if (galleryManifestCache) return galleryManifestCache;
     if (!galleryManifestPromise) {
-      galleryManifestPromise = fetch('images/gallery-manifest.json', { cache: 'no-store' })
+      galleryManifestPromise = fetch('images/gallery-manifest.json')
         .then((r) => (r.ok ? r.json() : { version: 1, images: {}, videos: {} }))
         .catch(() => ({ version: 1, images: {}, videos: {} }))
         .then((data) => {
@@ -709,7 +709,7 @@
     const grid = document.createElement('div');
     grid.className = premium ? 'hub-grid hub-grid--cuisines' : 'hub-grid hub-grid--services';
 
-    items.forEach((item) => {
+    items.forEach((item, index) => {
       const card = document.createElement('button');
       card.type = 'button';
       card.className = premium ? 'hub-card hub-card--cuisine observe' : 'hub-card observe';
@@ -722,9 +722,16 @@
       visual.className = 'hub-card-visual';
       const img = document.createElement('img');
       img.alt = '';
-      img.loading = 'lazy';
       img.decoding = 'async';
-      img.src = getCardImageSrc(kind, item.slug, baseFolder);
+      /** Hub grids always use thumb.jpg — avoids loading multi‑MB gallery heroes as card art. */
+      img.src = `${baseFolder}/${item.slug}/thumb.jpg`;
+      const eagerFirst = premium ? 3 : 2;
+      if (index < eagerFirst) {
+        img.loading = 'eager';
+        img.fetchPriority = 'high';
+      } else {
+        img.loading = 'lazy';
+      }
       if (premium) {
         img.sizes = '(max-width: 640px) 100vw, (max-width: 1100px) 50vw, (max-width: 1500px) 33vw, 460px';
         img.width = 800;
