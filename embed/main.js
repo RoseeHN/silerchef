@@ -1,7 +1,8 @@
 'use strict';
 
 (function () {
-  const CUISINES = [
+  /** Full lists shipped in JS — merged with API `cuisineCards` / `serviceCards` so older saved JSON cannot drop slugs. */
+  const CUISINES_CANONICAL = [
     {
       slug: 'american-cuisine',
       title: 'American Cuisine',
@@ -40,7 +41,7 @@
     },
   ];
 
-  const SERVICES = [
+  const SERVICES_CANONICAL = [
     {
       slug: 'anniversary-celebrations',
       title: 'Anniversary Celebrations',
@@ -78,6 +79,9 @@
       tagline: 'Chef-led lessons, workshops, and culinary coaching tailored to your group.',
     },
   ];
+
+  const CUISINES = CUISINES_CANONICAL.map((c) => ({ ...c }));
+  const SERVICES = SERVICES_CANONICAL.map((c) => ({ ...c }));
 
   let availabilityState = { note: '', blockedDates: [] };
   const ANALYTICS_SESSION_KEY = 'silerchef_session_id';
@@ -1004,9 +1008,34 @@
     if (text != null) el.textContent = String(text);
   }
 
-  function replaceCardCollection(target, value) {
-    if (!Array.isArray(value) || !value.length) return;
-    target.splice(0, target.length, ...value);
+  /**
+   * Overlay CMS/API cards onto the canonical list (by slug). Entries missing from saved JSON are kept.
+   * Re-numbers `no` sequentially after merge.
+   */
+  function mergeCardCollection(canonical, target, overrides) {
+    if (!Array.isArray(overrides) || !overrides.length) return;
+    const bySlug = new Map();
+    canonical.forEach((c) => {
+      bySlug.set(c.slug, { ...c });
+    });
+    overrides.forEach((row) => {
+      if (!row || !row.slug) return;
+      const prev = bySlug.get(row.slug);
+      bySlug.set(row.slug, prev ? { ...prev, ...row } : { ...row });
+    });
+    const canonSlugs = new Set(canonical.map((c) => c.slug));
+    const ordered = canonical.map((c) => bySlug.get(c.slug)).filter(Boolean);
+    const appended = new Set();
+    overrides.forEach((row) => {
+      if (row && row.slug && !canonSlugs.has(row.slug) && bySlug.has(row.slug) && !appended.has(row.slug)) {
+        ordered.push({ ...bySlug.get(row.slug) });
+        appended.add(row.slug);
+      }
+    });
+    ordered.forEach((c, i) => {
+      c.no = String(i + 1).padStart(2, '0');
+    });
+    target.splice(0, target.length, ...ordered);
   }
 
   function applySiteSettings(content) {
@@ -1288,8 +1317,8 @@
       const content = await res.json();
       if (!content || typeof content !== 'object') return;
       applySiteSettings(content);
-      replaceCardCollection(CUISINES, content.cuisineCards);
-      replaceCardCollection(SERVICES, content.serviceCards);
+      mergeCardCollection(CUISINES_CANONICAL, CUISINES, content.cuisineCards);
+      mergeCardCollection(SERVICES_CANONICAL, SERVICES, content.serviceCards);
       if (content.cuisines || content.services) {
         window.SC_SITE = mergeDeep(window.SC_SITE || {}, {
           cuisines: content.cuisines || undefined,
