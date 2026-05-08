@@ -1,6 +1,7 @@
 /**
  * 1) Filename-based migration: misplaced images → correct cuisine / service gallery.
- * 2) Append new media from cuisine folders under "website pictures and videos /".
+ * 2) Append new media from cuisine folders (default: ~/Downloads/website pictures and videos /,
+ *    or SILERCHEF_WEBSITE_MEDIA, else repo "website pictures and videos /").
  * 3) "homepage pictures /" → hero (chef-education), reel MP4, craft split visual, Moments strip,
  *    then patch embed/index.html for craft + Moments photo URLs when outputs exist.
  *
@@ -11,12 +12,31 @@
  */
 import fs from 'fs';
 import path from 'path';
+import { homedir } from 'os';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
 const EMBED_ROOT = path.join(ROOT, 'embed');
-const WEBSITE_MEDIA = path.join(ROOT, 'website pictures and videos ');
+
+/**
+ * Source folders: american cuisine, french cuisine, … under one root.
+ * Priority: SILERCHEF_WEBSITE_MEDIA → ~/Downloads/website pictures and videos  → repo copy.
+ */
+function resolveWebsiteMediaRoot() {
+  const env = process.env.SILERCHEF_WEBSITE_MEDIA;
+  if (env && String(env).trim()) {
+    const p = path.resolve(String(env).trim());
+    if (fs.existsSync(p)) return p;
+    console.warn('SILERCHEF_WEBSITE_MEDIA path missing, falling back:', p);
+  }
+  const downloads = path.join(homedir(), 'Downloads', 'website pictures and videos ');
+  if (fs.existsSync(downloads)) return downloads;
+  return path.join(ROOT, 'website pictures and videos ');
+}
+
+const WEBSITE_MEDIA = resolveWebsiteMediaRoot();
+console.log('Website media root:', WEBSITE_MEDIA);
 const DEST = path.join(ROOT, 'embed/images');
 const MANIFEST_PATH = path.join(DEST, 'gallery-manifest.json');
 
@@ -184,6 +204,13 @@ function normalizeSeg(name) {
     .toLowerCase();
 }
 
+/** Fixes stray digits on folder names (e.g. "turkish cuisine6" → turkish cuisine). */
+function canonicalTopFolderKey(key) {
+  const k = normalizeSeg(key);
+  if (/^turkish\s+cuisine\s*\d+$/.test(k)) return 'turkish cuisine';
+  return k;
+}
+
 /** Same rules as the original silerchef pipeline — destination under embed/images */
 function classify(filePathOrName) {
   const n = path.basename(filePathOrName).toLowerCase();
@@ -240,7 +267,7 @@ function classify(filePathOrName) {
 function targetRelForWebsiteFile(absPath) {
   const rel = path.relative(WEBSITE_MEDIA, absPath);
   const first = rel.split(path.sep)[0];
-  const key = normalizeSeg(first);
+  const key = canonicalTopFolderKey(first);
   if (!key || SKIP_TOP.has(key)) return null;
   const mapped = FOLDER_TO_REL[key];
   if (mapped) return mapped;

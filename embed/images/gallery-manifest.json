@@ -398,8 +398,8 @@
       "source": "coffe chocolate truffle cake.jpeg"
     },
     "images/cuisines/middle-eastern-cuisine/gallery/05.jpg": {
-      "title": "Coffee Caramel Bûche De Noël",
-      "source": "coffee caramel Bûche de Noël.jpeg"
+      "title": "Coffee Caramel Bûche De Noël",
+      "source": "coffee caramel Bûche de Noël.jpeg"
     },
     "images/cuisines/middle-eastern-cuisine/gallery/06.jpg": {
       "title": "Dark Chocolate Cake",
@@ -786,6 +786,26 @@
     "images/video/chef-reel.mov": {
       "title": "Chef Reel",
       "source": "chef-reel.mov"
+    },
+    "images/cuisines/american-cuisine/videos/4888885.mp4": {
+      "title": "Sliced Brisket",
+      "source": "sliced brisket.mp4"
+    },
+    "images/cuisines/american-cuisine/videos/4888886.mp4": {
+      "title": "Smoke Briskets 2",
+      "source": "smoke briskets 2.mp4"
+    },
+    "images/cuisines/american-cuisine/videos/4888887.mp4": {
+      "title": "Smoke Briskets",
+      "source": "smoke briskets.mp4"
+    },
+    "images/cuisines/american-cuisine/videos/4888888.mp4": {
+      "title": "Smoked Tri Tip 5",
+      "source": "smoked tri tip 5.mp4"
+    },
+    "images/cuisines/french-cuisine/videos/1555555.mp4": {
+      "title": "Space Theme Cake",
+      "source": "space theme cake.mp4"
     }
   }
 }
