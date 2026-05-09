@@ -2258,12 +2258,18 @@ body.scroll-locked {
   position: fixed;
   inset: 0;
   z-index: 200;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: clamp(0.75rem, 2vw, 1.1rem);
   isolation: isolate;
   overscroll-behavior: contain;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(197, 160, 89, 0.42) transparent;
 }
 
 .detail-overlay[hidden] {
@@ -2271,22 +2277,25 @@ body.scroll-locked {
 }
 
 .detail-backdrop {
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: 0;
   background: rgba(6, 5, 6, 0.78);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  pointer-events: auto;
 }
 
 .detail-sheet {
   position: relative;
   z-index: 1;
+  flex-shrink: 0;
   width: min(97vw, 1440px);
-  max-height: min(95dvh - 0.75rem, 900px);
-  overflow: hidden;
+  margin-block: auto;
+  max-height: none;
+  overflow: visible;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
   background:
     linear-gradient(180deg, rgba(30, 26, 28, 0.98), rgba(18, 16, 18, 0.98));
   border: 1px solid rgba(197, 160, 89, 0.28);
@@ -2299,15 +2308,10 @@ body.scroll-locked {
 .detail-sheet-scroll {
   min-height: 0;
   overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
+  overflow-y: visible;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(197, 160, 89, 0.42) transparent;
-  scrollbar-gutter: stable;
 }
 
 .detail-sheet__main-grid {
@@ -2317,15 +2321,15 @@ body.scroll-locked {
   min-height: 0;
 }
 
-.detail-sheet-scroll::-webkit-scrollbar {
+.detail-overlay::-webkit-scrollbar {
   width: 9px;
 }
 
-.detail-sheet-scroll::-webkit-scrollbar-track {
+.detail-overlay::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.detail-sheet-scroll::-webkit-scrollbar-thumb {
+.detail-overlay::-webkit-scrollbar-thumb {
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: padding-box;
@@ -2346,6 +2350,9 @@ body.scroll-locked {
 }
 
 .detail-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 4;
   flex-shrink: 0;
   padding: 0.82rem 1rem 0.72rem;
   display: flex;
@@ -3126,7 +3133,7 @@ body.scroll-locked {
 
   .detail-sheet {
     width: min(94vw, 880px);
-    max-height: min(92dvh - 1rem, 720px);
+    max-height: none;
   }
 
   .detail-sheet__stage {
@@ -3658,14 +3665,20 @@ body.scroll-locked {
 
 @media (max-width: 640px) {
   .detail-overlay {
-    align-items: flex-end;
+    align-items: stretch;
+    justify-content: flex-start;
     padding: 0;
   }
 
   .detail-sheet {
-    width: 100vw;
-    height: 100dvh;
-    max-height: 100dvh;
+    width: 100%;
+    max-width: 100vw;
+    margin-block: unset;
+    margin-top: auto;
+    margin-bottom: 0;
+    height: auto;
+    min-height: 0;
+    max-height: none;
     border-radius: 1.45rem 1.45rem 0 0;
     border-left: none;
     border-right: none;

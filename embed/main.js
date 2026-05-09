@@ -574,8 +574,7 @@
     document.body.classList.add('detail-open');
     lockViewport('detail');
 
-    const sheetScroll = overlay.querySelector('.detail-sheet-scroll');
-    if (sheetScroll) sheetScroll.scrollTop = 0;
+    overlay.scrollTop = 0;
 
     const GALLERY_PROBE_MS = 14000;
     void (async () => {
