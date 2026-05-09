@@ -250,12 +250,16 @@
     const base = `${baseFolder}/${slug}`;
     const found = [];
     if (copy && Array.isArray(copy.blocks) && copy.blocks.length) {
-      for (const block of copy.blocks) {
-        const raw = typeof block.image === 'string' ? block.image.trim() : '';
-        if (!raw) continue;
-        const hit = /^https?:\/\//i.test(raw) ? raw : await probeImage(raw);
+      const blockHits = await Promise.all(
+        copy.blocks.map(async (block) => {
+          const raw = typeof block.image === 'string' ? block.image.trim() : '';
+          if (!raw) return null;
+          return /^https?:\/\//i.test(raw) ? raw : await probeImage(raw);
+        })
+      );
+      blockHits.forEach((hit) => {
         if (hit) found.push(hit);
-      }
+      });
     }
     const fromGallery = await collectNumberedImages(`${base}/gallery`);
     fromGallery.forEach((u) => found.push(u));
@@ -542,7 +546,8 @@
 
   async function openDetail(kind, slug, title) {
     if (!overlay || !detailTitle || !detailIntro || !detailBlocks || !detailHero || !detailStrip) return;
-    await loadGalleryManifest();
+    /** Do not await — manifest fetch would delay the overlay; titles warm up via boot-time loadGalleryManifest(). */
+    void loadGalleryManifest();
     const baseFolder = kind === 'cuisine' ? 'images/cuisines' : 'images/services-and-occasions';
     const copy = getCopy(kind, slug);
     trackEvent(kind === 'cuisine' ? 'cuisine_open' : 'service_open', {
@@ -560,12 +565,9 @@
 
     renderBlocks(detailBlocks, copy, kind, slug);
 
-    let galleryUrls = await collectGalleryUrls(baseFolder, slug);
-    if (!galleryUrls.length) {
-      const fb = getCardImageSrc(kind, slug, baseFolder);
-      if (fb) galleryUrls = [fb];
-    }
-    setupCarousel(detailHero, detailStrip, galleryUrls);
+    const thumbFallback = getCardImageSrc(kind, slug, baseFolder);
+    const bootstrapUrls = thumbFallback ? [thumbFallback] : [];
+    setupCarousel(detailHero, detailStrip, bootstrapUrls);
 
     overlay.hidden = false;
     overlay.setAttribute('aria-hidden', 'false');
@@ -574,6 +576,22 @@
 
     const sheetScroll = overlay.querySelector('.detail-sheet-scroll');
     if (sheetScroll) sheetScroll.scrollTop = 0;
+
+    const GALLERY_PROBE_MS = 14000;
+    void (async () => {
+      try {
+        const urls = await Promise.race([
+          collectGalleryUrls(baseFolder, slug),
+          new Promise((_, reject) => {
+            window.setTimeout(() => reject(new Error('gallery-timeout')), GALLERY_PROBE_MS);
+          }),
+        ]);
+        const next = urls && urls.length ? urls : bootstrapUrls;
+        setupCarousel(detailHero, detailStrip, next);
+      } catch {
+        setupCarousel(detailHero, detailStrip, bootstrapUrls);
+      }
+    })();
 
     if (detailClose) {
       try {
