@@ -1402,6 +1402,15 @@ main {
   transform: translate3d(0, 0, 0);
 }
 
+/**
+ * Above-the-fold hero must not wait for deferred main.js + IntersectionObserver.
+ * Without this, users see only the header until JS downloads (slow 3G / cold cache).
+ */
+#home.hero.hero--editorial.observe {
+  opacity: 1;
+  transform: none;
+}
+
 @keyframes flow-rise {
   from {
     opacity: 0;
