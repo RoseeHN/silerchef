@@ -203,6 +203,28 @@
     });
   }
 
+  /** Prefer HEAD (cheap); fall back to Image decode if HEAD unsupported or inconclusive. */
+  async function probeUrlExists(url) {
+    try {
+      const ac = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timer =
+        ac &&
+        window.setTimeout(() => {
+          try {
+            ac.abort();
+          } catch (_) {}
+        }, 3200);
+      const r = await fetch(url, {
+        method: 'HEAD',
+        cache: 'force-cache',
+        ...(ac ? { signal: ac.signal } : {}),
+      });
+      if (timer) window.clearTimeout(timer);
+      if (r.ok) return url;
+    } catch (_) {}
+    return probeImage(url);
+  }
+
   async function probeAll(urls) {
     const out = [];
     const chunk = 30;
@@ -216,29 +238,40 @@
     return out;
   }
 
-  /** Try jpg/png/webp for one gallery index in parallel — faster than sequential extension probes. */
+  /** Resolve 01.jpg … per index: probe extensions in parallel (HEAD-first inside probeUrlExists). */
   async function probeNumberedSlot(basePath, i) {
     const extensions = ['jpg', 'jpeg', 'png', 'webp'];
     const candidates = extensions.map((ext) => `${basePath}/${pad2(i)}.${ext}`);
-    const results = await Promise.all(candidates.map((url) => probeImage(url)));
+    const results = await Promise.all(candidates.map((url) => probeUrlExists(url)));
     for (let k = 0; k < candidates.length; k++) {
       if (results[k]) return candidates[k];
     }
     return null;
   }
 
+  /**
+   * Discover numbered files under basePath. Scans in parallel batches (was one slot per await ≈ very slow).
+   */
   async function collectNumberedImages(basePath) {
     const found = [];
     let misses = 0;
-    for (let i = 1; i <= 80; i++) {
-      const hit = await probeNumberedSlot(basePath, i);
-      if (hit) {
-        found.push(hit);
-        misses = 0;
-      } else {
-        misses += 1;
-        if ((found.length === 0 && misses >= 4) || (found.length > 0 && misses >= 6)) {
-          break;
+    const BATCH = 12;
+    const MAX = 80;
+    for (let start = 1; start <= MAX; start += BATCH) {
+      const end = Math.min(MAX, start + BATCH - 1);
+      const slots = [];
+      for (let i = start; i <= end; i++) slots.push(i);
+      const batchHits = await Promise.all(slots.map((idx) => probeNumberedSlot(basePath, idx)));
+      for (let j = 0; j < batchHits.length; j++) {
+        const hit = batchHits[j];
+        if (hit) {
+          found.push(hit);
+          misses = 0;
+        } else {
+          misses += 1;
+          if ((found.length === 0 && misses >= 4) || (found.length > 0 && misses >= 6)) {
+            return found;
+          }
         }
       }
     }
@@ -254,23 +287,29 @@
         copy.blocks.map(async (block) => {
           const raw = typeof block.image === 'string' ? block.image.trim() : '';
           if (!raw) return null;
-          return /^https?:\/\//i.test(raw) ? raw : await probeImage(raw);
+          return /^https?:\/\//i.test(raw) ? raw : await probeUrlExists(raw);
         })
       );
       blockHits.forEach((hit) => {
         if (hit) found.push(hit);
       });
     }
-    const fromGallery = await collectNumberedImages(`${base}/gallery`);
+    const galleryPath = `${base}/gallery`;
+    const [fromGallery, hero] = await Promise.all([
+      collectNumberedImages(galleryPath),
+      (async () => {
+        return (
+          (await probeUrlExists(`${base}/hero.jpg`)) || (await probeUrlExists(`${base}/hero.jpeg`))
+        );
+      })(),
+    ]);
     fromGallery.forEach((u) => found.push(u));
+    if (hero) found.push(hero);
 
     if (!found.length) {
       const fromLegacy = await collectNumberedImages(base);
       fromLegacy.forEach((u) => found.push(u));
     }
-
-    const hero = (await probeImage(`${base}/hero.jpg`)) || (await probeImage(`${base}/hero.jpeg`));
-    if (hero) found.push(hero);
 
     return [...new Set(found)];
   }
@@ -393,7 +432,6 @@
     resetCarouselTimers();
 
     const heroWrap = heroEl.parentElement;
-    heroEl.removeAttribute('src');
     stripEl.innerHTML = '';
     stripEl.className = 'detail-marquee__slider';
 
@@ -401,6 +439,7 @@
     const marqueeRoot = document.getElementById('detail-marquee');
 
     if (!urls.length) {
+      heroEl.removeAttribute('src');
       heroEl.alt = '';
       heroEl.style.display = 'none';
       if (heroWrap) {
@@ -418,6 +457,7 @@
     if (heroWrap) {
       heroWrap.classList.remove('is-empty');
     }
+    heroEl.src = urls[0];
     heroEl.decoding = 'sync';
     if ('fetchPriority' in heroEl) {
       heroEl.fetchPriority = 'high';
@@ -565,8 +605,9 @@
 
     renderBlocks(detailBlocks, copy, kind, slug);
 
-    const thumbFallback = getCardImageSrc(kind, slug, baseFolder);
-    const bootstrapUrls = thumbFallback ? [thumbFallback] : [];
+    /** Always start from hub thumb — known to exist; avoids waiting on block.image probes for first paint. */
+    const thumbFast = `${baseFolder}/${slug}/thumb.jpg`;
+    const bootstrapUrls = [thumbFast];
     setupCarousel(detailHero, detailStrip, bootstrapUrls);
 
     overlay.hidden = false;
@@ -576,7 +617,7 @@
 
     overlay.scrollTop = 0;
 
-    const GALLERY_PROBE_MS = 14000;
+    const GALLERY_PROBE_MS = 9000;
     void (async () => {
       try {
         const urls = await Promise.race([
