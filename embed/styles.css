@@ -3432,7 +3432,7 @@ body.scroll-locked {
 .detail-gallery-dock {
   flex-shrink: 0;
   width: 100%;
-  margin-top: auto;
+  margin-top: 0;
   padding: 1rem 0 1.05rem;
   border-top: 1px solid rgba(197, 160, 89, 0.28);
   background:
