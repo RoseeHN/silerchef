@@ -288,20 +288,8 @@
   async function collectGalleryUrls(baseFolder, slug) {
     const copy = getCopy('cuisine', slug) || getCopy('service', slug);
     const base = `${baseFolder}/${slug}`;
-    const found = [];
-    if (copy && Array.isArray(copy.blocks) && copy.blocks.length) {
-      const blockHits = await Promise.all(
-        copy.blocks.map(async (block) => {
-          const raw = typeof block.image === 'string' ? block.image.trim() : '';
-          if (!raw) return null;
-          return /^https?:\/\//i.test(raw) ? raw : await probeUrlExists(raw);
-        })
-      );
-      blockHits.forEach((hit) => {
-        if (hit) found.push(hit);
-      });
-    }
     const galleryPath = `${base}/gallery`;
+
     const [fromGallery, hero] = await Promise.all([
       collectNumberedImages(galleryPath),
       (async () => {
@@ -310,15 +298,34 @@
         );
       })(),
     ]);
-    fromGallery.forEach((u) => found.push(u));
-    if (hero) found.push(hero);
+
+    const found = [];
+    const seen = new Set();
+
+    function pushUnique(url) {
+      if (!url || seen.has(url)) return;
+      seen.add(url);
+      found.push(url);
+    }
+
+    fromGallery.forEach(pushUnique);
+    pushUnique(hero);
+
+    if (copy && Array.isArray(copy.blocks)) {
+      for (const block of copy.blocks) {
+        const raw = typeof block.image === 'string' ? block.image.trim() : '';
+        if (!raw) continue;
+        /** data.js paths are canonical — probing each blocked the carousel on slow scans / timeouts. */
+        pushUnique(raw);
+      }
+    }
 
     if (!found.length) {
       const fromLegacy = await collectNumberedImages(base);
-      fromLegacy.forEach((u) => found.push(u));
+      fromLegacy.forEach(pushUnique);
     }
 
-    return [...new Set(found)];
+    return found;
   }
 
   function getCopy(kind, slug) {
