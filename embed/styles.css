@@ -2349,6 +2349,20 @@ body.scroll-locked {
   border-right: 1px solid rgba(197, 160, 89, 0.14);
 }
 
+@media (min-width: 901px) {
+  .detail-sheet__stage {
+    position: sticky;
+    top: 4.55rem;
+    align-self: start;
+    z-index: 2;
+    max-height: calc(100dvh - 5.5rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(197, 160, 89, 0.35) transparent;
+  }
+}
+
 .detail-toolbar {
   position: sticky;
   top: 0;
@@ -3137,6 +3151,12 @@ body.scroll-locked {
   }
 
   .detail-sheet__stage {
+    position: relative;
+    top: auto;
+    z-index: auto;
+    max-height: none;
+    overflow: visible;
+    overscroll-behavior: auto;
     border-right: none;
     border-bottom: 1px solid rgba(197, 160, 89, 0.14);
   }

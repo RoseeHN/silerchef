@@ -269,7 +269,14 @@
           misses = 0;
         } else {
           misses += 1;
-          if ((found.length === 0 && misses >= 4) || (found.length > 0 && misses >= 6)) {
+          /**
+           * Sparse folders (e.g. first file is 35.jpg) need many leading misses.
+           * Empty folder: still exits after a long empty run with zero hits.
+           */
+          if (
+            (found.length === 0 && misses >= 60) ||
+            (found.length > 0 && misses >= 6)
+          ) {
             return found;
           }
         }
@@ -617,7 +624,7 @@
 
     overlay.scrollTop = 0;
 
-    const GALLERY_PROBE_MS = 9000;
+    const GALLERY_PROBE_MS = 16000;
     void (async () => {
       try {
         const urls = await Promise.race([

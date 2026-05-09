@@ -44,7 +44,7 @@ if (str_starts_with($requestPath, '/api/')) {
 }
 
 redirect_legacy_embed_paths($requestPath, $requestUri, $requestMethod);
-serve_embed_file($requestPath, $embedDir);
+serve_embed_file($requestPath, $embedDir, $requestMethod);
 
 function route_api(string $path, string $method, Repository $repository, AdminAuth $auth): void
 {
@@ -319,7 +319,7 @@ function redirect_legacy_embed_paths(string $requestPath, string $requestUri, st
     exit;
 }
 
-function serve_embed_file(string $requestPath, string|false $embedDir): never
+function serve_embed_file(string $requestPath, string|false $embedDir, string $requestMethod = 'GET'): never
 {
     if ($embedDir === false) {
         json_response(['error' => 'server_misconfigured', 'detail' => 'embed directory missing'], 500);
@@ -353,6 +353,16 @@ function serve_embed_file(string $requestPath, string|false $embedDir): never
 
     http_response_code(200);
     header('Content-Type: ' . $mime);
+    if (strtoupper($requestMethod) === 'HEAD') {
+        if (str_ends_with($candidate, '/index.html')) {
+            $bodyLen = strlen(inject_google_site_verification((string) file_get_contents($candidate)));
+            header('Content-Length: ' . $bodyLen);
+        } else {
+            header('Content-Length: ' . (string) filesize($candidate));
+        }
+        exit;
+    }
+
     if (str_ends_with($candidate, '/index.html')) {
         echo inject_google_site_verification((string) file_get_contents($candidate));
         exit;
