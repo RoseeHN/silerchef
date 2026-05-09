@@ -801,10 +801,40 @@
     observeFresh(root);
   }
 
+  /** Homepage + gallery page: horizontal infinite marquee (clone strip for seamless loop). */
+  function initGalleryVideoMarquees() {
+    document.querySelectorAll('.gallery-videos--marquee').forEach((container) => {
+      if (container.dataset.marqueeReady) return;
+      const cards = Array.from(container.querySelectorAll(':scope > .video-card'));
+      if (!cards.length) return;
+      container.dataset.marqueeReady = '1';
+
+      const track = document.createElement('div');
+      track.className = 'gallery-videos__track';
+      const seq1 = document.createElement('div');
+      seq1.className = 'gallery-videos__seq';
+      const seq2 = document.createElement('div');
+      seq2.className = 'gallery-videos__seq';
+      seq2.setAttribute('aria-hidden', 'true');
+
+      cards.forEach((c) => seq1.appendChild(c));
+      cards.forEach((c) => seq2.appendChild(c.cloneNode(true)));
+
+      track.appendChild(seq1);
+      track.appendChild(seq2);
+      container.appendChild(track);
+
+      const secPerCard = 9;
+      const dur = Math.min(95, Math.max(28, cards.length * secPerCard));
+      track.style.setProperty('--gallery-marquee-duration', `${dur}s`);
+    });
+  }
+
   mountHub('cuisines-mount', CUISINES, 'cuisine', 'images/cuisines', { layout: 'cuisine-premium' });
   mountHub('services-mount', SERVICES, 'service', 'images/services-and-occasions', { layout: 'service-premium' });
   syncConversionStats(window.SC_SITE_STATS || {});
   bindMomentsGallery();
+  initGalleryVideoMarquees();
 
   loadGalleryManifest().then(() => {
     applyManifestToMomentImages();
