@@ -2264,8 +2264,8 @@ body.scroll-locked {
 }
 
 /**
- * Detail modal: ONE scroll surface (#detail-overlay). Everything inside flows naturally.
- * Do not add overflow-y/sticky on inner columns — that breaks scroll height and hides scrollbars.
+ * Detail modal: ONE scroll surface (#detail-overlay).
+ * Desktop: toolbar + left column use sticky within this scrollport (see --detail-toolbar-sticky-h).
  */
 .detail-overlay {
   position: fixed;
@@ -2299,6 +2299,7 @@ body.scroll-locked {
 }
 
 .detail-sheet {
+  --detail-toolbar-sticky-h: 4.9rem;
   position: relative;
   z-index: 1;
   width: min(97vw, 1440px);
@@ -2329,7 +2330,7 @@ body.scroll-locked {
 .detail-sheet__main-grid {
   display: grid;
   grid-template-columns: minmax(24rem, 1fr) minmax(0, 1fr);
-  align-items: start;
+  align-items: stretch;
   min-height: 0;
 }
 
@@ -2359,6 +2360,21 @@ body.scroll-locked {
     radial-gradient(circle at top left, rgba(197, 160, 89, 0.16), transparent 44%),
     linear-gradient(180deg, rgba(24, 21, 23, 0.96), rgba(14, 12, 14, 0.98));
   border-right: 1px solid rgba(197, 160, 89, 0.14);
+}
+
+@media (min-width: 901px) {
+  .detail-sheet__stage {
+    position: sticky;
+    top: var(--detail-toolbar-sticky-h);
+    align-self: stretch;
+    z-index: 2;
+    min-height: 0;
+    max-height: calc(100dvh - var(--detail-toolbar-sticky-h) - 1.25rem - env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(197, 160, 89, 0.35) transparent;
+  }
 }
 
 .detail-toolbar {
@@ -3141,6 +3157,7 @@ body.scroll-locked {
 
   .detail-sheet__main-grid {
     grid-template-columns: 1fr;
+    align-items: start;
   }
 
   .detail-sheet {
@@ -3149,6 +3166,13 @@ body.scroll-locked {
   }
 
   .detail-sheet__stage {
+    position: relative;
+    top: auto;
+    align-self: stretch;
+    z-index: auto;
+    max-height: none;
+    overflow: visible;
+    overscroll-behavior: auto;
     border-right: none;
     border-bottom: 1px solid rgba(197, 160, 89, 0.14);
   }
