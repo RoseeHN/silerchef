@@ -347,27 +347,133 @@ function serve_embed_file(string $requestPath, string|false $embedDir, string $r
     if (str_ends_with($candidate, '/admin.html')) {
         header('X-Robots-Tag: noindex, nofollow');
     }
-    if (preg_match('/\.(css|js|png|jpg|jpeg|svg|webp|gif|xml|txt|html)$/i', $candidate)) {
-        header('Cache-Control: public, max-age=' . (str_ends_with($candidate, '.html') ? '0, must-revalidate' : '3600'));
+    if (preg_match('/\.(css|js|png|jpg|jpeg|svg|webp|gif|xml|txt|html|mp4|webm|mov)$/i', $candidate)) {
+        header('Cache-Control: public, max-age=' . (preg_match('/\.html$/i', $candidate) ? '0, must-revalidate' : '3600'));
     }
 
-    http_response_code(200);
-    header('Content-Type: ' . $mime);
-    if (strtoupper($requestMethod) === 'HEAD') {
+    $method = strtoupper($requestMethod);
+
+    if ($method === 'HEAD') {
+        http_response_code(200);
+        header('Content-Type: ' . $mime);
         if (str_ends_with($candidate, '/index.html')) {
             $bodyLen = strlen(inject_google_site_verification((string) file_get_contents($candidate)));
             header('Content-Length: ' . $bodyLen);
         } else {
             header('Content-Length: ' . (string) filesize($candidate));
+            if (embed_media_supports_range_requests($candidate)) {
+                header('Accept-Ranges: bytes');
+            }
         }
         exit;
     }
 
     if (str_ends_with($candidate, '/index.html')) {
+        http_response_code(200);
+        header('Content-Type: ' . $mime);
         echo inject_google_site_verification((string) file_get_contents($candidate));
         exit;
     }
 
+    if (embed_media_supports_range_requests($candidate)) {
+        serve_embed_binary_with_ranges($candidate, $mime);
+    }
+
+    http_response_code(200);
+    header('Content-Type: ' . $mime);
+    readfile($candidate);
+    exit;
+}
+
+function embed_media_supports_range_requests(string $candidate): bool
+{
+    $ext = strtolower(pathinfo($candidate, PATHINFO_EXTENSION));
+
+    return in_array($ext, ['mp4', 'webm', 'mov', 'ogv', 'ogg', 'mp3', 'm4a', 'wav'], true);
+}
+
+/**
+ * HTML5 video/audio usually sends Range requests; plain 200 + full body fails on many browsers without 206 support.
+ */
+function serve_embed_binary_with_ranges(string $candidate, string $mime): never
+{
+    $size = filesize($candidate);
+    if ($size === false) {
+        json_response(['error' => 'not_found'], 404);
+    }
+
+    header('Accept-Ranges: bytes');
+
+    $rangeHeader = isset($_SERVER['HTTP_RANGE']) ? trim((string) $_SERVER['HTTP_RANGE']) : '';
+
+    if ($rangeHeader !== '' && preg_match('/^bytes=/i', $rangeHeader)) {
+        $firstRange = trim(explode(',', $rangeHeader, 2)[0]);
+        $rangeSpec = substr($firstRange, 6);
+
+        if (preg_match('/^(\d*)-(\d*)$/', $rangeSpec, $m)) {
+            $startStr = $m[1];
+            $endStr = $m[2];
+            $start = 0;
+            $end = $size - 1;
+
+            if ($startStr !== '' && $endStr !== '') {
+                $start = (int) $startStr;
+                $end = (int) $endStr;
+            } elseif ($startStr !== '' && $endStr === '') {
+                $start = (int) $startStr;
+                $end = $size - 1;
+            } elseif ($startStr === '' && $endStr !== '') {
+                $suffix = (int) $endStr;
+                if ($suffix <= 0) {
+                    http_response_code(416);
+                    header('Content-Range: bytes */' . $size);
+                    exit;
+                }
+                $start = max(0, $size - $suffix);
+                $end = $size - 1;
+            }
+
+            if ($start >= $size || $start > $end) {
+                http_response_code(416);
+                header('Content-Range: bytes */' . $size);
+                exit;
+            }
+
+            $end = min($end, $size - 1);
+            $length = $end - $start + 1;
+
+            http_response_code(206);
+            header('Content-Type: ' . $mime);
+            header('Content-Length: ' . $length);
+            header(sprintf('Content-Range: bytes %d-%d/%d', $start, $end, $size));
+
+            $fp = fopen($candidate, 'rb');
+            if ($fp === false) {
+                http_response_code(500);
+                exit;
+            }
+            if ($start > 0 && fseek($fp, $start) !== 0) {
+                fclose($fp);
+                http_response_code(500);
+                exit;
+            }
+            $remaining = $length;
+            while ($remaining > 0) {
+                $chunk = fread($fp, min(65536, $remaining));
+                if ($chunk === false || $chunk === '') {
+                    break;
+                }
+                echo $chunk;
+                $remaining -= strlen($chunk);
+            }
+            fclose($fp);
+            exit;
+        }
+    }
+
+    header('Content-Type: ' . $mime);
+    header('Content-Length: ' . $size);
+    http_response_code(200);
     readfile($candidate);
     exit;
 }
@@ -400,6 +506,7 @@ function detect_mime_type(string $filePath): string
         'gif' => 'image/gif',
         'webp' => 'image/webp',
         'mov' => 'video/quicktime',
+        'webm' => 'video/webm',
         'mp4' => 'video/mp4',
         'ico' => 'image/x-icon',
         'woff' => 'font/woff',
