@@ -2334,9 +2334,11 @@ body.scroll-locked {
 
 .detail-sheet__stage {
   min-width: 0;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  align-content: start;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  align-content: flex-start;
+  gap: 0;
   background:
     radial-gradient(circle at top left, rgba(197, 160, 89, 0.16), transparent 44%),
     linear-gradient(180deg, rgba(24, 21, 23, 0.96), rgba(14, 12, 14, 0.98));
@@ -2377,8 +2379,8 @@ body.scroll-locked {
 .detail-stage-copy {
   display: grid;
   gap: 1rem;
-  align-content: end;
-  padding: 0 1.3rem 1.35rem;
+  align-content: start;
+  padding: 0.6rem 1.3rem 1.2rem;
 }
 
 .detail-kicker {
@@ -3482,13 +3484,9 @@ body.scroll-locked {
   pointer-events: none;
 }
 
+/* Blurred duplicate layer removed — it made the hero read as soft/low-res behind the sharp img. */
 .detail-hero-wrap:not(.is-empty)::before {
-  background-image: var(--detail-hero-bg);
-  background-position: center;
-  background-size: cover;
-  filter: blur(22px) saturate(0.78);
-  transform: scale(1.06);
-  opacity: 0.38;
+  display: none;
 }
 
 .detail-hero-wrap:not(.is-empty)::after {

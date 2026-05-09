@@ -216,17 +216,22 @@
     return out;
   }
 
+  /** Try jpg/png/webp for one gallery index in parallel — faster than sequential extension probes. */
+  async function probeNumberedSlot(basePath, i) {
+    const extensions = ['jpg', 'jpeg', 'png', 'webp'];
+    const candidates = extensions.map((ext) => `${basePath}/${pad2(i)}.${ext}`);
+    const results = await Promise.all(candidates.map((url) => probeImage(url)));
+    for (let k = 0; k < candidates.length; k++) {
+      if (results[k]) return candidates[k];
+    }
+    return null;
+  }
+
   async function collectNumberedImages(basePath) {
     const found = [];
     let misses = 0;
-    const extensions = ['jpg', 'jpeg', 'png', 'webp'];
     for (let i = 1; i <= 80; i++) {
-      let hit = null;
-      for (const ext of extensions) {
-        const candidate = `${basePath}/${pad2(i)}.${ext}`;
-        hit = await probeImage(candidate);
-        if (hit) break;
-      }
+      const hit = await probeNumberedSlot(basePath, i);
       if (hit) {
         found.push(hit);
         misses = 0;
@@ -441,10 +446,6 @@
       heroEl.src = urls[currentIdx];
       const dish = galleryTitleForUrl(urls[currentIdx]);
       heroEl.alt = dish || 'Gallery image ' + (currentIdx + 1);
-      if (heroWrap) {
-        const bgUrl = urls[currentIdx].replace(/(["'()\\])/g, '\\$1');
-        heroWrap.style.setProperty('--detail-hero-bg', `url("${bgUrl}")`);
-      }
       stripEl.querySelectorAll('.detail-thumb').forEach((t) => {
         const ti = Number(t.dataset.thumbIndex);
         t.classList.toggle('is-active', ti === currentIdx);
@@ -559,9 +560,12 @@
 
     renderBlocks(detailBlocks, copy, kind, slug);
 
-    const warmPreview = getCardImageSrc(kind, slug, baseFolder);
-    const warmUrls = warmPreview ? [warmPreview] : [];
-    setupCarousel(detailHero, detailStrip, warmUrls);
+    let galleryUrls = await collectGalleryUrls(baseFolder, slug);
+    if (!galleryUrls.length) {
+      const fb = getCardImageSrc(kind, slug, baseFolder);
+      if (fb) galleryUrls = [fb];
+    }
+    setupCarousel(detailHero, detailStrip, galleryUrls);
 
     overlay.hidden = false;
     overlay.setAttribute('aria-hidden', 'false');
@@ -570,10 +574,6 @@
 
     const sheetScroll = overlay.querySelector('.detail-sheet-scroll');
     if (sheetScroll) sheetScroll.scrollTop = 0;
-
-    collectGalleryUrls(baseFolder, slug).then((urls) => {
-      setupCarousel(detailHero, detailStrip, urls);
-    });
 
     if (detailClose) {
       try {
