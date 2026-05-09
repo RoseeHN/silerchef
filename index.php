@@ -397,6 +397,10 @@ function embed_media_supports_range_requests(string $candidate): bool
  */
 function serve_embed_binary_with_ranges(string $candidate, string $mime): never
 {
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+
     $size = filesize($candidate);
     if ($size === false) {
         json_response(['error' => 'not_found'], 404);
