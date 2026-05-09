@@ -803,6 +803,7 @@
 
   mountHub('cuisines-mount', CUISINES, 'cuisine', 'images/cuisines', { layout: 'cuisine-premium' });
   mountHub('services-mount', SERVICES, 'service', 'images/services-and-occasions', { layout: 'service-premium' });
+  syncConversionStats(window.SC_SITE_STATS || {});
   bindMomentsGallery();
 
   loadGalleryManifest().then(() => {
@@ -991,6 +992,31 @@
     target.splice(0, target.length, ...ordered);
   }
 
+  function formatConversionCount(n) {
+    const words = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+    if (n >= 0 && n <= 10 && Number.isFinite(n)) return words[n];
+    return String(Math.max(0, n));
+  }
+
+  /** Keeps headline + stat numbers aligned with mounted cuisine/service cards (avoids stale CMS totals). */
+  function syncConversionStats(siteStats) {
+    const statNums = document.querySelectorAll('.stats-grid--premium .stat-num');
+    const nCuisine = CUISINES.length;
+    const nService = SERVICES.length;
+    if (statNums[0]) statNums[0].textContent = String(nCuisine);
+    if (statNums[1]) statNums[1].textContent = String(nService);
+    const s = siteStats && typeof siteStats === 'object' ? siteStats : {};
+    if (statNums[2] && s.chefExperience != null) statNums[2].textContent = String(s.chefExperience);
+
+    const titleEl = document.querySelector('.conversion-title');
+    if (titleEl) {
+      const cw = formatConversionCount(nCuisine);
+      const sw = formatConversionCount(nService);
+      const caps = cw.length ? cw.charAt(0).toUpperCase() + cw.slice(1) : cw;
+      titleEl.textContent = `${caps} cuisines · ${sw} occasions · one chef-led table`;
+    }
+  }
+
   function applySiteSettings(content) {
     if (!content || typeof content !== 'object') return;
     const site = content.site || {};
@@ -1081,10 +1107,6 @@
       if (craft.secondaryHref) craftActions[1].setAttribute('href', craft.secondaryHref);
       if (craft.secondaryLabel != null) craftActions[1].textContent = String(craft.secondaryLabel);
     }
-    const statNums = document.querySelectorAll('.stat-num');
-    if (statNums[0] && stats.cuisinePortfolios != null) statNums[0].textContent = String(stats.cuisinePortfolios);
-    if (statNums[1] && stats.occasionArchetypes != null) statNums[1].textContent = String(stats.occasionArchetypes);
-    if (statNums[2] && stats.chefExperience != null) statNums[2].textContent = String(stats.chefExperience);
     setNodeText('[data-booking-headline]', cta.headline);
     setNodeText('[data-booking-summary]', cta.summary);
     setNodeText('#reel-label', reel.kicker);
@@ -1254,13 +1276,14 @@
     }
   }
 
-  function remountHubs() {
+  function remountHubs(siteStatsForConversion) {
     const cuisinesMount = document.getElementById('cuisines-mount');
     const servicesMount = document.getElementById('services-mount');
     if (cuisinesMount) cuisinesMount.innerHTML = '';
     if (servicesMount) servicesMount.innerHTML = '';
     mountHub('cuisines-mount', CUISINES, 'cuisine', 'images/cuisines', { layout: 'cuisine-premium' });
     mountHub('services-mount', SERVICES, 'service', 'images/services-and-occasions', { layout: 'service-premium' });
+    syncConversionStats(siteStatsForConversion || (window.SC_SITE_STATS || {}));
   }
 
   async function loadRuntimeContent() {
@@ -1270,6 +1293,8 @@
       const content = await res.json();
       if (!content || typeof content !== 'object') return;
       applySiteSettings(content);
+      const siteStatsPersist = content.site && content.site.stats ? content.site.stats : {};
+      window.SC_SITE_STATS = siteStatsPersist;
       mergeCardCollection(CUISINES_CANONICAL, CUISINES, content.cuisineCards);
       mergeCardCollection(SERVICES_CANONICAL, SERVICES, content.serviceCards);
       if (content.cuisines || content.services) {
@@ -1278,7 +1303,7 @@
           services: content.services || undefined,
         });
       }
-      remountHubs();
+      remountHubs(siteStatsPersist);
     } catch (_) {
       /* ignore */
     }
