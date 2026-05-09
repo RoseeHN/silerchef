@@ -353,7 +353,7 @@
             kind === 'cuisine' ? 'images/cuisines' : 'images/services-and-occasions'
           )
         : '';
-    copy.blocks.forEach((block) => {
+    copy.blocks.forEach((block, idx) => {
       const article = document.createElement('article');
       article.className = 'meal-card observe' + (block.image ? ' meal-card--with-visual' : '');
 
@@ -366,8 +366,11 @@
         const img = document.createElement('img');
         img.src = block.image;
         img.alt = galleryTitleForUrl(block.image) || '';
-        img.loading = 'lazy';
+        img.loading = idx < 8 ? 'eager' : 'lazy';
         img.decoding = 'async';
+        if (idx < 4 && 'fetchPriority' in img) {
+          img.fetchPriority = 'high';
+        }
         img.sizes = '(max-width: 520px) 72px, 108px';
         img.addEventListener('error', function onBlockImageError() {
           img.removeEventListener('error', onBlockImageError);
