@@ -182,6 +182,15 @@
   contain: layout style;
 }
 
+/* Same preview height everywhere — flex rows often give cards unequal widths, which skewed 4:5 crops. */
+.module--video-gallery .video-card__media,
+.gallery-strip--video .video-card__media {
+  aspect-ratio: unset;
+  height: clamp(12rem, 22vw, 18rem);
+  min-height: 12rem;
+  max-height: 18rem;
+}
+
 .video-card__media video {
   position: absolute;
   inset: 0;
