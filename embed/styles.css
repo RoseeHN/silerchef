@@ -2265,7 +2265,7 @@ body.scroll-locked {
 
 /**
  * Detail modal: ONE scroll surface (#detail-overlay).
- * Desktop: toolbar + left column use sticky within this scrollport (see --detail-toolbar-sticky-h).
+ * Toolbar scrolls with the sheet (not sticky). Desktop: left column sticky within overlay only.
  */
 .detail-overlay {
   position: fixed;
@@ -2299,7 +2299,6 @@ body.scroll-locked {
 }
 
 .detail-sheet {
-  --detail-toolbar-sticky-h: 4.9rem;
   position: relative;
   z-index: 1;
   width: min(97vw, 1440px);
@@ -2365,11 +2364,11 @@ body.scroll-locked {
 @media (min-width: 901px) {
   .detail-sheet__stage {
     position: sticky;
-    top: var(--detail-toolbar-sticky-h);
+    top: clamp(0.65rem, 2vw, 1rem);
     align-self: stretch;
     z-index: 2;
     min-height: 0;
-    max-height: calc(100dvh - var(--detail-toolbar-sticky-h) - 1.25rem - env(safe-area-inset-bottom, 0px));
+    max-height: calc(100dvh - clamp(1.25rem, 4vw, 2rem) - env(safe-area-inset-bottom, 0px));
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
@@ -2378,9 +2377,8 @@ body.scroll-locked {
 }
 
 .detail-toolbar {
-  position: sticky;
-  top: 0;
-  z-index: 6;
+  position: relative;
+  z-index: 1;
   flex-shrink: 0;
   padding: 0.82rem 1rem 0.72rem;
   display: flex;
