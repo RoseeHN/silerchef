@@ -285,6 +285,27 @@
     return found;
   }
 
+  /**
+   * First paint for detail modal: hub thumb + numbered gallery JPGs (no probes).
+   * When runtime/API merge leaves `copy.blocks` empty, async scans alone can time out and leave a single thumb.
+   */
+  function buildDetailBootstrapGallery(baseFolder, slug, maxSlot) {
+    const cap = typeof maxSlot === 'number' && maxSlot > 0 ? maxSlot : 12;
+    const out = [];
+    const seen = new Set();
+    function add(u) {
+      if (!u || seen.has(u)) return;
+      seen.add(u);
+      out.push(u);
+    }
+    add(`${baseFolder}/${slug}/thumb.jpg`);
+    const gp = `${baseFolder}/${slug}/gallery`;
+    for (let i = 1; i <= cap; i++) {
+      add(`${gp}/${pad2(i)}.jpg`);
+    }
+    return out;
+  }
+
   async function collectGalleryUrls(baseFolder, slug) {
     const copy = getCopy('cuisine', slug) || getCopy('service', slug);
     const base = `${baseFolder}/${slug}`;
@@ -317,6 +338,16 @@
         if (!raw) continue;
         /** data.js paths are canonical — probing each blocked the carousel on slow scans / timeouts. */
         pushUnique(raw);
+      }
+    }
+
+    const hasBlockImages =
+      copy &&
+      Array.isArray(copy.blocks) &&
+      copy.blocks.some((b) => b && typeof b.image === 'string' && b.image.trim());
+    if (!hasBlockImages) {
+      for (let i = 1; i <= 12; i++) {
+        pushUnique(`${galleryPath}/${pad2(i)}.jpg`);
       }
     }
 
@@ -622,9 +653,8 @@
 
     renderBlocks(detailBlocks, copy, kind, slug);
 
-    /** Always start from hub thumb — known to exist; avoids waiting on block.image probes for first paint. */
-    const thumbFast = `${baseFolder}/${slug}/thumb.jpg`;
-    const bootstrapUrls = [thumbFast];
+    /** Thumb + canonical gallery/01… slots — immediate strip; async pass refines order and adds hero/extras. */
+    const bootstrapUrls = buildDetailBootstrapGallery(baseFolder, slug);
     setupCarousel(detailHero, detailStrip, bootstrapUrls);
 
     overlay.hidden = false;
