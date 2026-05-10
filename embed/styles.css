@@ -849,7 +849,7 @@ body.nav-drawer-open {
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
   gap: clamp(2rem, 4.5vw, 3.75rem);
-  align-items: center;
+  align-items: start;
   position: relative;
   z-index: 1;
 }
@@ -857,6 +857,70 @@ body.nav-drawer-open {
 .hero-panel--visual {
   position: relative;
   padding: 0.85rem 0 0.85rem;
+}
+
+@media (min-width: 901px) {
+  /** Image column top aligns with headline column; mini cards sit under the photo (grid below). */
+  .hero-panel--visual {
+    padding-top: 0;
+    padding-bottom: 0;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+  }
+
+  .hero-inner--split {
+    gap: unset;
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    grid-template-rows: auto auto;
+    column-gap: clamp(2rem, 4.5vw, 3.75rem);
+    row-gap: clamp(0.65rem, 1.8vw, 1rem);
+    align-items: start;
+  }
+
+  .hero-panel--copy {
+    display: contents;
+  }
+
+  .hero-copy-lead {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+    border-left: 1px solid rgba(197, 160, 89, 0.16);
+    box-shadow: inset 1px 0 0 rgba(255, 248, 235, 0.05);
+    padding-left: clamp(1.5rem, 3.2vw, 2.35rem);
+  }
+
+  .hero-actions {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: end;
+    border-left: 1px solid rgba(197, 160, 89, 0.16);
+    box-shadow: inset 1px 0 0 rgba(255, 248, 235, 0.05);
+    padding-left: clamp(1.5rem, 3.2vw, 2.35rem);
+    margin-top: 0;
+  }
+
+  .hero-mini-grid {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: start;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+
+  .hero-mini-card--primary {
+    grid-column: auto;
+  }
+}
+
+.hero-copy-lead {
+  min-width: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .hero-frame {
@@ -971,15 +1035,6 @@ body.nav-drawer-open {
   text-align: left;
   position: relative;
   z-index: 2;
-}
-
-/** Clear editorial separation between image and copy (impossible to miss on desktop). */
-@media (min-width: 901px) {
-  .hero-inner--split .hero-panel--copy {
-    padding-left: clamp(1.5rem, 3.2vw, 2.35rem);
-    border-left: 1px solid rgba(197, 160, 89, 0.16);
-    box-shadow: inset 1px 0 0 rgba(255, 248, 235, 0.05);
-  }
 }
 
 .hero-copy-top {
@@ -1178,7 +1233,26 @@ body.nav-drawer-open {
 @media (max-width: 900px) {
   .hero-inner--split {
     grid-template-columns: 1fr;
+    grid-template-rows: auto;
     gap: 2rem;
+  }
+
+  .hero-panel--copy {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 3vw, 1.35rem);
+  }
+
+  .hero-copy-lead {
+    border-left: none;
+    padding-left: 0;
+    box-shadow: none;
+  }
+
+  .hero-actions {
+    border-left: none;
+    padding-left: 0;
+    box-shadow: none;
   }
 
   .hero-panel--visual {
