@@ -290,7 +290,7 @@
    * When runtime/API merge leaves `copy.blocks` empty, async scans alone can time out and leave a single thumb.
    */
   function buildDetailBootstrapGallery(baseFolder, slug, maxSlot) {
-    const cap = typeof maxSlot === 'number' && maxSlot > 0 ? maxSlot : 12;
+    const cap = typeof maxSlot === 'number' && maxSlot > 0 ? maxSlot : 6;
     const out = [];
     const seen = new Set();
     function add(u) {
@@ -471,6 +471,8 @@
 
   let lockedScrollY = 0;
   let activeModalLock = '';
+  /** `<link rel="preload">` for detail hero; removed when carousel resets or modal closes. */
+  let detailHeroPreloadLink = null;
 
   function resetCarouselTimers() {
     /* Detail gallery uses CSS marquee + static hero; nothing to clear */
@@ -478,6 +480,11 @@
 
   function setupCarousel(heroEl, stripEl, urls) {
     resetCarouselTimers();
+
+    if (detailHeroPreloadLink) {
+      detailHeroPreloadLink.remove();
+      detailHeroPreloadLink = null;
+    }
 
     const heroWrap = heroEl.parentElement;
     stripEl.innerHTML = '';
@@ -505,7 +512,15 @@
     if (heroWrap) {
       heroWrap.classList.remove('is-empty');
     }
-    heroEl.src = urls[0];
+    const heroUrl = urls[0];
+    const preload = document.createElement('link');
+    preload.rel = 'preload';
+    preload.as = 'image';
+    preload.href = heroUrl;
+    document.head.appendChild(preload);
+    detailHeroPreloadLink = preload;
+
+    heroEl.src = heroUrl;
     heroEl.decoding = 'sync';
     if ('fetchPriority' in heroEl) {
       heroEl.fetchPriority = 'high';
@@ -547,7 +562,7 @@
     heroEl.style.cursor = 'zoom-in';
     heroEl.onclick = () => openMomentsLightbox(lightboxItems, currentIdx);
 
-    function makeThumb(idx) {
+    function makeThumb(idx, isMarqueeDuplicate) {
       const url = urls[idx];
       const dish = galleryTitleForUrl(url);
       const b = document.createElement('button');
@@ -558,7 +573,18 @@
       const im = document.createElement('img');
       im.src = url;
       im.alt = dish || '';
-      im.loading = idx < 12 ? 'eager' : 'lazy';
+      if (isMarqueeDuplicate) {
+        /** Second marquee strip is off-screen clone — defer so we do not double-contend with hero + row 1. */
+        im.loading = 'lazy';
+        if ('fetchPriority' in im) {
+          im.fetchPriority = 'low';
+        }
+      } else {
+        im.loading = idx < 12 ? 'eager' : 'lazy';
+        if (idx < 3 && 'fetchPriority' in im) {
+          im.fetchPriority = idx === 0 ? 'high' : 'auto';
+        }
+      }
       im.decoding = 'async';
       im.sizes = '140px';
       b.appendChild(im);
@@ -578,7 +604,7 @@
 
     const seq1 = document.createElement('div');
     seq1.className = 'detail-marquee__seq';
-    urls.forEach((_, idx) => seq1.appendChild(makeThumb(idx)));
+    urls.forEach((_, idx) => seq1.appendChild(makeThumb(idx, false)));
 
     stripEl.appendChild(seq1);
 
@@ -586,7 +612,7 @@
       const seq2 = document.createElement('div');
       seq2.className = 'detail-marquee__seq';
       seq2.setAttribute('aria-hidden', 'true');
-      urls.forEach((_, idx) => seq2.appendChild(makeThumb(idx)));
+      urls.forEach((_, idx) => seq2.appendChild(makeThumb(idx, true)));
       stripEl.appendChild(seq2);
       const secPerImg = 2.4;
       const dur = Math.min(100, Math.max(26, urls.length * secPerImg));
@@ -692,6 +718,10 @@
   function closeDetail() {
     if (!overlay) return;
     resetCarouselTimers();
+    if (detailHeroPreloadLink) {
+      detailHeroPreloadLink.remove();
+      detailHeroPreloadLink = null;
+    }
     overlay.hidden = true;
     overlay.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('detail-open');
