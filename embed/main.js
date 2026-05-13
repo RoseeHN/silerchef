@@ -1221,6 +1221,18 @@
     setNodeText('#experience-featured-eyebrow', experience.featuredEyebrow);
     setNodeText('#experience-featured-title', experience.featuredTitle);
     setNodeText('#experience-featured-body', experience.featuredBody);
+    const featuredImg = document.getElementById('experience-featured-img');
+    const hostingImg = document.getElementById('experience-hosting-img');
+    const guestImg = document.getElementById('experience-guest-img');
+    if (featuredImg && typeof experience.featuredImage === 'string' && experience.featuredImage.trim()) {
+      featuredImg.src = experience.featuredImage.trim();
+    }
+    if (hostingImg && typeof experience.hostingImage === 'string' && experience.hostingImage.trim()) {
+      hostingImg.src = experience.hostingImage.trim();
+    }
+    if (guestImg && typeof experience.guestImage === 'string' && experience.guestImage.trim()) {
+      guestImg.src = experience.guestImage.trim();
+    }
     setNodeText('#experience-hosting-eyebrow', experience.hostingEyebrow);
     setNodeText('#experience-hosting-title', experience.hostingTitle);
     setNodeText('#experience-hosting-body', experience.hostingBody);
