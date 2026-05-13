@@ -2,14 +2,20 @@
 # Runtime matches Procfile: PHP built-in server + router.php — Node is not required in prod.
 FROM php:8.2-cli-bookworm
 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends \
+# Headers for ext-pgsql / ext-pdo_pgsql (libpq) and SQLite; unzip for Composer archives.
+RUN set -eux; \
+  apt-get update; \
+  apt-get install -y --no-install-recommends \
     libpq-dev \
     libsqlite3-dev \
-    unzip \
-  && docker-php-ext-install -j"$(nproc)" pgsql pdo_pgsql pdo_sqlite sqlite3 \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+    unzip; \
+  docker-php-ext-install -j"$(nproc)" \
+    pdo_pgsql \
+    pgsql \
+    pdo_sqlite \
+    sqlite3; \
+  apt-get clean; \
+  rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
