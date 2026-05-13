@@ -1,0 +1,12 @@
+node_modules
+.runtime-data
+.git
+.gitignore
+.env
+.env.*
+*.log
+npm-debug.log*
+.DS_Store
+.cursor
+**/agent-tools
+**/agent-transcripts
