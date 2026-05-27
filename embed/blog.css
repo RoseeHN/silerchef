@@ -205,12 +205,13 @@
 
 .blog-article__hero {
   margin: 0 0 1.25rem;
-  width: 100%;
-  height: clamp(10.5rem, 28vw, 16.5rem);
-  max-height: min(16.5rem, 38vh);
+  /* 3:2 photo ratio — width capped so height stays ~18rem (not a wide squat crop) */
+  width: min(100%, 42rem, 27rem);
+  aspect-ratio: 3 / 2;
   border-radius: calc(var(--radius) + 4px);
   overflow: hidden;
   border: 1px solid rgba(197, 160, 89, 0.2);
+  background: rgba(12, 11, 12, 0.6);
 }
 
 .blog-article__hero img {
