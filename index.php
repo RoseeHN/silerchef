@@ -6,6 +6,7 @@ require_once __DIR__ . '/app/Support.php';
 require_once __DIR__ . '/app/Database.php';
 require_once __DIR__ . '/app/Repository.php';
 require_once __DIR__ . '/app/AdminAuth.php';
+require_once __DIR__ . '/app/Blog.php';
 
 $database = new Database();
 $repository = new Repository($database);
@@ -42,6 +43,8 @@ if ($requestPath === '/health') {
 if (str_starts_with($requestPath, '/api/')) {
     route_api($requestPath, $requestMethod, $repository, $auth);
 }
+
+serve_blog_routes($requestPath);
 
 redirect_legacy_embed_paths($requestPath, $requestUri, $requestMethod);
 serve_embed_file($requestPath, $embedDir, $requestMethod);
@@ -306,6 +309,7 @@ function redirect_legacy_embed_paths(string $requestPath, string $requestUri, st
         '/index.html', '/index', '/index/' => '/',
         '/admin.html', '/admin/' => '/admin',
         '/gallery.html', '/gallery/' => '/gallery',
+        '/blog.html', '/blog/' => '/blog',
         default => null,
     };
 
