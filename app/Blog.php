@@ -5,7 +5,7 @@ declare(strict_types=1);
 final class Blog
 {
     private const SITE_ORIGIN = 'https://www.silerchef.com';
-    private const ASSET_VERSION = 'sc-20260514c';
+    private const ASSET_VERSION = 'sc-20260528a';
 
     /** @var list<array<string, mixed>>|null */
     private static ?array $posts = null;
@@ -204,6 +204,14 @@ final class Blog
 
         require dirname(__DIR__) . '/embed/views/blog-post.php';
         exit;
+    }
+
+    /** @param array<string, mixed> $post */
+    public static function coverAlt(array $post): string
+    {
+        $alt = trim((string) ($post['imageAlt'] ?? ''));
+
+        return $alt !== '' ? $alt : (string) ($post['title'] ?? 'Siler Chef journal');
     }
 
     public static function excerpt(string $html, int $maxLen = 160): string

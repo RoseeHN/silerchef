@@ -2,14 +2,14 @@
 require __DIR__ . '/blog-layout-head.php';
 ?>
     <main class="blog-main">
-      <section class="blog-hero shell">
+      <section class="blog-hero blog-shell">
         <p class="blog-hero__eyebrow">Journal</p>
         <h1 class="blog-hero__title gold-text">Private chef guides for Reno, Tahoe &amp; the Bay Area</h1>
         <p class="blog-hero__lede">
           Practical notes on hosting, menu direction, and what to expect when you bring restaurant-level dining home — written for hosts planning their next table.
         </p>
       </section>
-      <section class="blog-grid-section shell" aria-label="Articles">
+      <section class="blog-grid-section blog-shell" aria-label="Articles">
         <ul class="blog-grid">
           <?php foreach ($posts as $post): ?>
             <?php
@@ -22,7 +22,7 @@ require __DIR__ . '/blog-layout-head.php';
             <li>
               <article class="blog-card">
                 <a class="blog-card__media" href="<?= $href ?>">
-                  <img src="<?= htmlspecialchars($img, ENT_QUOTES, 'UTF-8') ?>" alt="" loading="lazy" decoding="async" width="640" height="480" />
+                  <img src="<?= htmlspecialchars($img, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars(Blog::coverAlt($post), ENT_QUOTES, 'UTF-8') ?>" loading="lazy" decoding="async" width="640" height="480" />
                 </a>
                 <div class="blog-card__body">
                   <?php if ($date !== ''): ?>

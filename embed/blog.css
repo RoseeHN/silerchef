@@ -1,4 +1,14 @@
 /* Blog / Journal — reuses site tokens from styles.css */
+
+/** Match .header-inner width + horizontal inset so Journal aligns with the nav bar. */
+.blog-shell {
+  width: min(calc(100% - (var(--page-gutter) * 2)), var(--page-max));
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1rem, 2vw, 1.45rem);
+  padding-right: clamp(1rem, 2vw, 1.45rem);
+}
+
 .blog-page .page {
   padding-bottom: clamp(2rem, 5vw, 3rem);
 }
@@ -9,7 +19,6 @@
 
 .blog-hero {
   padding: clamp(1.25rem, 3vw, 2rem) 0 clamp(1.5rem, 3vw, 2.25rem);
-  max-width: 42rem;
 }
 
 .blog-hero__eyebrow {
@@ -33,7 +42,11 @@
   color: var(--text-muted);
   font-size: 1rem;
   line-height: 1.65;
-  max-width: 36rem;
+  max-width: 38rem;
+}
+
+.blog-hero__title {
+  max-width: 44rem;
 }
 
 .blog-grid {
@@ -126,8 +139,14 @@
 }
 
 .blog-article {
-  max-width: 46rem;
+  width: 100%;
   padding-bottom: 2rem;
+}
+
+.blog-article__header,
+.blog-article__content,
+.blog-article__footer {
+  max-width: 42rem;
 }
 
 .blog-article__crumb {

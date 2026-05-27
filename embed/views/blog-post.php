@@ -6,7 +6,7 @@ $published = (string) $post['published'];
 $tags = is_array($post['tags']) ? $post['tags'] : [];
 ?>
     <main class="blog-main blog-main--article">
-      <article class="blog-article shell">
+      <article class="blog-article blog-shell">
         <nav class="blog-article__crumb" aria-label="Breadcrumb">
           <a href="/blog">Journal</a>
           <span aria-hidden="true">/</span>
@@ -30,7 +30,7 @@ $tags = is_array($post['tags']) ? $post['tags'] : [];
         <figure class="blog-article__hero">
           <img
             src="/<?= htmlspecialchars(ltrim((string) $post['image'], '/'), ENT_QUOTES, 'UTF-8') ?>"
-            alt=""
+            alt="<?= htmlspecialchars(Blog::coverAlt($post), ENT_QUOTES, 'UTF-8') ?>"
             width="1200"
             height="800"
             loading="eager"

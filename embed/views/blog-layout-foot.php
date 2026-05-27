@@ -1,6 +1,6 @@
     </div>
     <footer class="site-footer">
-      <div class="shell site-footer__inner">
+      <div class="blog-shell site-footer__inner">
         <p class="site-footer__brand">Siler Chef · Personal chef · Reno · Tahoe · Bay Area</p>
         <p class="site-footer__links">
           <a href="/">Home</a>
