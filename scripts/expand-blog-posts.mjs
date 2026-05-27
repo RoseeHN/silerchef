@@ -1,321 +1,1199 @@
 #!/usr/bin/env node
 /**
- * Expands blog-posts.json bodyHtml for SEO (run from repo root).
+ * Full SEO body copy for all Journal posts (run from repo root).
  * node scripts/expand-blog-posts.mjs
  */
 import { readFileSync, writeFileSync } from 'fs';
-import { fileURLToPath } from 'url';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const jsonPath = path.join(root, 'embed/data/blog-posts.json');
 const updatedOn = '2026-05-28';
+const MIN_WORDS = 520;
+
+const aboutChef = `<h2>About Siler Chef</h2><p>Siler Chef LLC is led by <strong>Chef Fikret Siler</strong>, whose career spans Istanbul fine-dining hotels (including Michelin-guide environments), eight years at Vakko Patisserie alongside MOF-trained mentors, and leadership roles in Northern Nevada kitchens. That background informs how private events are paced: sauces finished with patience, pastry that lands cleanly, and service that feels calm rather than chaotic.</p><p>We serve <strong>Reno</strong>, <strong>Lake Tahoe</strong>, and the <strong>San Francisco Bay Area</strong> for private chef dinners, celebrations, corporate hosting, and chef-led education. Sample menus on the site are starting directions — every course can be rebuilt around your guest list, allergies, and the equipment in your home or rental kitchen.</p>`;
+
+const serviceArea = `<h2>Service area and travel</h2><p>Core scheduling is based in Reno, Nevada. We regularly travel to Tahoe homes and qualified Bay Area addresses when dates allow. Share your neighborhood, property type (primary home, rental, estate), and any access notes (gates, elevators, HOA quiet hours) in your first inquiry so travel and load-in are quoted accurately — not guessed the week of the event.</p>`;
+
+const cta = `<h2>Request availability</h2><p>Tell us your <strong>date</strong>, <strong>location</strong>, <strong>guest count</strong>, and any dietary restrictions. We follow up by phone, email, or WhatsApp with timing and menu direction. <a href="/#contact">Submit your reservation request</a>, explore <a href="/#cuisines">cuisine portfolios</a>, or browse the <a href="/gallery">gallery</a> for plating tone.</p>`;
+
+/** @param {{ title: string, paragraphs: string[], list?: string[] }} block */
+function block({ title, paragraphs, list }) {
+  let html = `<h2>${title}</h2>`;
+  for (const p of paragraphs) {
+    html += `<p>${p}</p>`;
+  }
+  if (list?.length) {
+    html += `<ul>${list.map((li) => `<li>${li}</li>`).join('')}</ul>`;
+  }
+  return html;
+}
+
+function timelineBlock(topicLabel) {
+  return block({
+    title: `Booking timeline for ${topicLabel}`,
+    paragraphs: [
+      `For ${topicLabel}, inquire two to eight weeks ahead when possible — longer for Thanksgiving week, New Year’s Eve, and peak Tahoe summer Saturdays. Your first reply includes questions about kitchen setup, realistic guest count, and service style rather than a one-size quote.`,
+      `Menu direction is confirmed before groceries are ordered. One week out we reconfirm allergies, arrival window, bar coordination (if separate), and any rental delivery times. Event-day load-in is scheduled to stay quiet during guest arrival.`,
+      `After service, kitchen reset scope is completed as written in your proposal — you should know in advance whether dish handling, trash consolidation, and tray removal are included.`,
+    ],
+  });
+}
+
+/**
+ * @param {string[]} lead
+ * @param {Array<{ title: string, paragraphs: string[], list?: string[] }>} sections
+ * @param {string} topicLabel
+ */
+function article(lead, sections, topicLabel) {
+  const intro = lead.map((p) => `<p>${p}</p>`).join('');
+  const body = sections.map((s) => block(s)).join('') + timelineBlock(topicLabel);
+  return `${intro}${body}${aboutChef}${serviceArea}${cta}`;
+}
 
 /** @type {Record<string, string>} */
 const bodies = {
-  'private-chef-reno-guide': `
-<p>If you are searching for a <strong>private chef in Reno</strong>, you are usually planning something more personal than a restaurant reservation: a home you love, guests you actually want to see, and a menu that fits the night instead of a fixed tasting card. That is the gap chef-led in-home dining fills.</p>
-<p>Siler Chef is based in Northern Nevada and serves Reno, the Truckee Meadows, and surrounding neighborhoods for private dinners, celebrations, and chef-led entertaining. Before anyone picks up a knife, we confirm guest count, service style, dietary needs, and what your kitchen can realistically support.</p>
-<h2>What a Reno private chef handles for you</h2>
-<p>Menu design, sourcing, prep, cooking, plating, timing, and discreet clearing — so you are not bouncing between the stove and the living room. Courses are sequenced the way they would be on a fine-dining line: hold times, rest, and sauce work are planned in advance, not improvised while guests wait.</p>
-<ul>
-<li><strong>Consultation:</strong> occasion, cuisine direction, allergies, and whether you want plated service or family-style sharing.</li>
-<li><strong>Menu draft:</strong> sample arcs from our <a href="/#cuisines">cuisine portfolios</a>, customized to your brief.</li>
-<li><strong>Day-of execution:</strong> load-in, cooking, service, and kitchen reset so the house still feels like yours afterward.</li>
-</ul>
-<h2>Plated dining vs. family-style at home</h2>
-<p>Smaller tables and milestone nights often suit plated courses — anniversaries, client dinners, or a chef’s-table feel in your dining room. Larger groups, birthdays, and relaxed weekends often work better with shared mains and composed sides brought to the table together. Both formats are common for Reno hosts; the right choice depends on guest count and how formal you want the rhythm to feel.</p>
-<h2>How far in advance to book</h2>
-<p>Popular weekends, holidays, and ski-season Tahoe overlap fill early. Sharing your date, neighborhood, and headcount even before the menu is final helps us hold the calendar and advise on timing. <a href="/#contact">Send your request through the reservation form</a> and we follow up by phone, email, or WhatsApp with next steps.</p>`,
+  'private-chef-reno-guide': article(
+    [
+      'If you are searching for a <strong>private chef in Reno</strong>, you are usually planning something more personal than a restaurant reservation: a home you love, guests you want to see, and a menu that fits the night instead of a fixed card. Chef-led in-home dining removes the split focus — you stay with guests while courses arrive with intention.',
+      'Siler Chef is based in Northern Nevada and serves Reno, the Truckee Meadows, Spanish Springs, South Meadows, and surrounding neighborhoods for private dinners, milestones, and chef-led entertaining.',
+    ],
+    [
+      {
+        title: 'What a Reno private chef handles end-to-end',
+        paragraphs: [
+          'Menu design, sourcing, prep, cooking, plating, timing, and discreet clearing. Courses are sequenced like a fine-dining line: hold times, resting proteins, and sauce work are planned before service — not improvised while guests wait in the living room.',
+          'Before anyone picks up a knife we confirm guest count, allergies, service style (plated vs. family-style), and what your kitchen can support realistically.',
+        ],
+        list: [
+          '<strong>Consultation:</strong> occasion, cuisine direction, and dietary documentation',
+          '<strong>Menu draft:</strong> customized from our <a href="/#cuisines">cuisine portfolios</a>',
+          '<strong>Day-of:</strong> load-in, service, and kitchen reset agreed in advance',
+        ],
+      },
+      {
+        title: 'Plated vs. family-style in Reno homes',
+        paragraphs: [
+          'Smaller tables and anniversaries often suit plated courses — pauses between wines, quieter clearing, and a chef’s-table feel. Larger birthdays and family weekends often work better with shared mains and composed sides.',
+          'There is no universal “right” answer; guest count and how formal you want the rhythm determines the format. Many hosts blend both: passed bites, shared centerpiece, plated dessert.',
+        ],
+      },
+      {
+        title: 'Kitchens, rentals, and equipment',
+        paragraphs: [
+          'Primary homes, townhouses, and mountain-weekend properties all differ. We ask about oven size, burner count, refrigeration, and outdoor grill access before locking proteins and pastry.',
+          'If you are between homes or hosting at a family member’s house, photos of the kitchen help — but a short description of burners and counter space is often enough.',
+        ],
+      },
+      {
+        title: 'Dietary needs on mixed Reno tables',
+        paragraphs: [
+          'Vegetarian, gluten-free, dairy-free, and severe allergy paths are designed at the recipe level. The goal is parallel courses that feel equal in care — not one alternate plate rushed at the pass.',
+          'Include severity notes when you inquire (for example airborne nut exposure vs. preference).',
+        ],
+      },
+      {
+        title: 'How far in advance to book',
+        paragraphs: [
+          'Popular weekends, holidays, and ski-season overlap fill early. Sharing your date and headcount before the menu is final helps hold the calendar.',
+          'Last-minute requests are sometimes possible but should never be assumed for peak Saturdays or major holidays.',
+        ],
+      },
+    ],
+    'a Reno private chef dinner'
+  ),
 
-  'lake-tahoe-private-dining': `
-<p><strong>Lake Tahoe private dining</strong> should feel like the view matters — not a logistics puzzle. Rentals, elevation, weather, and shared kitchens all change how a meal should be built. A private chef plans around those realities so you stay with guests instead of monitoring ovens between photo stops.</p>
-<p>Siler Chef travels to Tahoe homes and vacation properties for intimate dinners, family weekends, rehearsal meals, and small celebrations. We coordinate indoor vs. deck service, equipment on site, and backup timing if wind or temperature shifts the plan.</p>
-<h2>Rental kitchens and mountain timing</h2>
-<p>Tahoe properties range from fully equipped chef’s kitchens to tight galley layouts. We ask about burners, oven size, refrigeration, and outdoor grill access before locking the menu. Sunset, drive time, and whether guests are arriving from skiing or the lake all influence when hot food should hit the table.</p>
-<h2>Menu directions that match Tahoe weekends</h2>
-<p>Some hosts want fire-and-smoke energy — premium casual plates that feel generous after a day outside. Others want a calmer plated arc: seafood, bright vegetables, and a dessert that finishes clean. Sample menus on our site are starting points; every course can be adjusted for allergies, kids at the table, or a wine you already committed to.</p>
-<h2>Booking a chef for your Tahoe date</h2>
-<p>Share property location (Incline, South Shore, West Shore, Truckee-side, etc.), guest count, and whether you need passed bites before a seated dinner. <a href="/#contact">Tell us about your Tahoe date</a> and we will map service flow and menu direction from there. Browse the <a href="/gallery">gallery</a> for plating tone if you are still deciding on formality.</p>`,
+  'lake-tahoe-private-dining': article(
+    [
+      '<strong>Lake Tahoe private dining</strong> should protect the reason you came — the view, the people, and the pace of a mountain weekend — not turn you into the person missing from the deck because every dish fights for the same oven.',
+      'Siler Chef travels to Tahoe homes and vacation rentals for intimate dinners, family gatherings, rehearsal meals, and small celebrations across the basin.',
+    ],
+    [
+      {
+        title: 'Rental kitchens and realistic mountain timing',
+        paragraphs: [
+          'Properties range from chef-grade kitchens to tight galley layouts. We confirm burners, oven capacity, refrigeration, and outdoor grill access before proteins are chosen.',
+          'Elevation, sunset, drive time from skiing or the lake, and whether guests are in formal attire all influence when hot food should land.',
+        ],
+      },
+      {
+        title: 'Indoor, deck, and weather backup plans',
+        paragraphs: [
+          'Wind, temperature drops, and smoke restrictions can move service indoors with little notice. We build backup timing so the meal still feels intentional — not like a scramble.',
+          'Share HOA quiet hours, bear-box rules, and whether gear must load through a garage so arrival stays discreet during cocktails.',
+        ],
+      },
+      {
+        title: 'Menu directions that match Tahoe weekends',
+        paragraphs: [
+          'Some hosts want fire-and-smoke energy — premium casual plates after a day outside. Others want a calmer plated arc: seafood, bright vegetables, and dessert that finishes clean.',
+          'Kids, mixed ages, and wine you already purchased are all inputs we plan around — not surprises mid-service.',
+        ],
+      },
+      {
+        title: 'Rehearsals, birthdays, and multi-family weeks',
+        paragraphs: [
+          'Tahoe weeks often stack events: welcome dinner Friday, celebration Saturday, brunch-style lunch Sunday. Ask about coordinated menus if you are hosting across multiple nights.',
+          'Guest counts from eight to forty are common; format recommendations change with headcount more than with “fancy” vs. “casual” labels.',
+        ],
+      },
+      {
+        title: 'What to send when booking Tahoe',
+        paragraphs: [
+          'Property area (Incline, South Shore, West Shore, Truckee-side), date, guest count, indoor vs. deck preference, and known allergies.',
+          'Gate codes, parking for load-in, and planner contact (if you have one) prevent day-of delays.',
+        ],
+      },
+    ],
+    'Lake Tahoe private chef dining'
+  ),
 
-  'bay-area-in-home-chef': `
-<p>Hiring an <strong>in-home chef in the Bay Area</strong> is often the simplest way to host well without parking stress, reservation limits, or splitting a group across two restaurant tables. You keep the room, the playlist, and the pace — with restaurant-level craft in your own dining space.</p>
-<p>Siler Chef serves qualified private events in the San Francisco Bay Area in addition to Reno and Lake Tahoe. Menus are built with the same discipline used in fine-dining kitchens: intentional sourcing, prep timelines, and service cues that protect conversation.</p>
-<h2>Why Bay Area hosts choose private chef service</h2>
-<p>Client entertainment, birthdays, anniversaries, and multi-family gatherings all benefit when the host is not plating in the kitchen. Dietary layers — vegetarian, gluten-free, halal-friendly adaptations, or severe allergies — are mapped during booking so substitutions are designed at the recipe level, not patched at the pass.</p>
-<h2>What to send when you inquire</h2>
-<ul>
-<li>Event date and city/neighborhood</li>
-<li>Realistic guest count (including last-minute plus-ones you expect)</li>
-<li>Cuisine direction or menus you liked from our <a href="/#cuisines">cuisine section</a></li>
-<li>Known allergies and ingredients to avoid entirely</li>
-<li>Whether you prefer plated courses, family-style, or a mix</li>
-</ul>
-<h2>Travel and timing</h2>
-<p>Bay Area bookings include travel planning in the proposal so load-in, service length, and staffing match your address. When your date is firm, <a href="/#contact">request availability</a> and we will reply with timing and follow-up questions before you commit to a final menu.</p>`,
+  'bay-area-in-home-chef': article(
+    [
+      'Hiring an <strong>in-home chef in the Bay Area</strong> keeps the room, the playlist, and the guest list you want — without parking stress, reservation limits, or splitting a group across two restaurant tables.',
+      'Siler Chef serves qualified private events in the San Francisco Bay Area in addition to Reno and Lake Tahoe, with menus built using fine-dining discipline: sourcing, prep timelines, and service cues that protect conversation.',
+    ],
+    [
+      {
+        title: 'Why Bay Area hosts choose private chef service',
+        paragraphs: [
+          'Client entertainment, product launches at home, birthdays, anniversaries, and multi-family gatherings all suffer when the host plates in the kitchen.',
+          'Chef-led service times courses, handles dietary flags before anyone sits, and keeps clearing discreet during business or personal conversation.',
+        ],
+      },
+      {
+        title: 'Condos, townhomes, and suburban estates',
+        paragraphs: [
+          'Urban buildings may need elevator reservations and quiet-hour awareness. Suburban homes may need driveway space for temperature-controlled load-in.',
+          'Include access notes in your first message — doorman details, loading dock rules, and whether service must conclude by a fixed hour.',
+        ],
+      },
+      {
+        title: 'Menu design for mixed Bay Area guest lists',
+        paragraphs: [
+          'Neutral coursed menus work for client dinners; heritage cuisines work for family milestones. Dietary layers — vegetarian, gluten-free, halal-friendly adaptations — are mapped during booking.',
+          'Explore <a href="/#cuisines">global menu directions</a> for flavor families; every sample set can be redesigned from scratch.',
+        ],
+      },
+      {
+        title: 'Wine, pacing, and event length',
+        paragraphs: [
+          'If you are pouring bottles yourself, share what you are opening and we can align acidity and weight course by course.',
+          'Shorter coursed menus often outperform oversized ones for business entertaining — guests stay engaged and the night ends on time.',
+        ],
+      },
+      {
+        title: 'Travel, staffing, and proposals',
+        paragraphs: [
+          'Bay Area proposals include travel and load-in so you can compare chef-led service to restaurant buyouts fairly.',
+          'Larger groups may benefit from an additional server for plated service — we mention this early so rentals are ordered once.',
+        ],
+      },
+    ],
+    'Bay Area in-home chef events'
+  ),
 
-  'anniversary-dinner-private-chef': `
-<p>An <strong>anniversary dinner with a private chef</strong> works when the night feels intentional — not like a busy restaurant on a Saturday, and not like you spent the afternoon stressing over sauce timing. The right menu arc is short enough to stay romantic, strong enough to remember.</p>
-<p>We often build four movements for anniversaries: a bright opener, one interlude, a main that carries the story, and a dessert that lands softly. That can be fully plated or served family-style with composed plates — what matters is agreed pacing before guests sit down.</p>
-<h2>Setting the tone: formal vs. relaxed luxury</h2>
-<p>Some couples want candlelit tasting portions and quiet clearing between courses. Others want shared mains, a favorite bottle open on the table, and time for long conversation. Tell us which energy you want; we will recommend plateware, timing, and whether passed bites make sense during greeting.</p>
-<h2>Wine, dietary needs, and surprises</h2>
-<p>If you are pouring wine yourself, share what you are opening and we can align acidity and weight course by course. Allergies and preferences are documented during booking. Small touches — a favorite flavor from a trip, a shared heritage cuisine, or a lighter dessert — are easiest when we know early.</p>
-<h2>Reserve your anniversary date</h2>
-<p>Siler Chef serves Reno, Lake Tahoe, and the Bay Area for private celebrations. <a href="/#contact">Reserve your date</a> with guest count and location; we draft a direction before you commit to every course. See <a href="/#services">anniversary and special-occasion formats</a> for how we frame the evening.</p>`,
+  'anniversary-dinner-private-chef': article(
+    [
+      'An <strong>anniversary dinner with a private chef</strong> works when the night feels intentional — not like a crowded Saturday restaurant, and not like you spent the afternoon panicking over sauce timing.',
+      'The right arc is short enough to stay romantic, strong enough to remember: a bright opener, one interlude, a main that carries the story, and dessert that lands softly.',
+    ],
+    [
+      {
+        title: 'Formal vs. relaxed luxury at home',
+        paragraphs: [
+          'Some couples want candlelit tasting portions and quiet clearing between courses. Others want shared mains, a favorite bottle on the table, and time for long conversation.',
+          'Tell us which energy you want; we recommend plateware, timing, and whether passed bites make sense during greeting.',
+        ],
+      },
+      {
+        title: 'Music, lighting, and surprises',
+        paragraphs: [
+          'We coordinate with your timeline — when candles are lit, when the main should land, and whether the kitchen stays closed off visually.',
+          'Favorite flavors from a trip, a shared heritage cuisine, or a lighter dessert finisher are easiest when we know early.',
+        ],
+      },
+      {
+        title: 'Wine and non-alcoholic pairings',
+        paragraphs: [
+          'You do not need a cellar. Share what you are pouring and we can note per-course suggestions, or keep the menu flexible for a mixed case.',
+          'Zero-proof pairings and sparkling mocktails can be part of the brief when guests do not drink alcohol.',
+        ],
+      },
+      {
+        title: 'Dietary needs on a two-top (or small table)',
+        paragraphs: [
+          'Even small tables have allergies. We document restrictions during booking and build substitutions at the recipe level.',
+          'Gluten-free, dairy-free, and pescatarian paths can still feel indulgent — not like an afterthought.',
+        ],
+      },
+      {
+        title: 'Reserve your anniversary date',
+        paragraphs: [
+          'Weekend dates in Reno and Tahoe fill early. Share location, guest count (if close friends join), and preferred service style.',
+          'See <a href="/#services">anniversary formats</a> on the site for how we frame the evening.',
+        ],
+      },
+    ],
+    'an anniversary private chef dinner'
+  ),
 
-  'corporate-dinner-chef-home': `
-<p>A <strong>corporate dinner at home</strong> (or at a leased residence) keeps the focus on the relationship — not on whether the server interrupted the pitch. Chef-led service times courses so conversation has natural pauses, dietary flags are handled before anyone sits, and clearing stays discreet.</p>
-<p>Executive entertaining, client thank-yous, board-adjacent gatherings, and team milestones are common requests across Reno, Tahoe, and the Bay Area. Menus can stay neutral for mixed tastes or tell a deliberate cuisine story when you want the meal to signal hospitality and attention to detail.</p>
-<h2>Structuring the evening for business conversation</h2>
-<p>We coordinate arrival of guests, passed bites if you want a standing reception first, and when seated service begins. For many groups, a shorter coursed menu outperforms an oversized one — guests stay engaged, and the night ends on time.</p>
-<ul>
-<li>Passed canapés during mingling</li>
-<li>Two or three seated courses instead of a long gala arc</li>
-<li>Quiet clearing and reset between topics</li>
-<li>Alternate plates planned for documented restrictions</li>
-</ul>
-<h2>Logistics hosts forget to mention</h2>
-<p>Parking for load-in, kitchen access, trash and compost, and whether you need service to conclude before a hard departure time. Share those details when you <a href="/#contact">send your date, headcount, and address</a> — we will reply with timing and next steps.</p>`,
+  'corporate-dinner-chef-home': article(
+    [
+      'A <strong>corporate dinner at home</strong> or leased residence keeps focus on the relationship — not on whether service interrupted the pitch. Chef-led timing creates natural pauses; dietary flags are handled before anyone sits.',
+      'Executive entertaining, client thank-yous, team milestones, and board-adjacent gatherings are common across Reno, Tahoe, and the Bay Area.',
+    ],
+    [
+      {
+        title: 'Structuring the evening for conversation',
+        paragraphs: [
+          'We coordinate guest arrival, optional passed bites during mingling, and when seated service begins.',
+          'Many groups perform better with three strong courses than six — guests stay engaged and the night ends on schedule.',
+        ],
+        list: [
+          'Passed canapés during reception',
+          'Timed seated courses with quiet clearing',
+          'Alternate plates for documented restrictions',
+          'Optional coffee or dessert only if the room has energy',
+        ],
+      },
+      {
+        title: 'Menus that stay neutral or tell a story',
+        paragraphs: [
+          'Neutral menus work for mixed client tastes. Cuisine stories work when hospitality and attention to detail are part of the message.',
+          'We avoid overly polarizing ingredients unless you explicitly want a bold direction.',
+        ],
+      },
+      {
+        title: 'Privacy, discretion, and presentation',
+        paragraphs: [
+          'Client dinners often need low-key arrival and minimal branding. We dress for residential service and keep table-side conversation about food — not sales talk — unless you prefer otherwise.',
+          'Plating stays composed for photography when you want content for internal recaps.',
+        ],
+      },
+      {
+        title: 'Logistics hosts forget',
+        paragraphs: [
+          'Parking for load-in, kitchen access, trash handling, hard stop times, and whether AV/setup teams need the dining room clear.',
+          'Share those details when you inquire so proposals match reality.',
+        ],
+      },
+      {
+        title: 'Comparing chef-led vs. restaurant buyout',
+        paragraphs: [
+          'Restaurants cap headcount and noise. Homes let you control guest list and timing — chef-led service brings restaurant pacing without losing the room.',
+          'We will say honestly if your brief fits private chef service or another format.',
+        ],
+      },
+    ],
+    'a corporate private chef dinner'
+  ),
 
-  'birthday-party-private-chef': `
-<p>A <strong>birthday party with a private chef</strong> lets you celebrate in your own space without becoming the line cook for twenty people. Kids, parents, and friends can share one table while courses or shared platters arrive on a rhythm that fits speeches, cake, and photos.</p>
-<p>We plan birthdays as a pacing problem first and a theme second. Allergies, vegetarian guests, and timing for candles are built into prep lists — not handled mid-service when the kitchen is already full.</p>
-<h2>Formats that work for mixed guest lists</h2>
-<p><strong>Seated coursed dinner</strong> for smaller groups who want a milestone feel. <strong>Family-style mains</strong> when everyone wants to graze and talk. <strong>Hybrid flow</strong> — passed bites, shared centerpiece, plated dessert — when you need flexibility for kids and adults on different schedules.</p>
-<h2>Flavor and formality</h2>
-<p>Playful comfort food, global cuisine, or polished fine-dining plating can all fit a birthday; structure matters more than novelty. Browse <a href="/#services">birthday and celebration formats</a> on the site, then tell us what tone you want when you inquire.</p>
-<h2>Check availability</h2>
-<p>Weekend dates in Reno and Tahoe fill early. <a href="/#contact">Check availability</a> with your party date, location, and realistic headcount. Sample menus on our <a href="/#cuisines">cuisine pages</a> are easy starting points for flavor direction.</p>`,
+  'birthday-party-private-chef': article(
+    [
+      'A <strong>birthday party with a private chef</strong> lets you celebrate at home without becoming line cook for twenty people. Speeches, cake, and photos get space because food rhythm is planned — not guessed.',
+      'Kids, parents, and friends can share one table while courses or shared platters arrive on cue.',
+    ],
+    [
+      {
+        title: 'Formats for mixed guest lists',
+        paragraphs: [
+          '<strong>Seated coursed dinner</strong> for smaller milestones. <strong>Family-style mains</strong> when everyone wants to graze and talk. <strong>Hybrid</strong> — passed bites, shared centerpiece, plated dessert — when ages and schedules differ.',
+          'Structure matters more than theme; allergies and cake timing are built into prep lists.',
+        ],
+      },
+      {
+        title: 'Flavor and formality',
+        paragraphs: [
+          'Playful comfort, global cuisine, or polished plating can all fit a birthday. Tell us the tone you want when you inquire.',
+          'We plan vegetarian layers and kid-friendly sides without automatically running a separate kids menu unless you want one.',
+        ],
+      },
+      {
+        title: 'Cake, candles, and dessert timing',
+        paragraphs: [
+          'If you are bringing a celebration cake, tell us when candles should happen — we pace savory courses so guests still have energy for the moment.',
+          'House desserts can complement (not compete with) cake if you want a chocolate or fruit finisher before candles.',
+        ],
+      },
+      {
+        title: 'Backyard, rental, and Reno/Tahoe parties',
+        paragraphs: [
+          'Outdoor heat lamps, wind, and holding temps matter for deck service. We coordinate rentals if platters need chafing or if service is indoors-only backup.',
+          'Guest counts from ten to fifty change staffing recommendations — share realistic headcount early.',
+        ],
+      },
+      {
+        title: 'Check availability',
+        paragraphs: [
+          'Weekend dates fill early. Browse <a href="/#services">birthday formats</a>, then send date, location, and headcount.',
+          'Sample <a href="/#cuisines">menus</a> are easy starting points for flavor direction.',
+        ],
+      },
+    ],
+    'a birthday party with a private chef'
+  ),
 
-  'plated-vs-family-style-private-chef': `
-<p>Choosing between <strong>plated and family-style private chef service</strong> shapes everything: formality, staffing, plateware, how long guests stay seated, and how much interaction you want from the chef at the table. Neither is “better” — the right fit depends on guest count and the story of the night.</p>
-<h2>Plated service: when it shines</h2>
-<p>Each course is composed individually, timed, and cleared with intention. Plated dining suits anniversaries, client dinners, smaller tables, and hosts who want pauses between courses for conversation and wine. It reads as calm luxury because the room slows down with the menu.</p>
-<h2>Family-style service: when it shines</h2>
-<p>Larger platters and shared sides keep the table communal. Birthdays, casual premium hosting, and groups that want movement and interaction often prefer family-style — especially when guest count makes individual plating slower without adding staff.</p>
-<h2>Blended formats many hosts choose</h2>
-<ul>
-<li>Passed bites during arrival</li>
-<li>Shared mains in the middle</li>
-<li>Plated dessert to finish with focus</li>
-</ul>
-<p>Siler Chef serves Reno, Lake Tahoe, and the Bay Area. <a href="/#contact">Describe your guest count and vibe</a> and we will recommend a flow before you finalize courses.</p>`,
+  'plated-vs-family-style-private-chef': article(
+    [
+      'Choosing between <strong>plated and family-style private chef service</strong> shapes formality, staffing, plateware, and how long guests stay seated. Neither is universally better — the fit depends on guest count and the story of the night.',
+      'Siler Chef serves Reno, Lake Tahoe, and the Bay Area with both formats daily; we recommend a flow after we know your headcount and vibe.',
+    ],
+    [
+      {
+        title: 'Plated service: when it shines',
+        paragraphs: [
+          'Each course is composed, timed, and cleared with intention. Anniversaries, client dinners, and smaller tables benefit from pauses between courses and wine.',
+          'Plated reads as calm luxury because the room slows down with the menu.',
+        ],
+      },
+      {
+        title: 'Family-style service: when it shines',
+        paragraphs: [
+          'Larger platters and shared sides keep the table communal. Birthdays, casual premium hosting, and groups that want interaction often prefer family-style.',
+          'Without added staff, very large groups may wait longer for individual plating — family-style can be the practical choice.',
+        ],
+      },
+      {
+        title: 'Blended formats many hosts choose',
+        paragraphs: [
+          'Passed bites during arrival, shared mains in the middle, plated dessert to finish with focus — hybrids are common and often optimal.',
+          'Tell us if you want a speech window between courses; we hold timing accordingly.',
+        ],
+      },
+      {
+        title: 'Staffing, rentals, and plateware',
+        paragraphs: [
+          'Plated service for more than twelve guests may benefit from an additional server. Family-style needs larger platters and table space for passing.',
+          'We mention rentals early so you order once, not in a panic two days before.',
+        ],
+      },
+      {
+        title: 'How to decide quickly',
+        paragraphs: [
+          'Under ten guests and milestone tone → lean plated. Over sixteen and social tone → lean family-style or hybrid.',
+          '<a href="/#contact">Describe your guest count and occasion</a> and we will recommend a flow before you finalize courses.',
+        ],
+      },
+    ],
+    'choosing plated vs. family-style service'
+  ),
 
-  'how-to-hire-private-chef': `
-<p>Knowing <strong>how to hire a private chef</strong> saves you from vague quotes, last-minute menu panic, and the wrong service style for your guest list. Start with three facts: date, location, and realistic headcount. Everything else — staffing, rentals, menu complexity — branches from those answers.</p>
-<h2>Questions worth asking before you book</h2>
-<ul>
-<li>How are allergies and severe restrictions documented and handled?</li>
-<li>What happens if my kitchen is limited or I only have a rental setup?</li>
-<li>When is the menu finalized, and how many revisions are typical?</li>
-<li>Is service plated, family-style, or mixed — and what do you recommend for my guest count?</li>
-<li>What is included vs. quoted separately (rentals, extra staff, premium proteins)?</li>
-<li>How do travel and load-in work for Tahoe or Bay Area addresses?</li>
-</ul>
-<h2>What to send in your first inquiry</h2>
-<p>Occasion, cuisine preferences, known dietary needs, whether you want a full coursed menu or shared tables, and the best phone number for follow-up. Photos of the kitchen are helpful for Tahoe rentals but not required for every Reno home.</p>
-<h2>Working with Siler Chef</h2>
-<p>We serve Reno, Lake Tahoe, and the San Francisco Bay Area for private chef dining and chef-led education. <a href="/#contact">Submit your request</a> with cuisine preferences; we follow up by phone or email with timing and next steps. Explore <a href="/#cuisines">sample menus</a> while you wait — they are starting points, not fixed packages.</p>`,
+  'how-to-hire-private-chef': article(
+    [
+      'Knowing <strong>how to hire a private chef</strong> saves you from vague quotes, last-minute menu panic, and the wrong service style for your guest list. Start with date, location, and realistic headcount — everything else branches from there.',
+      'This checklist reflects how Siler Chef scopes Reno, Tahoe, and Bay Area events; use it to compare any provider fairly.',
+    ],
+    [
+      {
+        title: 'Questions to ask before you book',
+        paragraphs: [
+          'How are allergies and severe restrictions documented? What happens with limited rental kitchens? When is the menu finalized?',
+          'Is service plated, family-style, or mixed — and what do you recommend for my headcount?',
+        ],
+        list: [
+          'What is included vs. quoted separately (rentals, extra staff, premium proteins)',
+          'Travel and load-in rules for Tahoe or Bay Area addresses',
+          'Cancellation, weather backup, and illness policies',
+          'Kitchen reset and trash scope after service',
+        ],
+      },
+      {
+        title: 'What to send in your first inquiry',
+        paragraphs: [
+          'Occasion, cuisine preferences, dietary needs, service style instinct, and best phone number for follow-up.',
+          'Photos help for unusual rentals but are not required for most Reno homes — burner count and counter space often suffice.',
+        ],
+      },
+      {
+        title: 'Red flags vs. green flags',
+        paragraphs: [
+          'Green: clear answers on allergens, written menu timeline, honest format recommendation. Red: one flat per-head price with no questions about travel or kitchen.',
+          'Green: willingness to say catering might fit better for your brief. Red: no mention of how guest-count changes affect labor.',
+        ],
+      },
+      {
+        title: 'Contracts, deposits, and date holds',
+        paragraphs: [
+          'Peak weekends and holidays may require a deposit. Proposals should outline ingredients, labor, travel, and rentals separately enough to compare options.',
+          'Guest-count changes within agreed windows should be discussed upfront — not surprised at invoice time.',
+        ],
+      },
+      {
+        title: 'Working with Siler Chef',
+        paragraphs: [
+          'Submit your request with cuisine preferences; we follow up by phone or email with timing and next steps.',
+          'Explore <a href="/#cuisines">sample menus</a> while you wait — they are starting points, not fixed packages.',
+        ],
+      },
+    ],
+    'hiring a private chef'
+  ),
 
-  'private-chef-dietary-restrictions': `
-<p><strong>Private chef menus for allergies and dietary preferences</strong> only work when restrictions are treated as design inputs — not as a single alternate plate rushed at the end of service. Mixed tables are normal; the goal is parallel courses that feel equal in care.</p>
-<h2>How we document restrictions</h2>
-<p>During booking we capture allergens, severity, faith-based needs, vegetarian or vegan guests, and ingredients to avoid entirely. That information flows into prep lists, separate boards where needed, and service timing so cross-contact risk stays low.</p>
-<h2>Common adaptations we plan for</h2>
-<ul>
-<li>Gluten-free paths with dedicated fry/sauce steps where required</li>
-<li>Dairy-free sauces and desserts that still feel finished, not “without”</li>
-<li>Vegetarian courses with the same rigor as protein-centered plates</li>
-<li>Halal-friendly or pork-free menus when the whole table needs alignment</li>
-</ul>
-<h2>Start with clarity</h2>
-<p>When you <a href="/#contact\">send your request</a>, include severity notes (for example airborne nut exposure vs. preference). Sample <a href="/#cuisines\">cuisine portfolios</a> show flavor families we can adapt. Serving Reno, Tahoe, and the Bay Area.</p>`,
+  'private-chef-dietary-restrictions': article(
+    [
+      '<strong>Private chef menus for allergies and dietary preferences</strong> only work when restrictions are design inputs — not a single alternate plate rushed at the pass. Mixed tables are normal; parallel courses should feel equal in care.',
+      'Siler Chef documents allergens during booking and builds prep lists, boards, and service timing to reduce cross-contact risk.',
+    ],
+    [
+      {
+        title: 'How we capture restrictions',
+        paragraphs: [
+          'During inquiry we record allergens, severity, faith-based needs, vegetarian or vegan guests, and ingredients to avoid entirely.',
+          'Severity matters: airborne nut exposure is planned differently from preference.',
+        ],
+      },
+      {
+        title: 'Common paths we build',
+        paragraphs: [
+          'Gluten-free fry and sauce steps when needed. Dairy-free desserts that still feel finished. Vegetarian courses with the same rigor as protein-centered plates.',
+          'Halal-friendly or pork-free menus when the whole table needs alignment.',
+        ],
+        list: [
+          'Parallel prep boards for severe allergies',
+          'Recipe-level substitutions, not garnish swaps',
+          'Clear communication to servers (or host) about which plate goes where',
+        ],
+      },
+      {
+        title: 'When the whole table shares one restriction',
+        paragraphs: [
+          'If everyone is gluten-free or pork-free, the menu is one coherent arc. If one guest has a severe allergy, we often design parallel paths rather than isolating one plate last minute.',
+          'Buffet-style events need labeling and placement discipline — we plan that in advance.',
+        ],
+      },
+      {
+        title: 'What guests should never have to do',
+        paragraphs: [
+          'Guests should not need to explain their allergy repeatedly to every server. Hosts should not apologize for “complicated” tables — documentation upfront is the professional standard.',
+          'We welcome ingredient lists from guests when it helps everyone relax.',
+        ],
+      },
+      {
+        title: 'Start with clarity in your request',
+        paragraphs: [
+          'Include restriction notes when you <a href="/#contact">contact us</a>. Browse <a href="/#cuisines">cuisine portfolios</a> for flavor families we can adapt.',
+          'Serving Reno, Lake Tahoe, and the Bay Area.',
+        ],
+      },
+    ],
+    'private chef menus with dietary restrictions'
+  ),
 
-  'private-chef-vs-catering': `
-<p>Understanding <strong>private chef vs. catering</strong> helps you pick the right experience before you commit budget and guest expectations. Catering often optimizes for volume and hold times; chef-led service optimizes for finish, heat, and sequence — food meant to be eaten now.</p>
-<h2>When catering may be enough</h2>
-<p>Long open-house formats, self-serve buffets that stay up for hours, or events where food is secondary to logistics sometimes fit traditional catering. If guests are comfortable serving themselves from chafers, that can be the practical choice.</p>
-<h2>When a private chef is the better match</h2>
-<p>You want courses timed like a restaurant table moved into your home: composed plates, quiet clearing, dietary paths planned in advance, and a host who stays in the room. That is the pass mindset we bring — sourcing, prep, plating, and service rhythm included.</p>
-<h2>Honest guidance</h2>
-<p>We will tell you if your brief fits chef-led dining or if another format makes more sense. <a href="/#contact\">Share your occasion</a>, guest count, and location (Reno, Tahoe, or Bay Area) and we will recommend a direction.</p>`,
+  'private-chef-vs-catering': article(
+    [
+      'Understanding <strong>private chef vs. catering</strong> helps you pick the right experience before budget and guest expectations lock in. Catering optimizes for volume and hold times; chef-led service optimizes for finish, heat, and sequence.',
+      'Both can be excellent — for different kinds of events.',
+    ],
+    [
+      {
+        title: 'When catering may be enough',
+        paragraphs: [
+          'Long open-house formats, self-serve buffets up for hours, or events where food is secondary to logistics sometimes fit traditional catering.',
+          'If guests are comfortable with chafers and you want minimal service staff, catering can be practical.',
+        ],
+      },
+      {
+        title: 'When a private chef is the better match',
+        paragraphs: [
+          'You want courses timed like a restaurant table in your dining room: composed plates, quiet clearing, dietary paths planned in advance.',
+          'You want the host in the room — not coordinating warming trays.',
+        ],
+      },
+      {
+        title: 'Heat, holding, and food quality',
+        paragraphs: [
+          'Chef-led food is meant to be eaten now — proteins rested, sauces finished, pastry crisp where it should be.',
+          'Long holds change texture; we design menus that survive your timeline or we shorten the arc honestly.',
+        ],
+      },
+      {
+        title: 'Cleanup and reset',
+        paragraphs: [
+          'Chef-led proposals should state kitchen reset scope — not trays left at midnight without clarity.',
+          'Catering drop-off may leave different cleanup expectations; compare fairly.',
+        ],
+      },
+      {
+        title: 'Honest guidance from Siler Chef',
+        paragraphs: [
+          'We will tell you if chef-led dining fits or if another format makes more sense.',
+          '<a href="/#contact">Share your occasion</a>, guest count, and location.',
+        ],
+      },
+    ],
+    'private chef vs. catering decisions'
+  ),
 
-  'private-chef-cost-factors': `
-<p><strong>Private chef pricing</strong> follows labor, ingredients, and logistics — not a one-size sticker that ignores travel, menu depth, or how many guests you actually have. Transparent factors help you compare proposals fairly.</p>
-<h2>What typically moves the quote</h2>
-<ul>
-<li><strong>Guest count:</strong> plate volume, staffing, and timeline</li>
-<li><strong>Menu complexity:</strong> prep days, pastry work, premium proteins</li>
-<li><strong>Service style:</strong> plated multi-course vs. family-style vs. passed bites + seated</li>
-<li><strong>Travel:</strong> Tahoe, Bay Area, or outside core Reno scheduling</li>
-<li><strong>Rentals and support:</strong> extra servers, plateware, outdoor setup</li>
-<li><strong>Event length:</strong> reception plus dinner vs. dinner only</li>
-</ul>
-<h2>Why we do not publish a single per-head rate online</h2>
-<p>Tables vary too much — a twelve-guest plated anniversary is not the same labor as a forty-guest backyard celebration with shared mains. We prefer a tailored follow-up after we know date, location, and headcount.</p>
-<h2>Request a tailored conversation</h2>
-<p><a href="/#contact\">Send your date, location, and guest count</a>. We will reply with timing, questions, and next steps — serving Reno, Lake Tahoe, and the Bay Area.</p>`,
+  'private-chef-cost-factors': article(
+    [
+      '<strong>Private chef pricing</strong> follows labor, ingredients, and logistics — not a meaningless per-head sticker. Transparent factors help you compare proposals and plan a night that matches the experience you want.',
+      'Siler Chef does not publish one flat rate online because tables vary too much; this overview explains what typically moves quotes.',
+    ],
+    [
+      {
+        title: 'Guest count and service style',
+        paragraphs: [
+          'Headcount changes plate volume, staffing, and timeline. Plated multi-course service for eighteen guests is different labor than family-style for eighteen.',
+          'Passed bites plus seated dinner extend service length — and cost — compared to dinner only.',
+        ],
+      },
+      {
+        title: 'Menu complexity and prep days',
+        paragraphs: [
+          'Pastry-heavy menus, tasting arcs, and premium proteins increase prep time before arrival.',
+          'Simple elegant menus can be stunning without unnecessary complexity — we recommend honestly for your occasion.',
+        ],
+      },
+      {
+        title: 'Travel, load-in, and rentals',
+        paragraphs: [
+          'Tahoe and Bay Area addresses include travel planning. Rentals — platters, extra servers, outdoor setup — are line items discussed early.',
+          'Proposals should separate ingredients, labor, travel, and rentals enough to compare catering quotes fairly.',
+        ],
+      },
+      {
+        title: 'Deposits and peak dates',
+        paragraphs: [
+          'Holiday weeks and peak Saturdays may require a deposit to hold the calendar.',
+          'Last-minute bookings may carry rush constraints on menu depth — another reason to inquire early.',
+        ],
+      },
+      {
+        title: 'Request a tailored follow-up',
+        paragraphs: [
+          'Send date, location, and headcount — we reply with questions and next steps, not a generic auto-quote.',
+          'No surprise fees for documented guest-count windows agreed upfront.',
+        ],
+      },
+    ],
+    'private chef pricing and proposals'
+  ),
 
-  'wine-pairing-private-dinner': `
-<p><strong>Wine pairing for a private chef dinner</strong> does not require a cellar — it requires matching weight, acidity, and rhythm to the menu you are actually serving. At home you can pause between courses, revisit a bottle, and adjust without a sommelier standing over the table.</p>
-<h2>Simple frameworks that work</h2>
-<p><strong>Match weight:</strong> lighter wines with seafood and vegetable-forward courses; fuller reds with braised, grilled, or sauced mains. <strong>Use acidity</strong> to refresh rich sauces. <strong>Use sweetness carefully</strong> with spice or smoky heat — a little goes a long way.</p>
-<h2>How we collaborate on pairings</h2>
-<p>If you already own the bottles, tell us what you are opening and we can note suggestions per course. If you prefer flexibility, we keep the menu balanced for a mixed case — sparkling with opener, white or rosé with fish, red with meat, dessert wine or coffee with the finish.</p>
-<h2>Plan the menu first</h2>
-<p>Browse <a href="/#cuisines\">sample menus</a> for flavor families, then <a href="/#contact\">book a conversation</a> about your guests and bottles. Private chef service in Reno, Tahoe, and the Bay Area.</p>`,
+  'wine-pairing-private-dinner': article(
+    [
+      '<strong>Wine pairing for a private chef dinner</strong> does not require a cellar — it requires matching weight, acidity, and rhythm to the menu you are actually serving. At home you can pause, revisit a bottle, and adjust without a sommelier standing over the table.',
+      'Siler Chef can align courses to bottles you already own or keep menus flexible for a mixed case.',
+    ],
+    [
+      {
+        title: 'Weight and acidity basics',
+        paragraphs: [
+          'Match weight: lighter wines with seafood and vegetable-forward courses; fuller reds with braised, grilled, or sauced mains.',
+          'Acidity refreshes rich sauces; sweetness balances spice — a little goes a long way.',
+        ],
+      },
+      {
+        title: 'Course-by-course vs. flexible case',
+        paragraphs: [
+          'If you know your bottles, share them and we can note suggestions per course.',
+          'If guests bring wine, we can stagger richness so unexpected bottles still work.',
+        ],
+      },
+      {
+        title: 'Sparkling, rosé, and dessert',
+        paragraphs: [
+          'Sparkling works for arrival and fried openings. Rosé bridges fish and light poultry.',
+          'Dessert wine or coffee with finisher — avoid crushing pastry with overly tannic reds.',
+        ],
+      },
+      {
+        title: 'Non-alcoholic and low-alcohol tables',
+        paragraphs: [
+          'Zero-proof pairings, sparkling mocktails, and thoughtful teas can be part of the brief.',
+          'Tell us when the table is mixed so no guest feels like an afterthought.',
+        ],
+      },
+      {
+        title: 'Plan the menu first',
+        paragraphs: [
+          'Browse <a href="/#cuisines">sample menus</a> for flavor families, then discuss bottles during booking.',
+          'Private chef service in Reno, Tahoe, and the Bay Area.',
+        ],
+      },
+    ],
+    'wine pairing with a private chef menu'
+  ),
 
-  'turkish-cuisine-private-chef': `
-<p><strong>Turkish cuisine at home</strong> with a private chef should respect mezze pacing: small bright openings, shared warmth in the middle, and a main that earns its place. Siler Chef draws on Istanbul fine-dining training — pastry discipline, grill work, and yogurt-based sauces — adapted to your kitchen and guest mix.</p>
-<h2>What guests recognize on the table</h2>
-<p>Balance of acid and fat, bread that matters, vegetables with intent, and spice curves that build instead of shouting. We translate Ottoman and Anatolian references into modern plating that still feels generous for American home entertaining.</p>
-<h2>Reno and Tahoe gatherings</h2>
-<p>Turkish menus work for birthdays, family weekends, and cultural celebrations when you want something distinct from standard steak-or-pasta private dining. Dietary paths can be planned in parallel from the start.</p>
-<h2>Explore Turkish sample menus</h2>
-<p>See the <a href="/#cuisines\">Turkish portfolio</a> for three sample arcs, then <a href="/#contact\">request a custom menu</a> for your date. Every course can be redesigned from scratch around your brief.</p>`,
+  'turkish-cuisine-private-chef': article(
+    [
+      '<strong>Turkish cuisine at home</strong> with a private chef should respect mezze pacing: small bright openings, shared warmth in the middle, a main that earns its place. Siler Chef draws on Istanbul fine-dining training — pastry, grills, yogurt sauces — adapted to your kitchen.',
+      'Reno and Tahoe gatherings use Turkish menus for birthdays, cultural celebrations, and hosts who want distinct flavor from standard steak-or-pasta private dining.',
+    ],
+    [
+      {
+        title: 'What guests recognize on the table',
+        paragraphs: [
+          'Balance of acid and fat, bread that matters, vegetables with intent, spice curves that build instead of shout.',
+          'Modern plating can still feel generous for American home entertaining.',
+        ],
+      },
+      {
+        title: 'Bread, grill, and mezze on one timeline',
+        paragraphs: [
+          'Multiple hot elements compete for attention; we sequence ovens and burners so cold mezze, grilled proteins, and warm bread arrive in order.',
+          'Rental grills and indoor ovens are both workable when prep is planned honestly.',
+        ],
+      },
+      {
+        title: 'Dietary layers on Turkish tables',
+        paragraphs: [
+          'Vegetarian guests, halal-friendly paths, and gluten-free adaptations can be parallel from booking — not patched mid-service.',
+          'Tell us restrictions when you inquire.',
+        ],
+      },
+      {
+        title: 'Occasions that fit Turkish menus',
+        paragraphs: [
+          'Family weekends, engagement dinners, and cultural holidays. Also “we want something different” milestone nights.',
+          'See the <a href="/#cuisines">Turkish portfolio</a> for three sample arcs.',
+        ],
+      },
+      {
+        title: 'Request a custom Turkish arc',
+        paragraphs: [
+          'Every course can be redesigned from scratch around your brief.',
+          '<a href="/#contact">Request your date</a> with guest count and location.',
+        ],
+      },
+    ],
+    'Turkish private chef menus at home'
+  ),
 
-  'french-cuisine-private-dinner': `
-<p>A <strong>French private chef dinner</strong> is about clarity: stocks reduced with patience, proteins rested correctly, sauces that shine without heaviness, and desserts that finish clean. At home that discipline reads as calm luxury — not fussy theater.</p>
-<p>Chef Siler’s training includes years in pastry-forward French environments and mentorship under MOF-level craftsmen — techniques that inform how we handle sauce work, timing, and presentation for private tables.</p>
-<h2>Tasting menu or shorter gala arc</h2>
-<p>We can run a compact four-course anniversary menu or a longer entertaining arc depending on your evening. Vegetarian French courses are built with the same rigor as protein-centered plates.</p>
-<h2>Book a French direction at home</h2>
-<p>Open the <a href="/#cuisines\">French sample menus</a>, then <a href="/#contact\">hold your date</a> when you are ready to personalize. Serving Reno, Lake Tahoe, and the Bay Area.</p>`,
+  'french-cuisine-private-dinner': article(
+    [
+      'A <strong>French private chef dinner</strong> is about clarity: stocks reduced with patience, proteins rested correctly, sauces that shine without heaviness, desserts that finish clean. At home that discipline reads as calm luxury.',
+      'Chef Siler’s background includes pastry-forward French environments and mentorship under MOF-level craftsmen — techniques that inform private tables.',
+    ],
+    [
+      {
+        title: 'Tasting menu or shorter gala arc',
+        paragraphs: [
+          'We can run a compact four-course anniversary menu or a longer entertaining arc depending on your evening.',
+          'Vegetarian French courses receive the same rigor as protein-centered plates.',
+        ],
+      },
+      {
+        title: 'Sauce work and timing at home',
+        paragraphs: [
+          'Home burners and ovens limit simultaneous sauces; we prioritize what must be finished à la minute vs. what can be held professionally.',
+          'That planning is why French menus feel effortless to guests when they were anything but backstage.',
+        ],
+      },
+      {
+        title: 'Pastry and dessert finisher',
+        paragraphs: [
+          'French dinners often end with texture contrast — not supermarket sweetness. Chocolate, fruit, or lighter finisher depending on your preference.',
+          'Tell us if you are pouring dessert wine or coffee so pacing matches.',
+        ],
+      },
+      {
+        title: 'Wine-friendly structure',
+        paragraphs: [
+          'Classical arcs leave room for champagne opening, white with fish, red with meat — share your case when you inquire.',
+          'We avoid menu choices that fight tannic reds if you already committed to a bold bottle.',
+        ],
+      },
+      {
+        title: 'Book a French direction at home',
+        paragraphs: [
+          'Open <a href="/#cuisines">French sample menus</a>, then hold your date when ready to personalize.',
+          'Reno, Lake Tahoe, and Bay Area travel for qualified events.',
+        ],
+      },
+    ],
+    'French private chef dinners'
+  ),
 
-  'italian-private-chef-menu': `
-<p><strong>Italian private chef menus</strong> fail when everything lands at once. The point is sequence: pasta al dente, fish or meat with space to breathe, contorni that support instead of compete, and sauces that cling instead of pool.</p>
-<h2>Regional cues, one coherent arc</h2>
-<p>Menus can lean northern butter-and-risotto warmth or southern brightness — structure stays conversational. Family-style mains work for larger tables when prep supports simultaneous plating; smaller groups often prefer plated pasta and a composed secondo.</p>
-<h2>Entertaining at home without heaviness</h2>
-<p>Italian private dining should feel warm, not weighed down. We plan portion rhythm and cheese placement so guests still want dessert.</p>
-<h2>Start with sample sets</h2>
-<p>Explore <a href="/#cuisines\">Italian sample menus</a> or the <a href="/gallery">gallery</a> for visual tone, then <a href="/#contact\">share your guest count</a> and date.</p>`,
+  'italian-private-chef-menu': article(
+    [
+      '<strong>Italian private chef menus</strong> fail when everything lands at once. Sequence matters: pasta al dente, fish or meat with space to breathe, contorni that support, sauces that cling instead of pool.',
+      'Italian private dining should feel warm, not weighed down — portion rhythm and cheese placement keep guests ready for dessert.',
+    ],
+    [
+      {
+        title: 'Regional cues, one coherent arc',
+        paragraphs: [
+          'Menus can lean northern butter-and-risotto warmth or southern brightness; structure stays conversational.',
+          'Family-style mains work for larger tables when prep supports simultaneous plating.',
+        ],
+      },
+      {
+        title: 'Pasta timing at home',
+        paragraphs: [
+          'Fresh and dried pasta need different water chemistry and pan finishing. We build sauces to receive pasta so starch emulsifies and plates stay glossy.',
+          'Pre-cooked pasta held too long is a common home mistake — we plan around that explicitly.',
+        ],
+      },
+      {
+        title: 'Seafood, meat, and contorni',
+        paragraphs: [
+          'Italian menus are not only pasta. Grilled fish, braised meat, and seasonal vegetables can anchor the story.',
+          'Tell us if you want a lighter summer arc or a winter truffle-forward direction.',
+        ],
+      },
+      {
+        title: 'Dietary adaptations',
+        paragraphs: [
+          'Gluten-free pasta paths, dairy-free sauces, and pescatarian menus are planned early — not improvised.',
+          'Mixed tables are common; parallel courses should feel equally cared for.',
+        ],
+      },
+      {
+        title: 'Explore Italian sample sets',
+        paragraphs: [
+          'See <a href="/#cuisines">Italian portfolios</a> and the <a href="/gallery">gallery</a>, then share guest count and date.',
+          'Custom arcs available for Reno, Tahoe, and Bay Area homes.',
+        ],
+      },
+    ],
+    'Italian private chef menus'
+  ),
 
-  'greek-mediterranean-dinner-party': `
-<p>A <strong>Greek and Mediterranean dinner party</strong> with a private chef favors brightness: olive oil with intent, herbs at the right moment, seafood that stays delicate, and shared plates that keep the table social.</p>
-<p>Even in a Reno winter dining room, the menu can feel sun-lit — citrus, yogurt, grilled vegetables, and mains that photograph well without losing restraint.</p>
-<h2>Shared plates plus a composed anchor</h2>
-<p>We often anchor the middle with shareable mezze-style plates, then land a composed main so the meal still has a clear peak. Dietary layers are common; we plan vegetarian and pescatarian paths in parallel from booking.</p>
-<h2>Plan your table</h2>
-<p>View <a href="/#cuisines\">Greek sample menus</a> and <a href="/#contact\">tell us about your occasion</a> when dates are set. Tahoe, Bay Area, and Reno service available.</p>`,
+  'greek-mediterranean-dinner-party': article(
+    [
+      'A <strong>Greek and Mediterranean dinner party</strong> with a private chef favors brightness: olive oil with intent, herbs at the right moment, seafood that stays delicate, shared plates that keep the table social.',
+      'Even a Reno winter dining room can feel sun-lit — citrus, yogurt, grilled vegetables, and mains that photograph well without losing restraint.',
+    ],
+    [
+      {
+        title: 'Shared plates plus a composed anchor',
+        paragraphs: [
+          'Mezze-style openings and shared middle courses keep conversation moving; a composed main gives the meal a clear peak.',
+          'Dietary layers are planned in parallel from booking.',
+        ],
+      },
+      {
+        title: 'Seasonal produce in Northern Nevada',
+        paragraphs: [
+          'Winter menus lean on citrus, olives, quality oil, and fish timed carefully. Summer Tahoe decks favor lighter grills and salads that hold in mountain air.',
+          'We do not pretend tomatoes are peak in January — menus stay honest and delicious.',
+        ],
+      },
+      {
+        title: 'Seafood, grill, and vegetarian paths',
+        paragraphs: [
+          'Pescatarian guests, gluten-free needs, and meat lovers can coexist when prep is separated intelligently.',
+          'Tell us your guest mix when you inquire.',
+        ],
+      },
+      {
+        title: 'Entertaining rhythm',
+        paragraphs: [
+          'Mediterranean hosting is social — we pace courses so you are not stuck in the kitchen during the best conversations.',
+          'Outdoor service is possible with weather backup for Tahoe properties.',
+        ],
+      },
+      {
+        title: 'View Greek sample menus',
+        paragraphs: [
+          'Browse <a href="/#cuisines">Greek portfolios</a> and tell us about your table when dates are set.',
+          'Private chef service across Reno, Tahoe, and the Bay Area.',
+        ],
+      },
+    ],
+    'Greek and Mediterranean dinner parties'
+  ),
 
-  'middle-eastern-fusion-private-dining': `
-<p><strong>Middle Eastern fusion private dining</strong> works when spice curves are controlled — heat that builds, acidity that resets, fat used with precision. Fusion is a pacing problem, not a garnish problem.</p>
-<p>Passed bites can lean Levantine while mains borrow broader global references; the thread is balance and shareability for conversation-heavy tables.</p>
-<h2>Who this menu style fits</h2>
-<p>Hosts who want food that photographs well but still feels easy to eat, multicultural guest lists, and evenings where people move between living room and table.</p>
-<h2>See fusion portfolios</h2>
-<p>Browse <a href="/#cuisines\">Global Fusion and Middle Eastern sample menus</a>, then <a href="/#contact\">start with your occasion brief</a>. Custom arcs available for Reno, Tahoe, and Bay Area homes.</p>`,
+  'middle-eastern-fusion-private-dining': article(
+    [
+      '<strong>Middle Eastern fusion private dining</strong> works when spice curves are controlled — heat that builds, acidity that resets, fat used with precision. Fusion is a pacing problem, not a garnish problem.',
+      'Passed bites can lean Levantine while mains borrow broader global references; balance keeps conversation-friendly plates that still photograph well.',
+    ],
+    [
+      {
+        title: 'Spice level and guest comfort',
+        paragraphs: [
+          'We confirm heat tolerance during booking. Pickles, herb salads, and yogurt sauces give relief between richer bites.',
+          'Not every guest eats spicy food daily — menus should welcome them too.',
+        ],
+      },
+      {
+        title: 'Shared tables and passing space',
+        paragraphs: [
+          'Fusion menus often shine family-style. We account for table size and whether platters can sit centrally without crowding glassware.',
+          'Rentals for larger platters can be discussed early.',
+        ],
+      },
+      {
+        title: 'Who this menu style fits',
+        paragraphs: [
+          'Multicultural guest lists, engagement dinners, and hosts who want energy without formality.',
+          'Also teams tired of the same steak-and-potato private dinner template.',
+        ],
+      },
+      {
+        title: 'Halal-friendly and vegetarian planning',
+        paragraphs: [
+          'Faith-based needs and vegetarian guests are mapped during inquiry — not at the door.',
+          'See <a href="/#cuisines">Global Fusion portfolios</a> for starting flavors.',
+        ],
+      },
+      {
+        title: 'Start with your occasion brief',
+        paragraphs: [
+          'Tell us date, headcount, and location — we recommend format and menu direction.',
+          '<a href="/#contact">Contact Siler Chef</a> to begin.',
+        ],
+      },
+    ],
+    'Middle Eastern fusion private dining'
+  ),
 
-  'holiday-private-chef-dinner': `
-<p>A <strong>holiday private chef dinner</strong> solves the real Thanksgiving or Christmas problem: every dish fighting for the same oven while the host misses the toast. We sequence roasting, resting, sides, and dessert so you stay in the room.</p>
-<h2>Traditional center, upgraded execution</h2>
-<p>Honor the bird or roast you want as the centerpiece while sauces, vegetables, and starch courses are timed like a restaurant line. Or design a fully custom holiday arc if your table prefers prime rib, seafood, or global flavors.</p>
-<h2>Leftovers and second-day tables</h2>
-<p>Packaging and gentle reheating notes can be discussed if you want a relaxed follow-up meal. Holiday dates across Reno and Tahoe fill early — share headcount as soon as plans firm up.</p>
-<h2>Hold your holiday date</h2>
-<p><a href="/#contact\">Send your preferred date and guest count</a>. We serve Thanksgiving, Christmas, New Year, and other hosted holidays at home.</p>`,
+  'holiday-private-chef-dinner': article(
+    [
+      'A <strong>holiday private chef dinner</strong> fixes the real Thanksgiving or Christmas problem: every dish fighting for the same oven while the host misses the toast. We sequence roasting, resting, sides, and dessert so you stay in the room.',
+      'Reno and Tahoe holiday dates fill early — inquire as soon as headcount is firm.',
+    ],
+    [
+      {
+        title: 'Traditional center, upgraded execution',
+        paragraphs: [
+          'Honor the bird or roast you want while sauces, vegetables, and starches are timed like a restaurant line.',
+          'Fully custom holiday arcs work when your table prefers prime rib, seafood, or global flavors instead of turkey.',
+        ],
+      },
+      {
+        title: 'Oven load and timing discipline',
+        paragraphs: [
+          'Holiday failure mode is competing dishes. We plan holds, rest times, and what can be finished on burners vs. oven.',
+          'You should not baste in isolation while guests wonder where the host went.',
+        ],
+      },
+      {
+        title: 'Leftovers and second-day tables',
+        paragraphs: [
+          'Packaging and gentle reheating notes can be discussed if you want a relaxed follow-up meal.',
+          'Tell us if disposable containers should be stocked for guests.',
+        ],
+      },
+      {
+        title: 'Multiple homes on Tahoe holidays',
+        paragraphs: [
+          'Families sometimes split across two rentals the same weekend — ask about coordinated menus or staggered service.',
+          'Guest counts often swell beyond normal dinners; family-style may outperform plated for twenty-plus.',
+        ],
+      },
+      {
+        title: 'Hold your holiday date',
+        paragraphs: [
+          'Thanksgiving, Christmas, New Year, and other hosted holidays at home.',
+          '<a href="/#contact">Send preferred date and headcount</a> as soon as plans firm up.',
+        ],
+      },
+    ],
+    'holiday private chef dinners'
+  ),
 
-  'rehearsal-dinner-private-chef': `
-<p>A <strong>rehearsal dinner with a private chef</strong> sets the tone before the wedding: intimate scale, tight service, and food strong enough to remember without stealing focus from speeches and family introductions.</p>
-<p>Twenty guests can feel like a full room when pacing is right — courses short enough for conversation, clear timing for toasts, and menus that nod to family heritage or stay neutral for mixed tastes.</p>
-<h2>Coordination with your timeline</h2>
-<p>We align holds with planners or photographers when you have them, and build backup timing if weather moves Tahoe service indoors. House, rental, and estate properties are all common.</p>
-<h2>Inquire for Tahoe or Reno</h2>
-<p><a href="/#contact\">Share your date and venue type</a> — we map service style and menu direction from there. See <a href="/#services\">special-occasion dining</a> for related formats.</p>`,
+  'rehearsal-dinner-private-chef': article(
+    [
+      'A <strong>rehearsal dinner with a private chef</strong> sets tone before the wedding: intimate scale, tight service, food memorable without overshadowing speeches and family introductions.',
+      'Twenty guests can feel full when pacing is right — courses short enough for conversation, strong enough to remember.',
+    ],
+    [
+      {
+        title: 'Family-style vs. plated for wedding weekends',
+        paragraphs: [
+          'Rehearsal dinners often feel better family-style so both families mingle. Wedding day itself may be more formal — we can match each night to the energy you want.',
+          'Tell us if you want heritage cuisines on the rehearsal menu.',
+        ],
+      },
+      {
+        title: 'Coordination with planners and photographers',
+        paragraphs: [
+          'We align course holds with planners or photographers when you have them — golden hour should not leave guests hungry for ninety minutes.',
+          'Backup indoor timing for Tahoe weather is part of professional planning.',
+        ],
+      },
+      {
+        title: 'Toasts, speeches, and pacing',
+        paragraphs: [
+          'We build pauses where you want them — not accidental cold plates during long speeches.',
+          'Dessert can wait for champagne if that matches your timeline.',
+        ],
+      },
+      {
+        title: 'Venue types we serve',
+        paragraphs: [
+          'Primary homes, rentals, and estates around Reno and Tahoe are common. Share gate, kitchen, and rental rules early.',
+          'Bar service can be separate; we coordinate timing if cocktails run before seated dinner.',
+        ],
+      },
+      {
+        title: 'Inquire for your rehearsal date',
+        paragraphs: [
+          'Share date, venue type, and expected headcount.',
+          'See <a href="/#services">special-occasion dining</a> for related formats.',
+        ],
+      },
+    ],
+    'rehearsal dinner private chef service'
+  ),
 
-  'chef-led-cooking-class-reno': `
-<p><strong>Chef-led cooking classes in Reno</strong> work best with a clear goal: knife skills, sauce foundations, pastry tempering, or recreating a full menu together. Siler Chef offers private culinary training for small groups — paced so guests cook, taste, and ask questions without feeling rushed.</p>
-<h2>Demonstration vs. hands-on</h2>
-<p>Kitchen layout and group size determine format. Demonstration-heavy sessions suit larger living rooms; hands-on works when counters and burners can be shared safely.</p>
-<h2>Same dietary discipline as private dinners</h2>
-<p>Allergies and preferences are planned upfront — not improvised mid-class. Education sessions can pair with a seated meal afterward for birthdays or team events.</p>
-<h2>Propose a class date</h2>
-<p>Ask about <a href="/#services\">education formats</a> or <a href="/#contact\">propose a date and group size</a>. Based in Northern Nevada; travel considered for qualified groups.</p>`,
+  'chef-led-cooking-class-reno': article(
+    [
+      '<strong>Chef-led cooking classes in Reno</strong> work best with a clear goal: knife skills, sauce foundations, pastry tempering, or recreating a full menu together. Siler Chef offers private culinary training for small groups at home.',
+      'Sessions are paced so guests cook, taste, and ask questions without feeling rushed — demonstration or hands-on depending on layout.',
+    ],
+    [
+      {
+        title: 'Demonstration vs. hands-on',
+        paragraphs: [
+          'Tight kitchens suit demonstration with tasting portions for everyone. Larger islands allow true hands-on participation.',
+          'We recommend format after we know group size and equipment.',
+        ],
+      },
+      {
+        title: 'Group size sweet spot',
+        paragraphs: [
+          'Four to ten participants usually allows real instruction. Larger groups can work as demo with structured tasting stations.',
+          'Corporate team events and family milestones both book classes — goals differ, pacing principles do not.',
+        ],
+      },
+      {
+        title: 'Curriculum examples',
+        paragraphs: [
+          'Mother sauces and pan finishing. Pasta from scratch. Pastry tempering and chocolate work. Full Turkish or French mini-menu recreation.',
+          'Tell us what you want guests to leave knowing — not just what you want to eat.',
+        ],
+      },
+      {
+        title: 'Dietary needs in classes',
+        paragraphs: [
+          'Allergies are planned upfront like private dinners — not improvised mid-class.',
+          'Classes can end with a seated meal if you want celebration after instruction.',
+        ],
+      },
+      {
+        title: 'Propose a class date',
+        paragraphs: [
+          'Ask about <a href="/#services">education formats</a> or propose date and group size.',
+          'Based in Northern Nevada; travel considered for qualified groups.',
+        ],
+      },
+    ],
+    'chef-led cooking classes in Reno'
+  ),
 
-  'small-wedding-private-chef': `
-<p>A <strong>small wedding private chef</strong> reception fits micro-weddings, backyard vows, and Tahoe properties where you want restaurant-level food without venue minimums. Guest counts under fifty are a sweet spot for chef-led precision.</p>
-<h2>Choreography guests feel but do not notice</h2>
-<p>Ceremony overlap, golden-hour photos, and long gaps between “I do” and dinner are planned for. We hold courses when you need flexibility, then resume service when the room is ready — including backup timing if weather moves everything indoors.</p>
-<h2>Menu and service style</h2>
-<p>Plated coursed dining, family-style sharing, or passed bites plus seated mains — we recommend a flow based on guest count, rentals, and whether you have a planner coordinating the night.</p>
-<h2>Tell us about your wedding date</h2>
-<p><a href="/#contact\">Share date, location, and expected headcount</a>. Browse <a href="/#cuisines\">cuisine portfolios</a> for flavor direction. Reno, Lake Tahoe, and Bay Area travel available for qualified events.</p>`,
+  'small-wedding-private-chef': article(
+    [
+      'A <strong>small wedding private chef</strong> reception fits micro-weddings, backyard vows, and Tahoe properties where you want restaurant-level food without venue minimums. Guest counts under fifty are a sweet spot for chef-led precision.',
+      'Choreography matters: ceremony overlap, photo windows, and meals that do not leave guests hungry during long golden-hour gaps.',
+    ],
+    [
+      {
+        title: 'Timing with photography and planners',
+        paragraphs: [
+          'We align course holds with planners or photographers when you have them. Backup indoor timing if weather moves service.',
+          'Passed bites can bridge long photo blocks without feeling like filler.',
+        ],
+      },
+      {
+        title: 'Plated, family-style, and hybrid reception',
+        paragraphs: [
+          'Plated coursed dining signals formality. Family-style encourages mingling. Hybrids are common for mixed ages.',
+          'Rentals, staffing, and table layout recommendations come with honest headcount.',
+        ],
+      },
+      {
+        title: 'Bar service and non-alcoholic paths',
+        paragraphs: [
+          'We coordinate with bar setup if drinks are separate. Mocktails and zero-proof pairings can be part of the menu brief.',
+          'Tell us if cake is external so savory pacing preserves appetite for candles.',
+        ],
+      },
+      {
+        title: 'Tahoe vs. Reno home weddings',
+        paragraphs: [
+          'Travel, load-in, weather backup, and rental kitchen limits are scoped upfront.',
+          'Share property rules about noise, propane, and hour restrictions.',
+        ],
+      },
+      {
+        title: 'Tell us about your wedding date',
+        paragraphs: [
+          'Date, location, expected headcount, and service style instinct.',
+          'Browse <a href="/#cuisines">cuisine portfolios</a> for flavor direction.',
+        ],
+      },
+    ],
+    'small wedding private chef receptions'
+  ),
 
-  'american-cuisine-private-chef-home': `
-<p><strong>American cuisine with a private chef</strong> is not diner casual — it is heat, rest, and confident plates: premium cuts, smoke where it belongs, sides that earn space, and sauces with backbone.</p>
-<p>Reno and Tahoe hosts often want steakhouse energy, fire-forward weekend menus, or lighter coastal American depending on the crowd. Rental grills and indoor ovens are both workable when prep is built around your kitchen.</p>
-<h2>Directions we build often</h2>
-<ul>
-<li>Steakhouse-style plated mains with composed sides</li>
-<li>Smoke-forward celebrations with shared platters</li>
-<li>Holiday roasts with timed sides and dessert</li>
-</ul>
-<h2>Personalize your menu</h2>
-<p>Browse <a href="/#cuisines\">American sample menus</a>, then <a href="/#contact\">share your date and guest count</a>. Every course can be adjusted for dietary needs or redesigned from scratch.</p>`,
+  'american-cuisine-private-chef-home': article(
+    [
+      '<strong>American cuisine with a private chef</strong> is heat, rest, and confident plates — premium cuts, smoke where it belongs, sides that earn space, sauces with backbone. It is not diner casual unless you want it to be.',
+      'Reno and Tahoe hosts often want steakhouse energy, fire-forward weekends, or lighter coastal American depending on the crowd.',
+    ],
+    [
+      {
+        title: 'Steakhouse, smoke, and holiday roasts',
+        paragraphs: [
+          'Steakhouse-style plated mains with composed sides. Smoke-forward celebrations with shared platters. Holiday roasts with timed sides and dessert.',
+          'Rental grills and indoor ovens are both workable when prep is built around your kitchen.',
+        ],
+      },
+      {
+        title: 'Equipment we plan around',
+        paragraphs: [
+          'Tell us about burners, oven size, outdoor propane, and smoker boxes on decks.',
+          'Proteins rest correctly only when the timeline accounts for your gear — not an ideal restaurant pass.',
+        ],
+      },
+      {
+        title: 'Premium casual vs. formal American',
+        paragraphs: [
+          'Board-style steak presentations read premium casual. Plated tenderloin with reduction reads formal. Same cuisine family — different service choices.',
+          'Guest count helps us recommend which lane fits.',
+        ],
+      },
+      {
+        title: 'Dietary adaptations',
+        paragraphs: [
+          'Gluten-free, dairy-free, and pescatarian paths are planned early.',
+          'Tell us if any guests avoid red meat or need halal-friendly proteins.',
+        ],
+      },
+      {
+        title: 'Personalize your American menu',
+        paragraphs: [
+          'Browse <a href="/#cuisines">American sample menus</a>, then share date and guest count.',
+          'Every course can be adjusted or redesigned from scratch.',
+        ],
+      },
+    ],
+    'American cuisine private chef dinners'
+  ),
 
-  'family-dinner-private-chef-guide': `
-<p>A <strong>family dinner with a private chef</strong> keeps generations at the same table without one person missing for an hour at the stove. Shared platters, timed sides, and a dessert that lands cleanly make the host look effortless.</p>
-<h2>Mixed ages, one rhythm</h2>
-<p>Milder options for younger guests, fuller flavors for adults, allergens documented before prep — family-style and semi-plated formats both work when agreed upfront. The goal is warmth, not chaos.</p>
-<h2>When families book us</h2>
-<p>Holiday weekends, reunions, pre-wedding gatherings, and “everyone is in town” nights across Reno and Tahoe. We serve from your home kitchen with the same timing discipline as formal dinners.</p>
-<h2>Shape your menu</h2>
-<p>See <a href="/#services\">family dinner formats</a>, then <a href="/#contact\">tell us headcount and date</a>.</p>`,
+  'family-dinner-private-chef-guide': article(
+    [
+      'A <strong>family dinner with a private chef</strong> keeps generations at one table without one person missing for an hour at the stove. Shared platters, timed sides, and dessert that lands cleanly make hosting look effortless.',
+      'Holiday weekends, reunions, and “everyone is in town” nights are common across Reno and Tahoe.',
+    ],
+    [
+      {
+        title: 'Mixed ages, one rhythm',
+        paragraphs: [
+          'Milder options for younger guests, fuller flavors for adults, allergens documented before prep.',
+          'Family-style and semi-plated formats both work when agreed upfront — warmth beats chaos.',
+        ],
+      },
+      {
+        title: 'What to prep before the chef arrives',
+        paragraphs: [
+          'Clear counter space, empty dishwasher, and knowing which rooms are for plating keep load-in quiet.',
+          'We arrive with mise en place largely complete — on-site work is finishing and service, not chopping while guests sit.',
+        ],
+      },
+      {
+        title: 'Heritage menus and neutral formats',
+        paragraphs: [
+          'Turkish, Italian, American, or French arcs can all fit family tone depending on your crowd.',
+          'Neutral menus work when in-laws and friend groups mix — tell us the dynamic.',
+        ],
+      },
+      {
+        title: 'Leftovers and relaxed second helpings',
+        paragraphs: [
+          'Family-style naturally creates leftovers; packaging can be discussed if you want send-home portions.',
+          'Timing for coffee and dessert respects older guests who prefer earlier finishes.',
+        ],
+      },
+      {
+        title: 'Shape your family menu',
+        paragraphs: [
+          'See <a href="/#services">family dinner formats</a>, then tell us headcount and date.',
+          'We serve from your home kitchen with the same discipline as formal dinners.',
+        ],
+      },
+    ],
+    'family dinners with a private chef'
+  ),
 
-  'graduation-private-chef-celebration': `
-<p>A <strong>graduation party with a private chef</strong> needs food that keeps moving: staggered arrivals, long photo blocks, guests snacking before they sit. We build strong passed bites, a clear seated or buffet moment, and desserts that photograph well.</p>
-<h2>Indoor and backyard Reno/Tahoe parties</h2>
-<p>Holding temps, rentals, and speech-friendly pauses between courses are part of planning — not day-of guesses. Mixed guest lists get flexible menus with vegetarian paths planned early.</p>
-<h2>Send your milestone date</h2>
-<p><a href="/#contact\">Share location, guest count, and dietary notes</a> when your date is set. We reply with timing and menu direction. Explore <a href="/gallery">celebration plating</a> for visual tone.</p>`,
+  'graduation-private-chef-celebration': article(
+    [
+      'A <strong>graduation party with a private chef</strong> needs food that keeps moving: staggered arrivals, long photo blocks, guests snacking before they sit. We build passed bites, a clear seated or buffet moment, and desserts that photograph well.',
+      'Indoor and backyard Reno/Tahoe parties both need holding temps and speech-friendly pauses — planned upfront, not guessed day-of.',
+    ],
+    [
+      {
+        title: 'Sample flow for a home graduation',
+        paragraphs: [
+          'Many hosts choose ninety minutes of passed bites during arrival and photos, then seated main and dessert with a speech pause.',
+          'Continuous buffet with hot replenishment fits larger informal crowds.',
+        ],
+      },
+      {
+        title: 'Mixed generations at one party',
+        paragraphs: [
+          'Richer flavors for adults with approachable sides younger guests will actually eat — without a separate kids menu unless you want one.',
+          'Vegetarian and allergy paths planned in parallel.',
+        ],
+      },
+      {
+        title: 'Backyard, tent, and indoor backup',
+        paragraphs: [
+          'Wind and evening temperature drops affect deck service; we plan hot holding and indoor backup.',
+          'Rentals for chafing or extra platters can be discussed when headcount is firm.',
+        ],
+      },
+      {
+        title: 'Content-friendly plating',
+        paragraphs: [
+          'Milestone parties often want photos — menus can include composed plates and shareable moments that still taste better than delivery trays.',
+          'Tell us if you need a pause for cap-and-gown photos before dinner.',
+        ],
+      },
+      {
+        title: 'Send your milestone date',
+        paragraphs: [
+          'Location, guest count, dietary notes, and whether you prefer buffet or coursed service.',
+          'Explore <a href="/gallery">celebration plating</a> for visual tone.',
+        ],
+      },
+    ],
+    'graduation parties with a private chef'
+  ),
 };
 
-/** Extra sections for depth (unique per slug — avoids duplicate SEO blocks). */
-/** @type {Record<string, string>} */
-const supplemental = {
-  'graduation-private-chef-celebration': `<h2>Sample flow for a home graduation party</h2><p>Many hosts choose a 90-minute window of passed bites while guests arrive and photos happen, followed by a seated main and dessert that can pause for speeches. We can also design a continuous buffet with hot replenishment if your crowd is larger and informal.</p><p>If parents and grandparents are on the guest list, we balance richer flavors for adults with approachable sides younger guests will actually eat — without running a separate “kids menu” unless you want one.</p>`,
-  'family-dinner-private-chef-guide': `<h2>What to prep before the chef arrives</h2><p>Clear counter space, an empty dishwasher, and knowing which rooms you want used for plating help load-in stay quiet. We arrive with mise en place largely complete so on-site work is finishing, assembly, and service — not chopping twelve onions while guests are already seated.</p>`,
-  'american-cuisine-private-chef-home': `<h2>Equipment we plan around</h2><p>Home ovens, standard burners, outdoor propane grills, and smoker boxes on Tahoe decks all change timing. Tell us what you have; we adjust the menu so proteins rest correctly and sides hit the table hot.</p>`,
-  'middle-eastern-fusion-private-dining': `<h2>Spice level and guest comfort</h2><p>We confirm heat tolerance during booking. Bright pickles, herb salads, and yogurt-based sauces give guests relief between richer bites — especially helpful when not everyone at the table eats spicy food daily.</p>`,
-  'greek-mediterranean-dinner-party': `<h2>Seasonal produce in Northern Nevada</h2><p>Winter dinners can still feel Mediterranean through citrus, olives, quality olive oil, and fish timed carefully. Summer Tahoe decks favor lighter grills and salads that hold well in mountain air.</p>`,
-  'italian-private-chef-menu': `<h2>Pasta timing at home</h2><p>Fresh and dried pasta need different water chemistry and finishing in the pan. We build sauces to receive pasta — not the reverse — so starch emulsifies correctly and plates stay glossy.</p>`,
-  'french-cuisine-private-dinner': `<h2>Pastry and dessert on the same night</h2><p>Because pastry is a core strength, French menus often end with something that showcases tempering and texture — not supermarket sweetness. Tell us if you prefer chocolate, fruit, or a lighter finisher.</p>`,
-  'turkish-cuisine-private-chef': `<h2>Bread, grill, and mezze on one timeline</h2><p>Multiple hot elements compete for attention; we sequence ovens and burners so bread, grilled proteins, and cold mezze arrive in the right order — warm where it matters, cool where refreshment matters.</p>`,
-  'wine-pairing-private-dinner': `<h2>When guests bring bottles</h2><p>Mixed cases are normal. We can stagger courses so lighter wines appear before heavier reds, and keep one course flexible if a guest opens something unexpected.</p>`,
-  'private-chef-cost-factors': `<h2>Deposits and date holds</h2><p>Peak weekends and holiday weeks may require a deposit to hold the calendar. Your proposal outlines what is included so you can compare chef-led service to catering quotes fairly.</p>`,
-  'private-chef-vs-catering': `<h2>Cleanup and reset</h2><p>Chef-led service includes kitchen reset agreed in advance — not trays left for you at midnight. Scope is confirmed during booking so expectations match the night.</p>`,
-  'private-chef-dietary-restrictions': `<h2>When the whole table shares one restriction</h2><p>If every guest is gluten-free or pork-free, the menu is built as one arc. If only one guest has a severe allergy, we often design parallel prep paths rather than isolating one plate at the last second.</p>`,
-  'plated-vs-family-style-private-chef': `<h2>Staffing and rentals</h2><p>Plated service for more than twelve guests may benefit from an additional server; family-style can reduce staff but needs larger platters and passing space. We mention this early so rentals are ordered once.</p>`,
-  'corporate-dinner-chef-home': `<h2>Privacy and discretion</h2><p>Client dinners often need low-key arrival and minimal branding. We dress for residential service and keep conversation with guests about food only when you prefer — not table-side sales talk.</p>`,
-  'chef-led-cooking-class-reno': `<h2>Group size sweet spot</h2><p>Four to ten participants usually allows real hands-on time. Larger groups can work as demonstration with tasting portions for everyone.</p>`,
-  'rehearsal-dinner-private-chef': `<h2>Family-style vs. plated for wedding weekends</h2><p>Rehearsal dinners often feel better family-style so both families mingle; wedding day itself may be more formal. We can match each night to the energy you want.</p>`,
-  'holiday-private-chef-dinner': `<h2>Multiple homes or guest houses</h2><p>Tahoe holidays sometimes split families across two rentals. Ask about coordinated menus or staggered service if you are hosting across properties the same weekend.</p>`,
-  'birthday-party-private-chef': `<h2>Cake and dessert timing</h2><p>If you are bringing a celebration cake, tell us when candles should happen — we pace the savory menu so guests still have appetite and energy for the moment.</p>`,
-  'small-wedding-private-chef': `<h2>Bar service and non-alcoholic paths</h2><p>We coordinate with your bar setup if drinks are separate. Sparkling mocktails and zero-proof pairings can be part of the menu brief when guests do not drink alcohol.</p>`,
-  'private-chef-reno-guide': `<h2>Neighborhoods and travel we serve from Reno</h2><p>Beyond central Reno, we regularly serve Spanish Springs, South Meadows, Somersett, Galena, and Tahoe-bound homes when the calendar allows. Mention your ZIP or cross streets in the inquiry so travel is quoted accurately.</p>`,
-  'lake-tahoe-private-dining': `<h2>Parking and load-in at rentals</h2><p>Steep driveways, HOA quiet hours, and limited kitchen parking affect arrival time. Share gate codes, bear-box rules, and whether gear must come through a garage — we plan load-in so guests are not watching boxes cross the living room during cocktails.</p>`,
-  'bay-area-in-home-chef': `<h2>Parking, elevators, and building access</h2><p>Urban condos need elevator reservations and quiet-hour awareness. Suburban homes may need driveway space for temperature-controlled load-in. Include access notes in your first message to avoid delays.</p>`,
-  'anniversary-dinner-private-chef': `<h2>Music, lighting, and table setup</h2><p>We coordinate with your timeline — when candles are lit, when you want the main to land, and whether you prefer the kitchen closed off. Small floral or rental plateware choices can be discussed once the menu arc is set.</p>`,
-  'how-to-hire-private-chef': `<h2>Contracts and cancellation</h2><p>Ask any chef you hire about weather policies for outdoor Tahoe service, illness backup, and how guest-count changes affect price. Clarity upfront prevents awkward conversations the week of the event.</p>`,
-};
+function normalizeHtml(html) {
+  return html.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
+}
+
+function wordCount(html) {
+  return html
+    .replace(/<[^>]+>/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean).length;
+}
 
 const data = JSON.parse(readFileSync(jsonPath, 'utf8'));
 let count = 0;
+const report = [];
+
 for (const post of data.posts) {
   const html = bodies[post.slug];
   if (!html) {
     console.warn('Missing body for', post.slug);
     continue;
   }
-  let combined = html;
-  if (supplemental[post.slug]) {
-    combined += supplemental[post.slug];
-  }
-  post.bodyHtml = combined.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
+  post.bodyHtml = normalizeHtml(html);
   post.updated = updatedOn;
+  const words = wordCount(post.bodyHtml);
+  report.push({ slug: post.slug, words });
   count++;
 }
+
 writeFileSync(jsonPath, JSON.stringify(data, null, 4) + '\n', 'utf8');
+
+const min = Math.min(...report.map((r) => r.words));
+const max = Math.max(...report.map((r) => r.words));
+const avg = Math.round(report.reduce((s, r) => s + r.words, 0) / report.length);
+
 console.log(`Updated ${count} posts (updated: ${updatedOn})`);
+console.log(`Words — min: ${min}, avg: ${avg}, max: ${max}`);
+for (const r of report.sort((a, b) => a.words - b.words)) {
+  const flag = r.words < MIN_WORDS ? ' ⚠' : '';
+  console.log(`  ${r.words}\t${r.slug}${flag}`);
+}
