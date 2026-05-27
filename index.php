@@ -18,6 +18,17 @@ $requestPath = rawurldecode(parse_url($requestUri, PHP_URL_PATH) ?: '/');
 $requestMethod = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
 $embedDir = realpath(__DIR__ . '/embed');
 
+/** Prefer www for SEO (single canonical host). Only applies when traffic reaches this app. */
+if (in_array($requestMethod, ['GET', 'HEAD'], true)) {
+    $host = strtolower(preg_replace('/:\d+$/', '', (string) ($_SERVER['HTTP_HOST'] ?? '')));
+    if ($host === 'silerchef.com') {
+        $query = parse_url($requestUri, PHP_URL_QUERY);
+        $location = 'https://www.silerchef.com' . $requestPath . ($query !== null && $query !== '' ? '?' . $query : '');
+        header('Location: ' . $location, true, 301);
+        exit;
+    }
+}
+
 header_remove('X-Powered-By');
 header('X-Content-Type-Options: nosniff');
 header('Referrer-Policy: strict-origin-when-cross-origin');
@@ -328,6 +339,10 @@ function serve_embed_file(string $requestPath, string|false $embedDir, string $r
 {
     if ($embedDir === false) {
         json_response(['error' => 'server_misconfigured', 'detail' => 'embed directory missing'], 500);
+    }
+
+    if ($requestPath === '/robots.txt') {
+        Blog::renderRobotsTxt();
     }
 
     /** Never serve stale static sitemap.xml — dynamic list includes /blog and all articles. */

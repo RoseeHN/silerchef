@@ -1,4 +1,8 @@
+# Fallback copy — production serves /robots.txt dynamically from PHP (see app/Blog.php).
 User-agent: *
 Allow: /
-
+Allow: /blog/
+Allow: /gallery
+Disallow: /admin/
+Disallow: /api/
 Sitemap: https://www.silerchef.com/sitemap.xml

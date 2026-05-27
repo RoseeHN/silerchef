@@ -86,6 +86,40 @@ final class Blog
         return self::SITE_ORIGIN . '/blog/' . rawurlencode($slug);
     }
 
+    public static function renderRobotsTxt(): never
+    {
+        $lines = [
+            '# Siler Chef — private chef · Reno · Lake Tahoe · Bay Area',
+            '# Canonical site: https://www.silerchef.com',
+            '',
+            'User-agent: *',
+            'Allow: /',
+            'Allow: /blog',
+            'Allow: /blog/',
+            'Allow: /gallery',
+            '',
+            'Disallow: /admin',
+            'Disallow: /admin/',
+            'Disallow: /api/',
+            '',
+            'User-agent: Googlebot',
+            'Allow: /',
+            'Allow: /blog/',
+            'Allow: /gallery',
+            'Disallow: /admin',
+            'Disallow: /api/',
+            '',
+            'User-agent: Googlebot-Image',
+            'Allow: /images/',
+            '',
+            'Sitemap: ' . self::SITE_ORIGIN . '/sitemap.xml',
+            '',
+        ];
+
+        header('Cache-Control: public, max-age=86400');
+        text_response(implode("\n", $lines), 'text/plain; charset=utf-8');
+    }
+
     public static function renderSitemap(): never
     {
         $urls = [
@@ -186,6 +220,10 @@ final class Blog
 
 function serve_blog_routes(string $requestPath): void
 {
+    if ($requestPath === '/robots.txt') {
+        Blog::renderRobotsTxt();
+    }
+
     if ($requestPath === '/sitemap.xml') {
         Blog::renderSitemap();
     }
