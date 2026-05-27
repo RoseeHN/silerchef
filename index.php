@@ -310,6 +310,7 @@ function redirect_legacy_embed_paths(string $requestPath, string $requestUri, st
         '/admin.html', '/admin/' => '/admin',
         '/gallery.html', '/gallery/' => '/gallery',
         '/blog.html', '/blog/' => '/blog',
+        '/blogs', '/blogs/' => '/blog',
         default => null,
     };
 
@@ -327,6 +328,11 @@ function serve_embed_file(string $requestPath, string|false $embedDir, string $r
 {
     if ($embedDir === false) {
         json_response(['error' => 'server_misconfigured', 'detail' => 'embed directory missing'], 500);
+    }
+
+    /** Never serve stale static sitemap.xml — dynamic list includes /blog and all articles. */
+    if ($requestPath === '/sitemap.xml') {
+        Blog::renderSitemap();
     }
 
     $path = $requestPath === '/' ? '/index.html' : $requestPath;
