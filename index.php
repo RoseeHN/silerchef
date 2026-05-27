@@ -213,7 +213,7 @@ function route_api(string $path, string $method, Repository $repository, AdminAu
         json_response(['ok' => true, 'availability' => $repository->saveAvailability(json_input())]);
     }
 
-    if (preg_match('#^/api/admin/reservations/([^/]+)$#', $path, $matches) && $method === 'PATCH') {
+    if (preg_match('#^/api/admin/reservations/([^/]+)\z#', $path, $matches) && $method === 'PATCH') {
         require_admin($auth);
         $id = trim((string) ($matches[1] ?? ''));
         if ($id === '') {
@@ -226,7 +226,7 @@ function route_api(string $path, string $method, Repository $repository, AdminAu
         json_response(['ok' => true, 'reservation' => $updated]);
     }
 
-    if (preg_match('#^/api/admin/reservations/([^/]+)$#', $path, $matches) && $method === 'DELETE') {
+    if (preg_match('#^/api/admin/reservations/([^/]+)\z#', $path, $matches) && $method === 'DELETE') {
         require_admin($auth);
         $id = trim((string) ($matches[1] ?? ''));
         if ($id === '') {

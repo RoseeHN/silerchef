@@ -160,7 +160,7 @@ final class Blog
             self::renderList();
         }
 
-        if (preg_match('#^/blog/([a-z0-9-]+)$#', $requestPath, $m) === 1) {
+        if (preg_match('#^/blog/([a-z0-9-]+)\z#', $requestPath, $m) === 1) {
             $post = self::findBySlug($m[1]);
             if ($post === null) {
                 return false;
@@ -228,7 +228,7 @@ function serve_blog_routes(string $requestPath): void
         Blog::renderSitemap();
     }
 
-    if ($requestPath === '/blog' || $requestPath === '/blog/' || preg_match('#^/blog/[a-z0-9-]+$#', $requestPath) === 1) {
+    if ($requestPath === '/blog' || $requestPath === '/blog/' || preg_match('#^/blog/[a-z0-9-]+\z#', $requestPath) === 1) {
         if (!Blog::renderRoute($requestPath)) {
             json_response(['error' => 'not_found'], 404);
         }
