@@ -272,6 +272,45 @@
                 "Small events"
             ],
             "bodyHtml": "<p>Small weddings at home or on Tahoe properties need choreography: ceremony overlap, photo windows, and a meal that does not leave guests hungry during a long golden-hour gap.</p><p>We align course holds with your planner or photographer when you have one, and build backup timing if weather moves service indoors.</p><p>Guest counts under fifty are our sweet spot for chef-led precision. <a href=\"/#contact\">Tell us your date and location</a> to map service style and menu direction.</p>"
+        },
+        {
+            "slug": "american-cuisine-private-chef-home",
+            "title": "American Cuisine Private Chef: Premium Comfort at Your Table",
+            "description": "Steakhouse polish and contemporary American menus at home — fire, smoke, and composed plates for Reno and Tahoe hosts.",
+            "published": "2025-10-18",
+            "updated": "2025-10-18",
+            "image": "images/cuisines/american-cuisine/gallery/08.jpg",
+            "tags": [
+                "American",
+                "Cuisine"
+            ],
+            "bodyHtml": "<p>American private dining is not diner casual — it is about heat, rest, and plates that feel confident: premium cuts, sauces with backbone, and sides that earn space on the table.</p><p>We can lean steakhouse, smoke-forward, or lighter coastal American depending on your guests. Rental grills and indoor ovens are both workable when the prep timeline is built around your kitchen.</p><p>Browse the <a href=\"/#cuisines\">American sample menus</a> for direction, then <a href=\"/#contact\">share your date and guest count</a> to personalize courses.</p>"
+        },
+        {
+            "slug": "family-dinner-private-chef-guide",
+            "title": "Family Dinner With a Private Chef: Generous Tables, Calm Hosting",
+            "description": "Multi-generational family dinners at home — pacing for kids and adults, shared mains, and service that keeps you at the table.",
+            "published": "2025-10-12",
+            "updated": "2025-10-12",
+            "image": "images/services-and-occasions/family-dinners/hero.jpg",
+            "tags": [
+                "Family",
+                "Hosting"
+            ],
+            "bodyHtml": "<p>Family dinners fail when one person disappears into the kitchen for an hour. Chef-led service keeps the table warm: shared platters, timed sides, and a dessert that lands without a scramble.</p><p>We plan for mixed ages — milder options for younger guests, stronger flavors for adults, and allergens documented before prep begins. Family-style and semi-plated formats both work when the rhythm is agreed upfront.</p><p>See <a href=\"/#services\">family dinner formats</a> on the site, then <a href=\"/#contact\">tell us your headcount and date</a> to shape the menu.</p>"
+        },
+        {
+            "slug": "graduation-private-chef-celebration",
+            "title": "Graduation Party Private Chef: Celebrate the Milestone at Home",
+            "description": "Graduation and milestone celebrations with a private chef — flexible timing, crowd-friendly menus, and polished service for mixed guest lists.",
+            "published": "2025-10-05",
+            "updated": "2025-10-05",
+            "image": "images/services-and-occasions/special-events/hero.jpg",
+            "tags": [
+                "Graduation",
+                "Celebration"
+            ],
+            "bodyHtml": "<p>Graduation parties need food that keeps moving — arrivals stagger, photos run long, and guests snack before they sit. We build menus with strong passed bites, a clear seated or buffet moment, and desserts that photograph well.</p><p>Indoor and backyard service are both common in Reno and Tahoe; we coordinate holding temps, rentals, and whether you want a speech-friendly pause between courses.</p><p>When your date is set, <a href=\"/#contact\">send location, guest count, and any dietary notes</a> — we will reply with timing and menu direction.</p>"
         }
     ]
 }
