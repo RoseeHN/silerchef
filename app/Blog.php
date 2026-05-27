@@ -228,7 +228,7 @@ function serve_blog_routes(string $requestPath): void
         Blog::renderSitemap();
     }
 
-    if ($requestPath === '/blog' || $requestPath === '/blog/' || preg_match('#^/blog/[a-z0-9-]+$', $requestPath) === 1) {
+    if ($requestPath === '/blog' || $requestPath === '/blog/' || preg_match('#^/blog/[a-z0-9-]+$#', $requestPath) === 1) {
         if (!Blog::renderRoute($requestPath)) {
             json_response(['error' => 'not_found'], 404);
         }

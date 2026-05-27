@@ -42,11 +42,23 @@ if ($requestMethod === 'OPTIONS') {
 }
 
 if ($requestPath === '/health') {
+    $build = [
+        'commit' => trim((string) (getenv('RAILWAY_GIT_COMMIT_SHA') ?: '')),
+        'branch' => trim((string) (getenv('RAILWAY_GIT_BRANCH') ?: '')),
+        'deployId' => trim((string) (getenv('RAILWAY_DEPLOYMENT_ID') ?: '')),
+    ];
+    $build = array_filter($build, static fn (string $v): bool => $v !== '');
+
     json_response(
         [
             'ok' => true,
             'service' => 'silerchef-php',
             'database' => $database->storageLabel(),
+            'features' => [
+                'blog' => class_exists('Blog', false),
+                'dynamicSitemap' => class_exists('Blog', false),
+            ],
+            'build' => $build !== [] ? $build : null,
         ]
     );
 }
