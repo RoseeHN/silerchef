@@ -41,6 +41,11 @@ if ($requestMethod === 'OPTIONS') {
     exit;
 }
 
+if (in_array($requestMethod, ['GET', 'HEAD'], true)) {
+    serve_google_verification_file($requestPath);
+    redirect_seo_landing_paths($requestPath, $requestUri, $requestMethod);
+}
+
 if ($requestPath === '/health') {
     $build = [
         'commit' => trim((string) (getenv('RAILWAY_GIT_COMMIT_SHA') ?: '')),
@@ -57,6 +62,12 @@ if ($requestPath === '/health') {
             'features' => [
                 'blog' => class_exists('Blog', false),
                 'dynamicSitemap' => class_exists('Blog', false),
+            ],
+            'seo' => [
+                'canonicalOrigin' => 'https://www.silerchef.com',
+                'sitemap' => 'https://www.silerchef.com/sitemap.xml',
+                'robots' => 'https://www.silerchef.com/robots.txt',
+                'googleSiteVerificationEnv' => trim(env_string('GOOGLE_SITE_VERIFICATION', '')) !== '',
             ],
             'build' => $build !== [] ? $build : null,
         ]
@@ -322,6 +333,50 @@ function current_request_context(): array
     ];
 }
 
+function serve_google_verification_file(string $requestPath): void
+{
+    if (!preg_match('#^/google[0-9a-f]+\.html$#', $requestPath)) {
+        return;
+    }
+
+    $safeName = basename($requestPath);
+    $file = __DIR__ . '/embed/verification/' . $safeName;
+    if (!is_file($file)) {
+        return;
+    }
+
+    header('Content-Type: text/html; charset=utf-8');
+    header('Cache-Control: public, max-age=300');
+    readfile($file);
+    exit;
+}
+
+/** Permanent SEO-friendly URLs → Journal articles or homepage. */
+function redirect_seo_landing_paths(string $requestPath, string $requestUri, string $requestMethod): void
+{
+    if (!in_array($requestMethod, ['GET', 'HEAD'], true)) {
+        return;
+    }
+
+    $target = match ($requestPath) {
+        '/private-chef-reno', '/personal-chef-reno', '/reno-private-chef' => '/blog/private-chef-reno-guide',
+        '/private-chef-tahoe', '/lake-tahoe-private-chef', '/tahoe-private-chef' => '/blog/lake-tahoe-private-dining',
+        '/private-chef-bay-area', '/bay-area-private-chef', '/personal-chef-bay-area' => '/blog/bay-area-in-home-chef',
+        '/private-chef', '/personal-chef' => '/',
+        '/silerchef' => '/',
+        default => null,
+    };
+
+    if ($target === null) {
+        return;
+    }
+
+    $query = parse_url($requestUri, PHP_URL_QUERY);
+    $location = $target . ($query !== null && $query !== '' ? '?' . $query : '');
+    header('Location: ' . $location, true, 301);
+    exit;
+}
+
 function redirect_legacy_embed_paths(string $requestPath, string $requestUri, string $requestMethod): void
 {
     if (!in_array($requestMethod, ['GET', 'HEAD'], true)) {
@@ -408,6 +463,7 @@ function serve_embed_file(string $requestPath, string|false $embedDir, string $r
     if (str_ends_with($candidate, '/index.html')) {
         http_response_code(200);
         header('Content-Type: ' . $mime);
+        header('Link: <https://www.silerchef.com/sitemap.xml>; rel="sitemap"', false);
         echo inject_google_site_verification((string) file_get_contents($candidate));
         exit;
     }
