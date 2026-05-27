@@ -31,6 +31,7 @@
 
 .blog-hero__title {
   margin: 0 0 0.85rem;
+  max-width: 44rem;
   font-family: var(--font-display);
   font-size: clamp(1.85rem, 4vw, 2.65rem);
   line-height: 1.1;
@@ -43,10 +44,6 @@
   font-size: 1rem;
   line-height: 1.65;
   max-width: 38rem;
-}
-
-.blog-hero__title {
-  max-width: 44rem;
 }
 
 .blog-grid {
