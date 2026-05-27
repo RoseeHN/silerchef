@@ -5,7 +5,7 @@ declare(strict_types=1);
 final class Blog
 {
     private const SITE_ORIGIN = 'https://www.silerchef.com';
-    private const ASSET_VERSION = 'sc-20260528c';
+    private const ASSET_VERSION = 'sc-20260528d';
 
     /** @var list<array<string, mixed>>|null */
     private static ?array $posts = null;
