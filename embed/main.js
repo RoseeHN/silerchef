@@ -1339,6 +1339,32 @@
         locationLink.removeAttribute('href');
       }
     }
+    const mapFrame = document.querySelector('[data-contact-map]');
+    if (mapFrame) {
+      const embedSrc = String(contact.googleMapsEmbedSrc ?? '').trim();
+      if (embedSrc && /^https?:\/\//i.test(embedSrc)) {
+        mapFrame.setAttribute('src', embedSrc);
+      } else {
+        const parts = [
+          contact.streetAddress,
+          contact.addressLocality,
+          contact.addressRegion,
+          contact.postalCode,
+        ]
+          .map((v) => String(v ?? '').trim())
+          .filter(Boolean);
+        if (parts.length) {
+          mapFrame.setAttribute(
+            'src',
+            `https://maps.google.com/maps?q=${encodeURIComponent(parts.join(', '))}&hl=en&z=16&output=embed`
+          );
+        }
+      }
+      const mapTitle = contact.location
+        ? `Siler Chef — ${contact.location} on Google Maps`
+        : 'Siler Chef on Google Maps';
+      mapFrame.setAttribute('title', mapTitle);
+    }
     const contactSocialMap = {
       googlemaps: contact.googleMapsHref,
       instagram: contact.instagramHref,

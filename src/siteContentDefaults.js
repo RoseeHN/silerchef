@@ -132,6 +132,8 @@ const DEFAULT_SITE_CONTENT = {
       postalCode: '89503',
       googleMapsHref:
         'https://www.google.com/maps/place/Siler+Chef+LLC/@39.5433344,-119.8216659,17z/data=!3m1!4b1!4m6!3m5!1s0xa180e099e5f7d05b:0x5f23cef288df732e!8m2!3d39.5433344!4d-119.8216659!16s%2Fg%2F11z80y9ty7',
+      googleMapsEmbedSrc:
+        'https://maps.google.com/maps?q=Siler+Chef+LLC,+1555+N+Sierra+St,+Reno,+NV+89503&hl=en&z=16&output=embed',
       instagramHref: 'https://www.instagram.com/silerchef',
       yelpHref: 'https://www.yelp.com/biz/siler-chef-reno',
       whatsappHref: 'https://wa.me/17753896677',

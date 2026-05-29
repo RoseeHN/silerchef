@@ -1161,6 +1161,10 @@
         <span>Location line (display)</span>
         <input id="hp-contact-location" type="text" value="${esc(site.contact.location)}" />
       </label>
+      <label class="field field--advanced field--full">
+        <span>Google Maps embed URL (iframe src)</span>
+        <input id="hp-contact-googlemaps-embed" type="url" value="${esc(site.contact.googleMapsEmbedSrc || '')}" placeholder="https://maps.google.com/maps?q=..." />
+      </label>
       <label class="field field--advanced">
         <span>Google Maps / Business Profile</span>
         <input id="hp-contact-googlemaps" type="url" value="${esc(site.contact.googleMapsHref || '')}" placeholder="https://www.google.com/maps/place/..." />
@@ -2143,6 +2147,7 @@
     next.site.contact.postalCode = byId('hp-contact-zip').value.trim();
     next.site.contact.location = byId('hp-contact-location').value.trim();
     next.site.contact.googleMapsHref = byId('hp-contact-googlemaps').value.trim();
+    next.site.contact.googleMapsEmbedSrc = byId('hp-contact-googlemaps-embed').value.trim();
     next.site.contact.instagramHref = byId('hp-contact-instagram').value.trim();
     next.site.contact.yelpHref = byId('hp-contact-yelp').value.trim();
     next.site.contact.whatsappHref = byId('hp-contact-whatsapp').value.trim();

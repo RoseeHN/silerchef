@@ -1354,6 +1354,10 @@ final class Repository
             $content['site']['contact']['addressRegion'] = 'NV';
             $content['site']['contact']['postalCode'] = '89503';
         }
+        if (trim((string) ($content['site']['contact']['googleMapsEmbedSrc'] ?? '')) === '') {
+            $content['site']['contact']['googleMapsEmbedSrc'] =
+                'https://maps.google.com/maps?q=Siler+Chef+LLC,+1555+N+Sierra+St,+Reno,+NV+89503&hl=en&z=16&output=embed';
+        }
 
         $occasionStat = (string) ($content['site']['stats']['occasionArchetypes'] ?? '');
         if ($occasionStat === '' || $occasionStat === '5') {
