@@ -1342,7 +1342,17 @@ final class Repository
         }
         if (trim((string) ($content['site']['contact']['googleMapsHref'] ?? '')) === '') {
             $content['site']['contact']['googleMapsHref'] =
-                'https://www.google.com/maps/place/Siler+Chef+LLC/@39.5433344,-119.8216659,17z';
+                'https://www.google.com/maps/place/Siler+Chef+LLC/@39.5433344,-119.8216659,17z/data=!3m1!4b1!4m6!3m5!1s0xa180e099e5f7d05b:0x5f23cef288df732e!8m2!3d39.5433344!4d-119.8216659!16s%2Fg%2F11z80y9ty7';
+        }
+        $legacyLocations = ['Reno, Nevada, USA', 'Reno, Nevada'];
+        if (in_array(trim((string) ($content['site']['contact']['location'] ?? '')), $legacyLocations, true)) {
+            $content['site']['contact']['location'] = '1555 N Sierra St, Reno, NV 89503';
+        }
+        if (trim((string) ($content['site']['contact']['streetAddress'] ?? '')) === '') {
+            $content['site']['contact']['streetAddress'] = '1555 N Sierra St';
+            $content['site']['contact']['addressLocality'] = 'Reno';
+            $content['site']['contact']['addressRegion'] = 'NV';
+            $content['site']['contact']['postalCode'] = '89503';
         }
 
         $occasionStat = (string) ($content['site']['stats']['occasionArchetypes'] ?? '');

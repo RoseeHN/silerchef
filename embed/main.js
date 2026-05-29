@@ -1410,8 +1410,10 @@
             priceRange: '$$$',
             address: {
               '@type': 'PostalAddress',
-              addressLocality: 'Reno',
-              addressRegion: 'NV',
+              streetAddress: contact.streetAddress || '1555 N Sierra St',
+              addressLocality: contact.addressLocality || 'Reno',
+              addressRegion: contact.addressRegion || 'NV',
+              postalCode: contact.postalCode || '89503',
               addressCountry: 'US',
             },
             geo: {
@@ -1421,7 +1423,7 @@
             },
             hasMap:
               (contact.googleMapsHref && String(contact.googleMapsHref).trim()) ||
-              'https://www.google.com/maps/place/Siler+Chef+LLC/@39.5433344,-119.8216659,17z',
+              'https://www.google.com/maps/place/Siler+Chef+LLC/@39.5433344,-119.8216659,17z/data=!3m1!4b1!4m6!3m5!1s0xa180e099e5f7d05b:0x5f23cef288df732e!8m2!3d39.5433344!4d-119.8216659!16s%2Fg%2F11z80y9ty7',
             areaServed: [
               { '@type': 'City', name: 'Reno', containedInPlace: { '@type': 'State', name: 'Nevada' } },
               { '@type': 'AdministrativeArea', name: 'Lake Tahoe' },
@@ -1430,7 +1432,7 @@
             sameAs: (() => {
               const maps =
                 (contact.googleMapsHref && String(contact.googleMapsHref).trim()) ||
-                'https://www.google.com/maps/place/Siler+Chef+LLC/@39.5433344,-119.8216659,17z';
+                'https://www.google.com/maps/place/Siler+Chef+LLC/@39.5433344,-119.8216659,17z/data=!3m1!4b1!4m6!3m5!1s0xa180e099e5f7d05b:0x5f23cef288df732e!8m2!3d39.5433344!4d-119.8216659!16s%2Fg%2F11z80y9ty7';
               const list = [
                 maps,
                 contact.instagramHref || 'https://www.instagram.com/silerchef',

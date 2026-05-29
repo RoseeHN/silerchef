@@ -1142,7 +1142,23 @@
         <input id="hp-contact-website-href" type="url" value="${esc(site.contact.websiteHref)}" />
       </label>
       <label class="field field--full">
-        <span>Location line</span>
+        <span>Street address (Google Business Profile)</span>
+        <input id="hp-contact-street" type="text" value="${esc(site.contact.streetAddress || '')}" placeholder="1555 N Sierra St" />
+      </label>
+      <label class="field">
+        <span>City</span>
+        <input id="hp-contact-city" type="text" value="${esc(site.contact.addressLocality || 'Reno')}" />
+      </label>
+      <label class="field">
+        <span>State</span>
+        <input id="hp-contact-state" type="text" value="${esc(site.contact.addressRegion || 'NV')}" />
+      </label>
+      <label class="field">
+        <span>ZIP</span>
+        <input id="hp-contact-zip" type="text" value="${esc(site.contact.postalCode || '')}" placeholder="89503" />
+      </label>
+      <label class="field field--full">
+        <span>Location line (display)</span>
         <input id="hp-contact-location" type="text" value="${esc(site.contact.location)}" />
       </label>
       <label class="field field--advanced">
@@ -2121,6 +2137,10 @@
     next.site.contact.emailHref = byId('hp-contact-email-href').value.trim();
     next.site.contact.website = byId('hp-contact-website').value.trim();
     next.site.contact.websiteHref = byId('hp-contact-website-href').value.trim();
+    next.site.contact.streetAddress = byId('hp-contact-street').value.trim();
+    next.site.contact.addressLocality = byId('hp-contact-city').value.trim();
+    next.site.contact.addressRegion = byId('hp-contact-state').value.trim();
+    next.site.contact.postalCode = byId('hp-contact-zip').value.trim();
     next.site.contact.location = byId('hp-contact-location').value.trim();
     next.site.contact.googleMapsHref = byId('hp-contact-googlemaps').value.trim();
     next.site.contact.instagramHref = byId('hp-contact-instagram').value.trim();
