@@ -1327,9 +1327,20 @@
       if (contact.websiteHref) websiteLink.setAttribute('href', contact.websiteHref);
       if (contact.website != null) websiteLink.textContent = String(contact.website);
     }
-    const locationNode = document.querySelector('#contact .contact-col:last-child .contact-item:last-child div');
-    if (locationNode && contact.location != null) locationNode.textContent = String(contact.location);
+    const locationLink = document.querySelector('[data-contact-maps]');
+    if (locationLink) {
+      const mapsHref = String(contact.googleMapsHref ?? '').trim();
+      if (mapsHref && /^https?:\/\//i.test(mapsHref)) {
+        locationLink.setAttribute('href', mapsHref);
+        if (contact.location != null) locationLink.textContent = String(contact.location);
+        locationLink.removeAttribute('hidden');
+      } else if (contact.location != null) {
+        locationLink.textContent = String(contact.location);
+        locationLink.removeAttribute('href');
+      }
+    }
     const contactSocialMap = {
+      googlemaps: contact.googleMapsHref,
       instagram: contact.instagramHref,
       yelp: contact.yelpHref,
       facebook: contact.facebookHref,
@@ -1379,7 +1390,17 @@
             '@type': ['LocalBusiness', 'ProfessionalService'],
             '@id': 'https://www.silerchef.com/#business',
             name: 'Siler Chef',
-            alternateName: ['SilerChef', 'Chef Siler'],
+            legalName: 'Siler Chef LLC',
+            alternateName: ['SilerChef', 'silerchef', 'silerchef.com', 'Chef Siler', 'Private Chef Reno'],
+            slogan: 'Personal chef · Private dining · Reno · Tahoe · Bay Area',
+            knowsAbout: [
+              'Private chef',
+              'Personal chef',
+              'In-home dining',
+              'Reno Nevada',
+              'Lake Tahoe',
+              'San Francisco Bay Area',
+            ],
             url: 'https://www.silerchef.com/',
             image: 'https://www.silerchef.com/images/homepage/hero-01.jpg',
             logo: 'https://www.silerchef.com/images/brand/silerchef-logo.png',
@@ -1393,13 +1414,25 @@
               addressRegion: 'NV',
               addressCountry: 'US',
             },
+            geo: {
+              '@type': 'GeoCoordinates',
+              latitude: 39.5433344,
+              longitude: -119.8216659,
+            },
+            hasMap:
+              (contact.googleMapsHref && String(contact.googleMapsHref).trim()) ||
+              'https://www.google.com/maps/place/Siler+Chef+LLC/@39.5433344,-119.8216659,17z',
             areaServed: [
               { '@type': 'City', name: 'Reno', containedInPlace: { '@type': 'State', name: 'Nevada' } },
               { '@type': 'AdministrativeArea', name: 'Lake Tahoe' },
               { '@type': 'AdministrativeArea', name: 'San Francisco Bay Area' },
             ],
             sameAs: (() => {
+              const maps =
+                (contact.googleMapsHref && String(contact.googleMapsHref).trim()) ||
+                'https://www.google.com/maps/place/Siler+Chef+LLC/@39.5433344,-119.8216659,17z';
               const list = [
+                maps,
                 contact.instagramHref || 'https://www.instagram.com/silerchef',
                 contact.facebookHref || 'https://www.facebook.com/share/1Eea7fQpfV/?mibextid=wwXIfr',
               ];

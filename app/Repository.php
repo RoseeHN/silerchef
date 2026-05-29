@@ -1340,6 +1340,10 @@ final class Repository
         ], true)) {
             $content['site']['contact']['facebookHref'] = 'https://www.facebook.com/share/1Eea7fQpfV/?mibextid=wwXIfr';
         }
+        if (trim((string) ($content['site']['contact']['googleMapsHref'] ?? '')) === '') {
+            $content['site']['contact']['googleMapsHref'] =
+                'https://www.google.com/maps/place/Siler+Chef+LLC/@39.5433344,-119.8216659,17z';
+        }
 
         $occasionStat = (string) ($content['site']['stats']['occasionArchetypes'] ?? '');
         if ($occasionStat === '' || $occasionStat === '5') {
