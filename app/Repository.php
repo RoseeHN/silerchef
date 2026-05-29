@@ -1340,9 +1340,17 @@ final class Repository
         ], true)) {
             $content['site']['contact']['facebookHref'] = 'https://www.facebook.com/share/1Eea7fQpfV/?mibextid=wwXIfr';
         }
-        if (trim((string) ($content['site']['contact']['googleMapsHref'] ?? '')) === '') {
-            $content['site']['contact']['googleMapsHref'] =
-                'https://www.google.com/maps/place/Siler+Chef+LLC/@39.5433344,-119.8216659,17z/data=!3m1!4b1!4m6!3m5!1s0xa180e099e5f7d05b:0x5f23cef288df732e!8m2!3d39.5433344!4d-119.8216659!16s%2Fg%2F11z80y9ty7';
+        $gbpMapsHref =
+            'https://www.google.com/maps/place/Siler+Chef+LLC/@39.543334371593346,-119.82424082388114,17z/data=!4m6!3m5!1s0xa180e099e5f7d05b:0x5f23cef288df732e!8m2!3d39.543334371593346!4d-119.82424082388114!16s%2Fg%2F11z80y9ty7';
+        $gbpMapsEmbed =
+            'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3076.721583400254!2d-119.82424082388114!3d39.543334371593346!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xa180e099e5f7d05b%3A0x5f23cef288df732e!2sSiler%20Chef%20LLC!5e0!3m2!1str!2str!4v1780082158534!5m2!1str!2str';
+        $mapsHref = trim((string) ($content['site']['contact']['googleMapsHref'] ?? ''));
+        if (
+            $mapsHref === ''
+            || preg_match('#/place/@|/place//@|maps\.google\.com/maps\?#i', $mapsHref)
+            || str_contains($mapsHref, 'output=embed')
+        ) {
+            $content['site']['contact']['googleMapsHref'] = $gbpMapsHref;
         }
         $legacyLocations = ['Reno, Nevada, USA', 'Reno, Nevada'];
         if (in_array(trim((string) ($content['site']['contact']['location'] ?? '')), $legacyLocations, true)) {
@@ -1354,9 +1362,13 @@ final class Repository
             $content['site']['contact']['addressRegion'] = 'NV';
             $content['site']['contact']['postalCode'] = '89503';
         }
-        if (trim((string) ($content['site']['contact']['googleMapsEmbedSrc'] ?? '')) === '') {
-            $content['site']['contact']['googleMapsEmbedSrc'] =
-                'https://maps.google.com/maps?q=Siler+Chef+LLC,+1555+N+Sierra+St,+Reno,+NV+89503&hl=en&z=16&output=embed';
+        $mapsEmbed = trim((string) ($content['site']['contact']['googleMapsEmbedSrc'] ?? ''));
+        if (
+            $mapsEmbed === ''
+            || str_contains($mapsEmbed, 'maps.google.com/maps?q=')
+            || str_contains($mapsEmbed, 'output=embed')
+        ) {
+            $content['site']['contact']['googleMapsEmbedSrc'] = $gbpMapsEmbed;
         }
 
         $occasionStat = (string) ($content['site']['stats']['occasionArchetypes'] ?? '');

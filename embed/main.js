@@ -1,6 +1,27 @@
 'use strict';
 
 (function () {
+  const GBP_MAPS_HREF =
+    'https://www.google.com/maps/place/Siler+Chef+LLC/@39.543334371593346,-119.82424082388114,17z/data=!4m6!3m5!1s0xa180e099e5f7d05b:0x5f23cef288df732e!8m2!3d39.543334371593346!4d-119.82424082388114!16s%2Fg%2F11z80y9ty7';
+  const GBP_MAPS_EMBED =
+    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3076.721583400254!2d-119.82424082388114!3d39.543334371593346!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xa180e099e5f7d05b%3A0x5f23cef288df732e!2sSiler%20Chef%20LLC!5e0!3m2!1str!2str!4v1780082158534!5m2!1str!2str';
+
+  function normalizeGoogleMapsHref(href) {
+    const raw = String(href ?? '').trim();
+    if (!raw || /\/place\/@|\/place\/\/@|maps\.google\.com\/maps\?/i.test(raw) || raw.includes('output=embed')) {
+      return GBP_MAPS_HREF;
+    }
+    return raw;
+  }
+
+  function normalizeGoogleMapsEmbed(src) {
+    const raw = String(src ?? '').trim();
+    if (!raw || raw.includes('maps.google.com/maps?q=') || raw.includes('output=embed')) {
+      return GBP_MAPS_EMBED;
+    }
+    return raw;
+  }
+
   /** Full lists shipped in JS — merged with API `cuisineCards` / `serviceCards` so older saved JSON cannot drop slugs. */
   const CUISINES_CANONICAL = [
     {
@@ -1329,7 +1350,7 @@
     }
     const locationLink = document.querySelector('[data-contact-maps]');
     if (locationLink) {
-      const mapsHref = String(contact.googleMapsHref ?? '').trim();
+      const mapsHref = normalizeGoogleMapsHref(contact.googleMapsHref);
       if (mapsHref && /^https?:\/\//i.test(mapsHref)) {
         locationLink.setAttribute('href', mapsHref);
         if (contact.location != null) locationLink.textContent = String(contact.location);
@@ -1341,24 +1362,11 @@
     }
     const mapFrame = document.querySelector('[data-contact-map]');
     if (mapFrame) {
-      const embedSrc = String(contact.googleMapsEmbedSrc ?? '').trim();
+      const embedSrc = normalizeGoogleMapsEmbed(contact.googleMapsEmbedSrc);
       if (embedSrc && /^https?:\/\//i.test(embedSrc)) {
         mapFrame.setAttribute('src', embedSrc);
       } else {
-        const parts = [
-          contact.streetAddress,
-          contact.addressLocality,
-          contact.addressRegion,
-          contact.postalCode,
-        ]
-          .map((v) => String(v ?? '').trim())
-          .filter(Boolean);
-        if (parts.length) {
-          mapFrame.setAttribute(
-            'src',
-            `https://maps.google.com/maps?q=${encodeURIComponent(parts.join(', '))}&hl=en&z=16&output=embed`
-          );
-        }
+        mapFrame.setAttribute('src', GBP_MAPS_EMBED);
       }
       const mapTitle = contact.location
         ? `Siler Chef — ${contact.location} on Google Maps`
@@ -1366,7 +1374,7 @@
       mapFrame.setAttribute('title', mapTitle);
     }
     const contactSocialMap = {
-      googlemaps: contact.googleMapsHref,
+      googlemaps: normalizeGoogleMapsHref(contact.googleMapsHref),
       instagram: contact.instagramHref,
       yelp: contact.yelpHref,
       facebook: contact.facebookHref,
@@ -1447,18 +1455,14 @@
               latitude: 39.5433344,
               longitude: -119.8216659,
             },
-            hasMap:
-              (contact.googleMapsHref && String(contact.googleMapsHref).trim()) ||
-              'https://www.google.com/maps/place/Siler+Chef+LLC/@39.5433344,-119.8216659,17z/data=!3m1!4b1!4m6!3m5!1s0xa180e099e5f7d05b:0x5f23cef288df732e!8m2!3d39.5433344!4d-119.8216659!16s%2Fg%2F11z80y9ty7',
+            hasMap: normalizeGoogleMapsHref(contact.googleMapsHref),
             areaServed: [
               { '@type': 'City', name: 'Reno', containedInPlace: { '@type': 'State', name: 'Nevada' } },
               { '@type': 'AdministrativeArea', name: 'Lake Tahoe' },
               { '@type': 'AdministrativeArea', name: 'San Francisco Bay Area' },
             ],
             sameAs: (() => {
-              const maps =
-                (contact.googleMapsHref && String(contact.googleMapsHref).trim()) ||
-                'https://www.google.com/maps/place/Siler+Chef+LLC/@39.5433344,-119.8216659,17z/data=!3m1!4b1!4m6!3m5!1s0xa180e099e5f7d05b:0x5f23cef288df732e!8m2!3d39.5433344!4d-119.8216659!16s%2Fg%2F11z80y9ty7';
+              const maps = normalizeGoogleMapsHref(contact.googleMapsHref);
               const list = [
                 maps,
                 contact.instagramHref || 'https://www.instagram.com/silerchef',

@@ -1163,7 +1163,7 @@
       </label>
       <label class="field field--advanced field--full">
         <span>Google Maps embed URL (iframe src)</span>
-        <input id="hp-contact-googlemaps-embed" type="url" value="${esc(site.contact.googleMapsEmbedSrc || '')}" placeholder="https://maps.google.com/maps?q=..." />
+        <input id="hp-contact-googlemaps-embed" type="url" value="${esc(site.contact.googleMapsEmbedSrc || '')}" placeholder="https://www.google.com/maps/embed?pb=..." />
       </label>
       <label class="field field--advanced">
         <span>Google Maps / Business Profile</span>
