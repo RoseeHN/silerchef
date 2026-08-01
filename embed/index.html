@@ -226,14 +226,6 @@
       media="print"
       onload="this.media='all'"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-      media="print"
-      onload="this.media='all'"
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
     <noscript>
       <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap"
@@ -245,11 +237,32 @@
         crossorigin="anonymous"
         referrerpolicy="no-referrer"
       />
-      <link rel="stylesheet" href="styles.css?v=sc-20260801p" />
-      <link rel="stylesheet" href="gallery.css?v=sc-20260801p" />
+      <link rel="stylesheet" href="styles.css?v=sc-20260801p2" />
+      <link rel="stylesheet" href="gallery.css?v=sc-20260801p2" />
     </noscript>
-    <link rel="stylesheet" href="styles.css?v=sc-20260801p" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="gallery.css?v=sc-20260801p" media="print" onload="this.media='all'" />
+    <script>
+      // Font Awesome is non-critical — load after first paint to protect LCP.
+      (function () {
+        function loadFa() {
+          var l = document.createElement('link');
+          l.rel = 'stylesheet';
+          l.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css';
+          l.crossOrigin = 'anonymous';
+          l.referrerPolicy = 'no-referrer';
+          document.head.appendChild(l);
+        }
+        if ('requestIdleCallback' in window) requestIdleCallback(loadFa, { timeout: 2500 });
+        else window.addEventListener('load', function () { setTimeout(loadFa, 1); });
+      })();
+    </script>
+    <!-- Core layout CSS must stay render-blocking for LCP; gallery styles can wait. -->
+    <link rel="stylesheet" href="styles.css?v=sc-20260801p2" />
+    <link
+      rel="stylesheet"
+      href="gallery.css?v=sc-20260801p2"
+      media="print"
+      onload="this.media='all'"
+    />
     <link rel="icon" type="image/png" href="images/brand/silerchef-logo.png" />
   </head>
   <body>
@@ -1779,7 +1792,7 @@
         if (c) window.__SILERCHEF_API_BASE__ = c;
       })();
     </script>
-    <script src="data.js?v=sc-20260801p" defer></script>
-    <script src="main.js?v=sc-20260801p" defer></script>
+    <script src="data.js?v=sc-20260801p2" defer></script>
+    <script src="main.js?v=sc-20260801p2" defer></script>
   </body>
 </html>
