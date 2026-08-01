@@ -318,30 +318,29 @@
         .hero-inner--split { grid-template-columns: 1fr; }
       }
     </style>
-    <!-- Defer full CSS/fonts until after the LCP image has a head start. -->
-    <script>
-      (function () {
-        var hrefs = [
-          'styles.min.css?v=sc-20260801f7',
-          'fonts-display.css?v=sc-20260801f7',
-          'gallery.css?v=sc-20260801f7',
-        ];
-        function loadStyles() {
-          hrefs.forEach(function (href) {
-            var link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = href;
-            document.head.appendChild(link);
-          });
-        }
-        if (document.readyState === 'complete') loadStyles();
-        else window.addEventListener('load', loadStyles, { once: true });
-      })();
-    </script>
+    <!-- Non-blocking CSS: critical hero styles above paint first; full CSS follows without blocking parse. -->
+    <link
+      rel="stylesheet"
+      href="styles.min.css?v=sc-20260801f8"
+      media="print"
+      onload="this.media='all'"
+    />
+    <link
+      rel="stylesheet"
+      href="fonts-display.css?v=sc-20260801f8"
+      media="print"
+      onload="this.media='all'"
+    />
+    <link
+      rel="stylesheet"
+      href="gallery.css?v=sc-20260801f8"
+      media="print"
+      onload="this.media='all'"
+    />
     <noscript>
-      <link rel="stylesheet" href="styles.min.css?v=sc-20260801f7" />
-      <link rel="stylesheet" href="fonts-display.css?v=sc-20260801f7" />
-      <link rel="stylesheet" href="gallery.css?v=sc-20260801f7" />
+      <link rel="stylesheet" href="styles.min.css?v=sc-20260801f8" />
+      <link rel="stylesheet" href="fonts-display.css?v=sc-20260801f8" />
+      <link rel="stylesheet" href="gallery.css?v=sc-20260801f8" />
     </noscript>
     <link rel="icon" type="image/png" href="images/brand/silerchef-logo.png" />
   </head>
@@ -1891,7 +1890,7 @@
         if (c) window.__SILERCHEF_API_BASE__ = c;
       })();
     </script>
-    <script src="data.js?v=sc-20260801f7" defer></script>
-    <script src="main.js?v=sc-20260801f7" defer></script>
+    <script src="data.js?v=sc-20260801f8" defer></script>
+    <script src="main.js?v=sc-20260801f8" defer></script>
   </body>
 </html>
