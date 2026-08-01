@@ -5,7 +5,7 @@ declare(strict_types=1);
 final class Blog
 {
     private const SITE_ORIGIN = 'https://www.silerchef.com';
-    private const ASSET_VERSION = 'sc-20260529c';
+    private const ASSET_VERSION = 'sc-20260802a';
 
     /** @var list<array<string, mixed>>|null */
     private static ?array $posts = null;
@@ -55,6 +55,7 @@ final class Blog
                 'published' => trim((string) ($row['published'] ?? '')),
                 'updated' => trim((string) ($row['updated'] ?? $row['published'] ?? '')),
                 'image' => trim((string) ($row['image'] ?? 'images/homepage/hero-01.jpg')),
+                'imageAlt' => trim((string) ($row['imageAlt'] ?? '')),
                 'tags' => is_array($row['tags'] ?? null) ? array_values(array_filter($row['tags'], 'is_string')) : [],
                 'bodyHtml' => (string) ($row['bodyHtml'] ?? ''),
             ];
@@ -79,6 +80,61 @@ final class Blog
         }
 
         return null;
+    }
+
+    /**
+     * Related journal posts for internal linking (shared tags first, then recency).
+     *
+     * @param array<string, mixed> $post
+     * @return list<array<string, mixed>>
+     */
+    public static function relatedPosts(array $post, int $limit = 3): array
+    {
+        $slug = (string) ($post['slug'] ?? '');
+        $tags = array_map('strval', is_array($post['tags'] ?? null) ? $post['tags'] : []);
+        $tagSet = array_fill_keys(array_map('strtolower', $tags), true);
+        $scored = [];
+
+        foreach (self::posts() as $candidate) {
+            if ((string) $candidate['slug'] === $slug) {
+                continue;
+            }
+            $score = 0;
+            foreach ($candidate['tags'] as $tag) {
+                if (isset($tagSet[strtolower((string) $tag)])) {
+                    $score += 3;
+                }
+            }
+            // Soft boost for same service-area keywords in title/slug.
+            $hay = strtolower((string) $candidate['slug'] . ' ' . (string) $candidate['title']);
+            foreach (['reno', 'tahoe', 'bay-area', 'bay area'] as $place) {
+                if (str_contains($hay, $place) && str_contains(strtolower($slug . ' ' . (string) ($post['title'] ?? '')), $place)) {
+                    $score += 1;
+                }
+            }
+            $scored[] = ['score' => $score, 'published' => (string) $candidate['published'], 'post' => $candidate];
+        }
+
+        usort(
+            $scored,
+            static function (array $a, array $b): int {
+                if ($a['score'] !== $b['score']) {
+                    return $b['score'] <=> $a['score'];
+                }
+
+                return strcmp($b['published'], $a['published']);
+            }
+        );
+
+        $out = [];
+        foreach ($scored as $row) {
+            $out[] = $row['post'];
+            if (count($out) >= $limit) {
+                break;
+            }
+        }
+
+        return $out;
     }
 
     public static function urlForPost(string $slug): string

@@ -4,6 +4,7 @@ require __DIR__ . '/blog-layout-head.php';
 $slug = (string) $post['slug'];
 $published = (string) $post['published'];
 $tags = is_array($post['tags']) ? $post['tags'] : [];
+$related = Blog::relatedPosts($post, 3);
 ?>
     <main class="blog-main blog-main--article">
       <article class="blog-article blog-shell">
@@ -41,13 +42,47 @@ $tags = is_array($post['tags']) ? $post['tags'] : [];
           <?= (string) $post['bodyHtml'] ?>
         </div>
         <footer class="blog-article__footer">
-          <p>Planning a private table in Reno, Lake Tahoe, or the Bay Area?</p>
+          <h2 class="blog-article__cta-title">Plan your private chef evening</h2>
+          <p>
+            Siler Chef serves Reno, Lake Tahoe, and the Bay Area. Share your date, location, guest count, and dietary notes —
+            we follow up with timing and menu direction.
+          </p>
           <div class="blog-article__actions">
             <a class="btn btn-primary" href="/#contact">Reserve your date</a>
             <a class="btn btn-ghost" href="/#cuisines">Explore sample menus</a>
+            <a class="btn btn-ghost" href="/gallery">View the gallery</a>
           </div>
         </footer>
       </article>
+      <?php if ($related !== []): ?>
+        <aside class="blog-related blog-shell" aria-labelledby="blog-related-title">
+          <h2 id="blog-related-title" class="blog-related__title gold-text">Continue reading</h2>
+          <ul class="blog-related__list">
+            <?php foreach ($related as $item): ?>
+              <?php
+                $relHref = '/blog/' . htmlspecialchars((string) $item['slug'], ENT_QUOTES, 'UTF-8');
+                $relImg = '/' . ltrim((string) $item['image'], '/');
+              ?>
+              <li>
+                <a class="blog-related__card" href="<?= $relHref ?>">
+                  <img
+                    src="<?= htmlspecialchars($relImg, ENT_QUOTES, 'UTF-8') ?>"
+                    alt="<?= htmlspecialchars(Blog::coverAlt($item), ENT_QUOTES, 'UTF-8') ?>"
+                    width="480"
+                    height="360"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span class="blog-related__copy">
+                    <strong><?= htmlspecialchars((string) $item['title'], ENT_QUOTES, 'UTF-8') ?></strong>
+                    <em><?= htmlspecialchars(Blog::excerpt((string) ($item['description'] ?: $item['bodyHtml']), 110), ENT_QUOTES, 'UTF-8') ?></em>
+                  </span>
+                </a>
+              </li>
+            <?php endforeach; ?>
+          </ul>
+        </aside>
+      <?php endif; ?>
     </main>
     <script type="application/ld+json">
       <?= json_encode(
