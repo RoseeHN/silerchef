@@ -591,7 +591,7 @@
           im.fetchPriority = 'low';
         }
       } else {
-        im.loading = idx < 12 ? 'eager' : 'lazy';
+        im.loading = idx < 2 ? 'eager' : 'lazy';
         if (idx < 3 && 'fetchPriority' in im) {
           im.fetchPriority = idx === 0 ? 'high' : 'auto';
         }
@@ -964,7 +964,21 @@
       seq2.setAttribute('aria-hidden', 'true');
 
       cards.forEach((c) => seq1.appendChild(c));
-      cards.forEach((c) => seq2.appendChild(c.cloneNode(true)));
+      cards.forEach((c) => {
+        const clone = c.cloneNode(true);
+        clone.querySelectorAll('video').forEach((v) => {
+          v.preload = 'none';
+          v.removeAttribute('autoplay');
+          try {
+            v.pause();
+          } catch (_) {}
+          // Avoid duplicate network work from the marquee clone strip.
+          v.removeAttribute('src');
+          v.querySelectorAll('source').forEach((s) => s.remove());
+          v.load();
+        });
+        seq2.appendChild(clone);
+      });
 
       track.appendChild(seq1);
       track.appendChild(seq2);

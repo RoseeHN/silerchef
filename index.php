@@ -439,8 +439,13 @@ function serve_embed_file(string $requestPath, string|false $embedDir, string $r
     if (str_ends_with($candidate, '/admin.html')) {
         header('X-Robots-Tag: noindex, nofollow');
     }
-    if (preg_match('/\.(css|js|png|jpg|jpeg|svg|webp|gif|xml|txt|html|mp4|webm|mov)$/i', $candidate)) {
-        header('Cache-Control: public, max-age=' . (preg_match('/\.html$/i', $candidate) ? '0, must-revalidate' : '3600'));
+    if (preg_match('/\.html$/i', $candidate)) {
+        header('Cache-Control: public, max-age=0, must-revalidate');
+    } elseif (preg_match('/\.(css|js)$/i', $candidate)) {
+        // Fingerprinted via ?v= query in HTML — long cache is safe for repeat visits.
+        header('Cache-Control: public, max-age=604800');
+    } elseif (preg_match('/\.(png|jpg|jpeg|svg|webp|gif|mp4|webm|mov|xml|txt)$/i', $candidate)) {
+        header('Cache-Control: public, max-age=604800');
     }
 
     $method = strtoupper($requestMethod);
@@ -464,8 +469,7 @@ function serve_embed_file(string $requestPath, string|false $embedDir, string $r
         http_response_code(200);
         header('Content-Type: ' . $mime);
         header('Link: <https://www.silerchef.com/sitemap.xml>; rel="sitemap"', false);
-        echo inject_google_site_verification((string) file_get_contents($candidate));
-        exit;
+        respond_possibly_gzipped(inject_google_site_verification((string) file_get_contents($candidate)), $mime);
     }
 
     if (embed_media_supports_range_requests($candidate)) {
@@ -474,7 +478,34 @@ function serve_embed_file(string $requestPath, string|false $embedDir, string $r
 
     http_response_code(200);
     header('Content-Type: ' . $mime);
+    if (preg_match('/\.(css|js|svg|xml|txt)$/i', $candidate)) {
+        respond_possibly_gzipped((string) file_get_contents($candidate), $mime);
+    }
     readfile($candidate);
+    exit;
+}
+
+/** Gzip text responses when the client accepts it (PageSpeed text-compression). */
+function respond_possibly_gzipped(string $body, string $mime): never
+{
+    $accept = (string) ($_SERVER['HTTP_ACCEPT_ENCODING'] ?? '');
+    if (
+        function_exists('gzencode')
+        && $body !== ''
+        && stripos($accept, 'gzip') !== false
+        && preg_match('#^(text/|application/(javascript|json|xml)|image/svg\+xml)#i', $mime)
+    ) {
+        $gz = gzencode($body, 6);
+        if ($gz !== false && strlen($gz) < strlen($body)) {
+            header('Content-Encoding: gzip');
+            header('Vary: Accept-Encoding');
+            header('Content-Length: ' . (string) strlen($gz));
+            echo $gz;
+            exit;
+        }
+    }
+    header('Content-Length: ' . (string) strlen($body));
+    echo $body;
     exit;
 }
 

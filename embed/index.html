@@ -211,29 +211,45 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+    <style>
+      html { background: #141214; }
+      body {
+        margin: 0;
+        background: #141214;
+        color: rgba(243, 234, 209, 0.92);
+        font-family: Outfit, system-ui, sans-serif;
+      }
+    </style>
     <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
     <link
-      rel="preload"
+      rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-      as="style"
+      media="print"
+      onload="this.media='all'"
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
-      onload="this.onload=null;this.rel='stylesheet'"
     />
     <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap"
+        rel="stylesheet"
+      />
       <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
         crossorigin="anonymous"
         referrerpolicy="no-referrer"
       />
+      <link rel="stylesheet" href="styles.css?v=sc-20260801p" />
+      <link rel="stylesheet" href="gallery.css?v=sc-20260801p" />
     </noscript>
-    <link rel="stylesheet" href="styles.css?v=sc-20260529c" />
-    <link rel="stylesheet" href="gallery.css?v=sc-20260514b" />
+    <link rel="stylesheet" href="styles.css?v=sc-20260801p" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="gallery.css?v=sc-20260801p" media="print" onload="this.media='all'" />
     <link rel="icon" type="image/png" href="images/brand/silerchef-logo.png" />
   </head>
   <body>
@@ -663,14 +679,10 @@
                     playsinline
                     webkit-playsinline
                     disableremoteplayback
-                    preload="metadata"
+                    preload="none"
                     poster="images/gallery-curated/posters/01-6f3dd371cb81478db17cbcd94472dae5.jpg"
                   >
-                    <source
-                      src="images/gallery-curated/videos/01-6f3dd371cb81478db17cbcd94472dae5.opt.mp4"
-                      type="video/mp4"
-                    />
-                    <source
+<source
                       src="images/gallery-curated/videos/01-6f3dd371cb81478db17cbcd94472dae5.mp4"
                       type="video/mp4"
                     />
@@ -690,11 +702,10 @@
                     playsinline
                     webkit-playsinline
                     disableremoteplayback
-                    preload="metadata"
+                    preload="none"
                     poster="images/gallery-curated/posters/02-img-3927.jpg"
                   >
-                    <source src="images/gallery-curated/videos/02-img-3927.opt.mp4" type="video/mp4" />
-                    <source src="images/gallery-curated/videos/02-img-3927.mp4" type="video/mp4" />
+<source src="images/gallery-curated/videos/02-img-3927.mp4" type="video/mp4" />
                   </video>
                 </div>
                 <div class="video-card__meta">
@@ -711,11 +722,10 @@
                     playsinline
                     webkit-playsinline
                     disableremoteplayback
-                    preload="metadata"
+                    preload="none"
                     poster="images/gallery-curated/posters/03-img-4367.jpg"
                   >
-                    <source src="images/gallery-curated/videos/03-img-4367.opt.mp4" type="video/mp4" />
-                    <source src="images/gallery-curated/videos/03-img-4367.mp4" type="video/mp4" />
+<source src="images/gallery-curated/videos/03-img-4367.mp4" type="video/mp4" />
                   </video>
                 </div>
                 <div class="video-card__meta">
@@ -732,11 +742,10 @@
                     playsinline
                     webkit-playsinline
                     disableremoteplayback
-                    preload="metadata"
+                    preload="none"
                     poster="images/gallery-curated/posters/04-img-4368.jpg"
                   >
-                    <source src="images/gallery-curated/videos/04-img-4368.opt.mp4" type="video/mp4" />
-                    <source src="images/gallery-curated/videos/04-img-4368.mp4" type="video/mp4" />
+<source src="images/gallery-curated/videos/04-img-4368.mp4" type="video/mp4" />
                   </video>
                 </div>
                 <div class="video-card__meta">
@@ -753,11 +762,10 @@
                     playsinline
                     webkit-playsinline
                     disableremoteplayback
-                    preload="metadata"
+                    preload="none"
                     poster="images/gallery-curated/posters/05-49847c0891a34c0083cbf223c3464865.jpg"
                   >
-                    <source src="images/gallery-curated/videos/05-49847c0891a34c0083cbf223c3464865.opt.mp4" type="video/mp4" />
-                    <source src="images/gallery-curated/videos/05-49847c0891a34c0083cbf223c3464865.mp4" type="video/mp4" />
+<source src="images/gallery-curated/videos/05-49847c0891a34c0083cbf223c3464865.mp4" type="video/mp4" />
                   </video>
                 </div>
                 <div class="video-card__meta">
@@ -1771,7 +1779,7 @@
         if (c) window.__SILERCHEF_API_BASE__ = c;
       })();
     </script>
-    <script src="data.js?v=sc-20260529c" defer></script>
-    <script src="main.js?v=sc-20260529c" defer></script>
+    <script src="data.js?v=sc-20260801p" defer></script>
+    <script src="main.js?v=sc-20260801p" defer></script>
   </body>
 </html>

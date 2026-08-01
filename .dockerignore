@@ -10,3 +10,8 @@ npm-debug.log*
 .cursor
 **/agent-tools
 **/agent-transcripts
+
+*.mov
+**/*.mov
+*.bak
+**/*.bak
