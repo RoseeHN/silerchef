@@ -27,7 +27,23 @@ function json_response(array $payload, int $status = 200): never
 {
     http_response_code($status);
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    $body = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    if (!is_string($body)) {
+        $body = '{}';
+    }
+    $accept = (string) ($_SERVER['HTTP_ACCEPT_ENCODING'] ?? '');
+    if (function_exists('gzencode') && $body !== '' && stripos($accept, 'gzip') !== false) {
+        $gz = gzencode($body, 6);
+        if ($gz !== false && strlen($gz) < strlen($body)) {
+            header('Content-Encoding: gzip');
+            header('Vary: Accept-Encoding');
+            header('Content-Length: ' . (string) strlen($gz));
+            echo $gz;
+            exit;
+        }
+    }
+    header('Content-Length: ' . (string) strlen($body));
+    echo $body;
     exit;
 }
 

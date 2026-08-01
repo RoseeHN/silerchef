@@ -1245,14 +1245,26 @@
     const featuredImg = document.getElementById('experience-featured-img');
     const hostingImg = document.getElementById('experience-hosting-img');
     const guestImg = document.getElementById('experience-guest-img');
+    const optimizedImage = (url) => {
+      const map = {
+        'images/gallery-curated/photos/03-kalamata-food-17.jpg':
+          'images/gallery-curated/photos/03-kalamata-food-17-640.webp',
+        'images/gallery-curated/photos/03-kalamata-food-17.webp':
+          'images/gallery-curated/photos/03-kalamata-food-17-640.webp',
+        'images/homepage/hero-02.jpg': 'images/homepage/hero-02-480.webp',
+        'images/homepage/hero-03.jpg': 'images/homepage/hero-03-480.webp',
+      };
+      const key = String(url || '').trim();
+      return map[key] || key;
+    };
     if (featuredImg && typeof experience.featuredImage === 'string' && experience.featuredImage.trim()) {
-      featuredImg.src = experience.featuredImage.trim();
+      featuredImg.src = optimizedImage(experience.featuredImage);
     }
     if (hostingImg && typeof experience.hostingImage === 'string' && experience.hostingImage.trim()) {
-      hostingImg.src = experience.hostingImage.trim();
+      hostingImg.src = optimizedImage(experience.hostingImage);
     }
     if (guestImg && typeof experience.guestImage === 'string' && experience.guestImage.trim()) {
-      guestImg.src = experience.guestImage.trim();
+      guestImg.src = optimizedImage(experience.guestImage);
     }
     setNodeText('#experience-hosting-eyebrow', experience.hostingEyebrow);
     setNodeText('#experience-hosting-title', experience.hostingTitle);
