@@ -444,7 +444,7 @@ function serve_embed_file(string $requestPath, string|false $embedDir, string $r
     } elseif (preg_match('/\.(css|js)$/i', $candidate)) {
         // Fingerprinted via ?v= query in HTML — long cache is safe for repeat visits.
         header('Cache-Control: public, max-age=604800');
-    } elseif (preg_match('/\.(png|jpg|jpeg|svg|webp|gif|mp4|webm|mov|xml|txt)$/i', $candidate)) {
+    } elseif (preg_match('/\.(png|jpg|jpeg|svg|webp|gif|mp4|webm|mov|woff2?|xml|txt)$/i', $candidate)) {
         header('Cache-Control: public, max-age=604800');
     }
 

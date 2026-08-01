@@ -37,7 +37,16 @@
     <link rel="sitemap" type="application/xml" title="Sitemap" href="https://www.silerchef.com/sitemap.xml" />
     <link rel="alternate" hreflang="en-US" href="https://www.silerchef.com/" />
     <link rel="alternate" hreflang="x-default" href="https://www.silerchef.com/" />
-    <link rel="preload" as="image" href="images/homepage/hero-01.jpg" fetchpriority="high" />
+    <link
+      rel="preload"
+      as="image"
+      type="image/webp"
+      imagesrcset="images/homepage/hero-01-480.webp 480w, images/homepage/hero-01-800.webp 800w, images/homepage/hero-01-1200.webp 1200w"
+      imagesizes="(max-width: 900px) 100vw, 48vw"
+      fetchpriority="high"
+    />
+    <link rel="preload" href="fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="fonts/playfair-500.woff2" as="font" type="font/woff2" crossorigin />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Siler Chef" />
@@ -209,8 +218,6 @@
       }
     </script>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <style>
       html { background: #141214; }
       body {
@@ -220,28 +227,18 @@
         font-family: Outfit, system-ui, sans-serif;
       }
     </style>
+    <link rel="stylesheet" href="fonts.css?v=sc-20260801f1" />
+    <!-- Core layout CSS must stay render-blocking for LCP; gallery styles can wait. -->
+    <link rel="stylesheet" href="styles.css?v=sc-20260801f1" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap"
       rel="stylesheet"
+      href="gallery.css?v=sc-20260801f1"
       media="print"
       onload="this.media='all'"
     />
     <noscript>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap"
-        rel="stylesheet"
-      />
-      <link rel="stylesheet" href="styles.css?v=sc-20260801p5" />
-      <link rel="stylesheet" href="gallery.css?v=sc-20260801p5" />
+      <link rel="stylesheet" href="gallery.css?v=sc-20260801f1" />
     </noscript>
-    <!-- Core layout CSS must stay render-blocking for LCP; gallery styles can wait. -->
-    <link rel="stylesheet" href="styles.css?v=sc-20260801p5" />
-    <link
-      rel="stylesheet"
-      href="gallery.css?v=sc-20260801p5"
-      media="print"
-      onload="this.media='all'"
-    />
     <link rel="icon" type="image/png" href="images/brand/silerchef-logo.png" />
   </head>
   <body>
@@ -253,15 +250,18 @@
         <a class="brand-lockup" href="#home">
           <span class="brand-lockup__shell">
             <span class="brand-mark" aria-hidden="true">
-              <img
-                class="brand-logo brand-logo--header"
-                src="images/brand/silerchef-logo.png"
-                width="48"
-                height="48"
-                alt=""
-                decoding="async"
-                fetchpriority="low"
-              />
+              <picture>
+                <source type="image/webp" srcset="images/brand/silerchef-logo.webp" />
+                <img
+                  class="brand-logo brand-logo--header"
+                  src="images/brand/silerchef-logo.png"
+                  width="48"
+                  height="48"
+                  alt=""
+                  decoding="async"
+                  fetchpriority="low"
+                />
+              </picture>
             </span>
             <span class="brand-text">
               <strong>Siler Chef</strong>
@@ -322,37 +322,56 @@
             </div>
             <figure class="hero-frame hero-frame--feature hero-frame--rotator" aria-label="Chef Fikret Siler">
               <div class="hero-rotator">
-                <img
-                  class="hero-rotator__slide is-active"
-                  src="images/homepage/hero-01.jpg"
-                  alt="Chef Fikret Siler finishing French madeleines in the kitchen"
-                  width="1290"
-                  height="1139"
-                  loading="eager"
-                  decoding="async"
-                  fetchpriority="high"
-                  sizes="(max-width: 900px) 100vw, 48vw"
-                />
-                <img
-                  class="hero-rotator__slide"
-                  data-src="images/homepage/hero-02.jpg"
-                  alt="Chef Fikret Siler glazing mango cheesecake"
-                  width="1290"
-                  height="1139"
-                  loading="lazy"
-                  decoding="async"
-                  sizes="(max-width: 900px) 100vw, 48vw"
-                />
-                <img
-                  class="hero-rotator__slide"
-                  data-src="images/homepage/hero-03.jpg"
-                  alt="Chef Fikret Siler piping meringue"
-                  width="1290"
-                  height="1139"
-                  loading="lazy"
-                  decoding="async"
-                  sizes="(max-width: 900px) 100vw, 48vw"
-                />
+                <picture class="hero-rotator__slide is-active">
+                  <source
+                    type="image/webp"
+                    srcset="
+                      images/homepage/hero-01-480.webp 480w,
+                      images/homepage/hero-01-800.webp 800w,
+                      images/homepage/hero-01-1200.webp 1200w
+                    "
+                    sizes="(max-width: 900px) 100vw, 48vw"
+                  />
+                  <img
+                    src="images/homepage/hero-01-800.jpg"
+                    alt="Chef Fikret Siler finishing French madeleines in the kitchen"
+                    width="1290"
+                    height="1139"
+                    loading="eager"
+                    decoding="async"
+                    fetchpriority="high"
+                    sizes="(max-width: 900px) 100vw, 48vw"
+                    srcset="
+                      images/homepage/hero-01-480.jpg 480w,
+                      images/homepage/hero-01-800.jpg 800w,
+                      images/homepage/hero-01-1200.jpg 1200w
+                    "
+                  />
+                </picture>
+                <picture class="hero-rotator__slide">
+                  <img
+                    data-src="images/homepage/hero-02.webp"
+                    data-src-fallback="images/homepage/hero-02.jpg"
+                    alt="Chef Fikret Siler glazing mango cheesecake"
+                    width="1290"
+                    height="1139"
+                    loading="lazy"
+                    decoding="async"
+                    sizes="(max-width: 900px) 100vw, 48vw"
+                  />
+                </picture>
+                <picture class="hero-rotator__slide">
+                  <img
+                    data-src="images/homepage/hero-03.webp"
+                    data-src-fallback="images/homepage/hero-03.jpg"
+                    alt="Chef Fikret Siler piping meringue"
+                    width="1290"
+                    height="1139"
+                    loading="lazy"
+                    decoding="async"
+                    sizes="(max-width: 900px) 100vw, 48vw"
+                  />
+                </picture>
               </div>
             </figure>
             <div class="hero-floating-card hero-floating-card--south">
@@ -363,14 +382,17 @@
           <div class="hero-panel hero-panel--copy">
             <div class="hero-copy-lead">
               <div class="hero-copy-top">
-                <img
-                  class="brand-logo brand-logo--hero-inline"
-                  src="images/brand/silerchef-logo.png"
-                  width="52"
-                  height="52"
-                  alt=""
-                  decoding="async"
-                />
+                <picture>
+                  <source type="image/webp" srcset="images/brand/silerchef-logo.webp" />
+                  <img
+                    class="brand-logo brand-logo--hero-inline"
+                    src="images/brand/silerchef-logo.png"
+                    width="52"
+                    height="52"
+                    alt=""
+                    decoding="async"
+                  />
+                </picture>
                 <p class="hero-eyebrow">Siler Chef · Reno–Tahoe</p>
               </div>
               <h1 class="gold-text hero-headline">Siler Chef — Private &amp; Personal Chef in Reno, Lake Tahoe &amp; the Bay Area</h1>
@@ -1759,7 +1781,7 @@
         if (c) window.__SILERCHEF_API_BASE__ = c;
       })();
     </script>
-    <script src="data.js?v=sc-20260801p5" defer></script>
-    <script src="main.js?v=sc-20260801p5" defer></script>
+    <script src="data.js?v=sc-20260801f1" defer></script>
+    <script src="main.js?v=sc-20260801f1" defer></script>
   </body>
 </html>

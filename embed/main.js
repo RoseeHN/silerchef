@@ -1921,12 +1921,14 @@
     }
     let idx = 0;
     function ensureSlideSrc(slide) {
-      if (!slide || slide.getAttribute('src')) return;
-      const pending = slide.getAttribute('data-src');
-      if (pending) {
-        slide.setAttribute('src', pending);
-        slide.removeAttribute('data-src');
-      }
+      if (!slide) return;
+      const img = slide.tagName === 'IMG' ? slide : slide.querySelector('img');
+      if (!img || img.getAttribute('src')) return;
+      const pending = img.getAttribute('data-src');
+      if (!pending) return;
+      img.setAttribute('src', pending);
+      img.removeAttribute('data-src');
+      img.removeAttribute('data-src-fallback');
     }
     window.setInterval(() => {
       idx = (idx + 1) % slides.length;
