@@ -1924,8 +1924,17 @@
       return;
     }
     let idx = 0;
+    function ensureSlideSrc(slide) {
+      if (!slide || slide.getAttribute('src')) return;
+      const pending = slide.getAttribute('data-src');
+      if (pending) {
+        slide.setAttribute('src', pending);
+        slide.removeAttribute('data-src');
+      }
+    }
     window.setInterval(() => {
       idx = (idx + 1) % slides.length;
+      ensureSlideSrc(slides[idx]);
       slides.forEach((s, j) => s.classList.toggle('is-active', j === idx));
     }, 6500);
   })();
