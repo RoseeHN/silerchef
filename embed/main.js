@@ -2033,7 +2033,7 @@
         btn.setAttribute('aria-label', unmuted ? 'Mute' : 'Turn sound on');
         const icon = btn.querySelector('i');
         if (icon) {
-          icon.className = unmuted ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+icon && icon.setAttribute('data-sound', unmuted ? 'on' : 'off');
         }
         if (unmuted) video.play().catch(() => {});
       });

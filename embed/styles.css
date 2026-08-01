@@ -5920,3 +5920,6 @@ body.scroll-locked {
     padding: 1.1rem 1rem 1.2rem;
   }
 }
+
+.icon{display:inline-block;vertical-align:middle;flex-shrink:0;fill:currentColor}
+.pillar-icon .icon,.contact-icon .icon,.social-tile__icon .icon{width:1.15rem;height:1.15rem}
