@@ -40,12 +40,19 @@
     <link
       rel="preload"
       as="image"
+      href="images/homepage/hero-01-480.webp"
       type="image/webp"
-      imagesrcset="images/homepage/hero-01-480.webp 480w, images/homepage/hero-01-800.webp 800w, images/homepage/hero-01-1200.webp 1200w"
-      imagesizes="(max-width: 900px) 100vw, 48vw"
+      media="(max-width: 900px)"
       fetchpriority="high"
     />
-    <link rel="preload" href="fonts/outfit-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link
+      rel="preload"
+      as="image"
+      href="images/homepage/hero-01-800.webp"
+      type="image/webp"
+      media="(min-width: 901px)"
+      fetchpriority="high"
+    />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Siler Chef" />
@@ -320,30 +327,29 @@
         .hero-inner--split { grid-template-columns: 1fr; }
       }
     </style>
-    <!-- Preload + non-blocking full CSS: critical hero CSS above paints FCP without waiting on 19KB gzip. -->
-    <link rel="preload" href="styles.min.css?v=sc-20260801f5" as="style" />
+    <!-- Non-blocking full CSS (no preload — keeps bandwidth free for LCP hero image). -->
     <link
       rel="stylesheet"
-      href="styles.min.css?v=sc-20260801f5"
+      href="styles.min.css?v=sc-20260801f6"
       media="print"
       onload="this.media='all'"
     />
     <link
       rel="stylesheet"
-      href="fonts-display.css?v=sc-20260801f5"
+      href="fonts-display.css?v=sc-20260801f6"
       media="print"
       onload="this.media='all'"
     />
     <link
       rel="stylesheet"
-      href="gallery.css?v=sc-20260801f5"
+      href="gallery.css?v=sc-20260801f6"
       media="print"
       onload="this.media='all'"
     />
     <noscript>
-      <link rel="stylesheet" href="styles.min.css?v=sc-20260801f5" />
-      <link rel="stylesheet" href="fonts-display.css?v=sc-20260801f5" />
-      <link rel="stylesheet" href="gallery.css?v=sc-20260801f5" />
+      <link rel="stylesheet" href="styles.min.css?v=sc-20260801f6" />
+      <link rel="stylesheet" href="fonts-display.css?v=sc-20260801f6" />
+      <link rel="stylesheet" href="gallery.css?v=sc-20260801f6" />
     </noscript>
     <link rel="icon" type="image/png" href="images/brand/silerchef-logo.png" />
   </head>
@@ -1893,7 +1899,7 @@
         if (c) window.__SILERCHEF_API_BASE__ = c;
       })();
     </script>
-    <script src="data.js?v=sc-20260801f5" defer></script>
-    <script src="main.js?v=sc-20260801f5" defer></script>
+    <script src="data.js?v=sc-20260801f6" defer></script>
+    <script src="main.js?v=sc-20260801f6" defer></script>
   </body>
 </html>
