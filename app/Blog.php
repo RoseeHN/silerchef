@@ -122,10 +122,22 @@ final class Blog
 
     public static function renderSitemap(): never
     {
+        $hubLastmod = gmdate('Y-m-d');
+        $latestPostMod = '';
+        foreach (self::posts() as $post) {
+            $candidate = self::formatLastmod((string) ($post['updated'] ?: $post['published']));
+            if ($candidate !== '' && ($latestPostMod === '' || $candidate > $latestPostMod)) {
+                $latestPostMod = $candidate;
+            }
+        }
+        if ($latestPostMod !== '') {
+            $hubLastmod = $latestPostMod;
+        }
+
         $urls = [
-            ['loc' => self::SITE_ORIGIN . '/', 'priority' => '1.0', 'changefreq' => 'weekly'],
-            ['loc' => self::SITE_ORIGIN . '/gallery', 'priority' => '0.8', 'changefreq' => 'weekly'],
-            ['loc' => self::SITE_ORIGIN . '/blog', 'priority' => '0.85', 'changefreq' => 'weekly'],
+            ['loc' => self::SITE_ORIGIN . '/', 'priority' => '1.0', 'changefreq' => 'weekly', 'lastmod' => $hubLastmod],
+            ['loc' => self::SITE_ORIGIN . '/gallery', 'priority' => '0.8', 'changefreq' => 'weekly', 'lastmod' => $hubLastmod],
+            ['loc' => self::SITE_ORIGIN . '/blog', 'priority' => '0.85', 'changefreq' => 'weekly', 'lastmod' => $hubLastmod],
         ];
 
         foreach (self::posts() as $post) {
@@ -151,6 +163,7 @@ final class Blog
         }
         $xml .= "</urlset>\n";
 
+        header('Cache-Control: public, max-age=3600');
         text_response($xml, 'application/xml; charset=utf-8');
     }
 
@@ -189,6 +202,21 @@ final class Blog
             'Guides on private chef dining, in-home entertaining, and menu planning for Reno, Lake Tahoe, and the San Francisco Bay Area.';
         $canonical = self::SITE_ORIGIN . '/blog';
         $activeNav = 'blog';
+        $ogType = 'website';
+        $extraHeadHtml = '<script type="application/ld+json">' . json_encode(
+            [
+                '@context' => 'https://schema.org',
+                '@type' => 'CollectionPage',
+                '@id' => self::SITE_ORIGIN . '/blog#page',
+                'url' => $canonical,
+                'name' => $pageTitle,
+                'description' => $pageDescription,
+                'isPartOf' => ['@id' => self::SITE_ORIGIN . '/#website'],
+                'about' => ['@id' => self::SITE_ORIGIN . '/#business'],
+                'inLanguage' => 'en-US',
+            ],
+            JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
+        ) . '</script>';
 
         require dirname(__DIR__) . '/embed/views/blog-list.php';
         exit;
@@ -201,6 +229,9 @@ final class Blog
         $pageDescription = (string) ($post['description'] ?: $post['title']);
         $canonical = self::urlForPost((string) $post['slug']);
         $activeNav = 'blog';
+        $ogType = 'article';
+        $articlePublished = (string) ($post['published'] ?? '');
+        $articleModified = (string) (($post['updated'] ?? '') ?: $articlePublished);
 
         require dirname(__DIR__) . '/embed/views/blog-post.php';
         exit;

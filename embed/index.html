@@ -129,8 +129,9 @@
             "geo": {
               "@type": "GeoCoordinates",
               "latitude": 39.5433344,
-              "longitude": -119.8216659
+              "longitude": -119.8242408
             },
+            "founder": { "@id": "https://www.silerchef.com/#chef" },
             "hasMap": "https://www.google.com/maps/place/Siler+Chef+LLC/@39.543334371593346,-119.82424082388114,17z/data=!4m6!3m5!1s0xa180e099e5f7d05b:0x5f23cef288df732e!8m2!3d39.543334371593346!4d-119.82424082388114!16s%2Fg%2F11z80y9ty7",
             "areaServed": [
               { "@type": "City", "name": "Reno", "containedInPlace": { "@type": "State", "name": "Nevada" } },
@@ -175,6 +176,15 @@
             }
           },
           {
+            "@type": "Person",
+            "@id": "https://www.silerchef.com/#chef",
+            "name": "Fikret Siler",
+            "jobTitle": "Personal Chef & Culinary Artist",
+            "worksFor": { "@id": "https://www.silerchef.com/#business" },
+            "url": "https://www.silerchef.com/",
+            "image": "https://www.silerchef.com/images/homepage/hero-01.jpg"
+          },
+          {
             "@type": "FAQPage",
             "@id": "https://www.silerchef.com/#faq",
             "mainEntity": [
@@ -183,7 +193,7 @@
                 "name": "What areas does Siler Chef serve?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Siler Chef serves private dining clients in Reno, Lake Tahoe, and the San Francisco Bay Area, with travel considered for qualified events."
+                  "text": "Siler Chef serves Reno, Lake Tahoe, and the San Francisco Bay Area, with travel considered for qualified private events and chef-led occasions."
                 }
               },
               {
@@ -191,15 +201,15 @@
                 "name": "How do reservation requests work?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Guests submit their event date, guest count, event location, preferred cuisine, and any allergy notes through the reservation form. The request lands in the private dashboard, and follow-up happens by phone or email."
+                  "text": "Guests send their event date, guest count, event location, preferred cuisine, and any dietary notes. The request goes into the private reservation dashboard, and follow-up happens by phone or email."
                 }
               },
               {
                 "@type": "Question",
-                "name": "Can menus be customized?",
+                "name": "Can the sample menus be customized?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Yes. Every cuisine and sample menu is a starting point. Courses can be adjusted around the brief, dietary needs, allergies, and preferred service style."
+                  "text": "Yes. Every cuisine and sample menu is only a starting direction. Courses can be adjusted or redesigned from scratch around the host brief, guest list, and dietary needs."
                 }
               },
               {
@@ -207,15 +217,23 @@
                 "name": "What information should guests send when booking?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "The most useful details are the event date, guest count, event location, preferred cuisine, allergy or intolerance notes, and the best phone number for follow-up."
+                  "text": "The most useful details are the date, guest count, event location, preferred cuisine, allergy or intolerance notes, and the best phone number for follow-up."
                 }
               },
               {
                 "@type": "Question",
-                "name": "Does Siler Chef offer private lessons and chef education?",
+                "name": "Can the menu accommodate dietary restrictions?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Yes. Siler Chef offers private lessons, workshops, and chef-led education formats that can be tailored for small groups, hosts, or culinary learning experiences."
+                  "text": "Yes. The planning flow is built to capture allergies, food preferences, and lifestyle requirements early so the menu direction and sourcing can be shaped around them."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Does Siler Chef offer private lessons?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. Private lessons and chef education sessions can be prepared for small groups, hosts who want a more interactive night, or clients who want a guided culinary workshop."
                 }
               }
             ]
@@ -321,26 +339,26 @@
     <!-- Non-blocking CSS: critical hero styles above paint first; full CSS follows without blocking parse. -->
     <link
       rel="stylesheet"
-      href="styles.min.css?v=sc-20260801f9"
+      href="styles.min.css?v=sc-20260801s1"
       media="print"
       onload="this.media='all'"
     />
     <link
       rel="stylesheet"
-      href="fonts-display.css?v=sc-20260801f9"
+      href="fonts-display.css?v=sc-20260801s1"
       media="print"
       onload="this.media='all'"
     />
     <link
       rel="stylesheet"
-      href="gallery.css?v=sc-20260801f9"
+      href="gallery.css?v=sc-20260801s1"
       media="print"
       onload="this.media='all'"
     />
     <noscript>
-      <link rel="stylesheet" href="styles.min.css?v=sc-20260801f9" />
-      <link rel="stylesheet" href="fonts-display.css?v=sc-20260801f9" />
-      <link rel="stylesheet" href="gallery.css?v=sc-20260801f9" />
+      <link rel="stylesheet" href="styles.min.css?v=sc-20260801s1" />
+      <link rel="stylesheet" href="fonts-display.css?v=sc-20260801s1" />
+      <link rel="stylesheet" href="gallery.css?v=sc-20260801s1" />
     </noscript>
     <link rel="icon" type="image/png" href="images/brand/silerchef-logo.png" />
   </head>
@@ -1890,7 +1908,7 @@
         if (c) window.__SILERCHEF_API_BASE__ = c;
       })();
     </script>
-    <script src="data.js?v=sc-20260801f9" defer></script>
-    <script src="main.js?v=sc-20260801f9" defer></script>
+    <script src="data.js?v=sc-20260801s1" defer></script>
+    <script src="main.js?v=sc-20260801s1" defer></script>
   </body>
 </html>

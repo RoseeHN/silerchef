@@ -53,19 +53,63 @@ $tags = is_array($post['tags']) ? $post['tags'] : [];
       <?= json_encode(
           [
               '@context' => 'https://schema.org',
-              '@type' => 'BlogPosting',
-              'headline' => (string) $post['title'],
-              'description' => (string) ($post['description'] ?: Blog::excerpt((string) $post['bodyHtml'], 160)),
-              'datePublished' => $published !== '' ? $published : null,
-              'dateModified' => (string) ($post['updated'] ?: $published) ?: null,
-              'author' => ['@type' => 'Person', 'name' => 'Fikret Siler'],
-              'publisher' => [
-                  '@type' => 'Organization',
-                  'name' => 'Siler Chef',
-                  'logo' => ['@type' => 'ImageObject', 'url' => Blog::siteOrigin() . '/images/brand/silerchef-logo.png'],
+              '@graph' => [
+                  [
+                      '@type' => 'BreadcrumbList',
+                      '@id' => $canonical . '#breadcrumb',
+                      'itemListElement' => [
+                          [
+                              '@type' => 'ListItem',
+                              'position' => 1,
+                              'name' => 'Home',
+                              'item' => Blog::siteOrigin() . '/',
+                          ],
+                          [
+                              '@type' => 'ListItem',
+                              'position' => 2,
+                              'name' => 'Journal',
+                              'item' => Blog::siteOrigin() . '/blog',
+                          ],
+                          [
+                              '@type' => 'ListItem',
+                              'position' => 3,
+                              'name' => (string) $post['title'],
+                              'item' => $canonical,
+                          ],
+                      ],
+                  ],
+                  [
+                      '@type' => 'BlogPosting',
+                      '@id' => $canonical . '#article',
+                      'headline' => (string) $post['title'],
+                      'description' => (string) ($post['description'] ?: Blog::excerpt((string) $post['bodyHtml'], 160)),
+                      'datePublished' => $published !== '' ? $published : null,
+                      'dateModified' => (string) ($post['updated'] ?: $published) ?: null,
+                      'author' => [
+                          '@type' => 'Person',
+                          '@id' => Blog::siteOrigin() . '/#chef',
+                          'name' => 'Fikret Siler',
+                      ],
+                      'publisher' => [
+                          '@type' => 'Organization',
+                          'name' => 'Siler Chef',
+                          'logo' => [
+                              '@type' => 'ImageObject',
+                              'url' => Blog::siteOrigin() . '/images/brand/silerchef-logo.png',
+                          ],
+                      ],
+                      'image' => [
+                          '@type' => 'ImageObject',
+                          'url' => $ogImage,
+                          'caption' => Blog::coverAlt($post),
+                      ],
+                      'mainEntityOfPage' => [
+                          '@type' => 'WebPage',
+                          '@id' => $canonical,
+                      ],
+                      'inLanguage' => 'en-US',
+                  ],
               ],
-              'image' => $ogImage,
-              'mainEntityOfPage' => $canonical,
           ],
           JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
       ) ?>

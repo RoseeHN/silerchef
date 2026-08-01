@@ -1415,9 +1415,19 @@
             '@id': 'https://www.silerchef.com/#website',
             url: 'https://www.silerchef.com/',
             name: 'Siler Chef',
+            alternateName: ['SilerChef', 'silerchef', 'silerchef.com', 'Chef Siler'],
             description: 'Personal chef and private in-home dining in Reno, Lake Tahoe, and the Bay Area.',
             inLanguage: 'en-US',
             publisher: { '@id': 'https://www.silerchef.com/#business' },
+          },
+          {
+            '@type': 'Person',
+            '@id': 'https://www.silerchef.com/#chef',
+            name: 'Fikret Siler',
+            jobTitle: 'Personal Chef & Culinary Artist',
+            worksFor: { '@id': 'https://www.silerchef.com/#business' },
+            url: 'https://www.silerchef.com/',
+            image: 'https://www.silerchef.com/images/homepage/hero-01.jpg',
           },
           {
             '@type': ['LocalBusiness', 'ProfessionalService'],
@@ -1452,8 +1462,9 @@
             geo: {
               '@type': 'GeoCoordinates',
               latitude: 39.5433344,
-              longitude: -119.8216659,
+              longitude: -119.8242408,
             },
+            founder: { '@id': 'https://www.silerchef.com/#chef' },
             hasMap: normalizeGoogleMapsHref(contact.googleMapsHref),
             areaServed: [
               { '@type': 'City', name: 'Reno', containedInPlace: { '@type': 'State', name: 'Nevada' } },
