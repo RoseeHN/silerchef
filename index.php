@@ -478,7 +478,7 @@ function serve_embed_file(string $requestPath, string|false $embedDir, string $r
 
     http_response_code(200);
     header('Content-Type: ' . $mime);
-    if (preg_match('/\.(css|js|svg|xml|txt)$/i', $candidate)) {
+    if (preg_match('/\.(css|js|svg|xml|txt|json)$/i', $candidate)) {
         respond_possibly_gzipped((string) file_get_contents($candidate), $mime);
     }
     readfile($candidate);

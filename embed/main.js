@@ -1930,11 +1930,14 @@
       img.removeAttribute('data-src');
       img.removeAttribute('data-src-fallback');
     }
-    window.setInterval(() => {
-      idx = (idx + 1) % slides.length;
-      ensureSlideSrc(slides[idx]);
-      slides.forEach((s, j) => s.classList.toggle('is-active', j === idx));
-    }, 6500);
+    // Start later so LCP/Speed Index stay on hero-01 during the critical window.
+    window.setTimeout(() => {
+      window.setInterval(() => {
+        idx = (idx + 1) % slides.length;
+        ensureSlideSrc(slides[idx]);
+        slides.forEach((s, j) => s.classList.toggle('is-active', j === idx));
+      }, 6500);
+    }, 12000);
   })();
 
   (function initChefReel() {
