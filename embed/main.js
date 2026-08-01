@@ -873,13 +873,9 @@
       img.decoding = 'async';
       /** Hub grids always use thumb.jpg — avoids loading multi‑MB gallery heroes as card art. */
       img.src = `${baseFolder}/${item.slug}/thumb.jpg`;
-      const eagerFirst = premium ? 3 : 2;
-      if (index < eagerFirst) {
-        img.loading = 'eager';
-        img.fetchPriority = 'high';
-      } else {
-        img.loading = 'lazy';
-      }
+      // Keep hub thumbs off the LCP critical path so hero-01 wins bandwidth.
+      img.loading = 'lazy';
+      if ('fetchPriority' in img) img.fetchPriority = 'low';
       if (premium) {
         img.sizes = '(max-width: 640px) 100vw, (max-width: 1100px) 50vw, (max-width: 1500px) 33vw, 460px';
         img.width = 800;
