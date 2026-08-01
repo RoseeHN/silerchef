@@ -225,18 +225,34 @@
         color: rgba(243, 234, 209, 0.92);
         font-family: Outfit, system-ui, sans-serif;
       }
+      /* Critical UI face only — display face loads async to shorten FCP chain. */
+      @font-face {
+        font-family: "Outfit";
+        font-style: normal;
+        font-weight: 300 600;
+        font-display: swap;
+        src: url("fonts/outfit-latin.woff2") format("woff2");
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+          U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
     </style>
-    <link rel="stylesheet" href="fonts.css?v=sc-20260801f3" />
-    <!-- Core layout CSS must stay render-blocking for LCP; gallery styles can wait. -->
-    <link rel="stylesheet" href="styles.css?v=sc-20260801f3" />
+    <!-- Core layout CSS must stay render-blocking for LCP; gallery + display font can wait. -->
+    <link rel="stylesheet" href="styles.css?v=sc-20260801f4" />
     <link
       rel="stylesheet"
-      href="gallery.css?v=sc-20260801f3"
+      href="fonts-display.css?v=sc-20260801f4"
+      media="print"
+      onload="this.media='all'"
+    />
+    <link
+      rel="stylesheet"
+      href="gallery.css?v=sc-20260801f4"
       media="print"
       onload="this.media='all'"
     />
     <noscript>
-      <link rel="stylesheet" href="gallery.css?v=sc-20260801f3" />
+      <link rel="stylesheet" href="fonts-display.css?v=sc-20260801f4" />
+      <link rel="stylesheet" href="gallery.css?v=sc-20260801f4" />
     </noscript>
     <link rel="icon" type="image/png" href="images/brand/silerchef-logo.png" />
   </head>
@@ -1786,7 +1802,7 @@
         if (c) window.__SILERCHEF_API_BASE__ = c;
       })();
     </script>
-    <script src="data.js?v=sc-20260801f3" defer></script>
-    <script src="main.js?v=sc-20260801f3" defer></script>
+    <script src="data.js?v=sc-20260801f4" defer></script>
+    <script src="main.js?v=sc-20260801f4" defer></script>
   </body>
 </html>

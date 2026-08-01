@@ -1,4 +1,4 @@
-/* Self-hosted latin variable fonts — no Google Fonts round-trip. */
+/* Secondary pages: both faces. Homepage inlines Outfit and defers Playfair. */
 @font-face {
   font-family: "Outfit";
   font-style: normal;
