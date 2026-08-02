@@ -1,8 +1,25 @@
-# Fallback copy — production serves /robots.txt dynamically from PHP (see app/Blog.php).
+# Siler Chef — private chef · Reno · Lake Tahoe · Bay Area
+# Canonical site: https://www.silerchef.com
+# Production usually serves this dynamically from PHP (app/Blog.php).
+
 User-agent: *
+Allow: /
+Allow: /blog
+Allow: /blog/
+Allow: /gallery
+
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Googlebot
 Allow: /
 Allow: /blog/
 Allow: /gallery
-Disallow: /admin/
+Disallow: /admin
 Disallow: /api/
+
+User-agent: Googlebot-Image
+Allow: /images/
+
 Sitemap: https://www.silerchef.com/sitemap.xml

@@ -3,15 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/app/Support.php';
-require_once __DIR__ . '/app/Database.php';
-require_once __DIR__ . '/app/Repository.php';
-require_once __DIR__ . '/app/AdminAuth.php';
 require_once __DIR__ . '/app/Blog.php';
-
-$database = new Database();
-$repository = new Repository($database);
-$repository->ensureReady();
-$auth = new AdminAuth();
 
 $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 $requestPath = rawurldecode(parse_url($requestUri, PHP_URL_PATH) ?: '/');
@@ -41,10 +33,32 @@ if ($requestMethod === 'OPTIONS') {
     exit;
 }
 
+/**
+ * Serve crawler discovery files before DB bootstrap.
+ * PageSpeed / Googlebot sometimes time out when every robots/llms hit waits on Postgres.
+ */
 if (in_array($requestMethod, ['GET', 'HEAD'], true)) {
+    if ($requestPath === '/robots.txt') {
+        Blog::renderRobotsTxt();
+    }
+    if ($requestPath === '/sitemap.xml') {
+        Blog::renderSitemap();
+    }
+    if ($requestPath === '/llms.txt') {
+        serve_llms_txt($embedDir);
+    }
     serve_google_verification_file($requestPath);
     redirect_seo_landing_paths($requestPath, $requestUri, $requestMethod);
 }
+
+require_once __DIR__ . '/app/Database.php';
+require_once __DIR__ . '/app/Repository.php';
+require_once __DIR__ . '/app/AdminAuth.php';
+
+$database = new Database();
+$repository = new Repository($database);
+$repository->ensureReady();
+$auth = new AdminAuth();
 
 if ($requestPath === '/health') {
     $build = [
@@ -351,6 +365,23 @@ function serve_google_verification_file(string $requestPath): void
     exit;
 }
 
+function serve_llms_txt(string|false $embedDir): never
+{
+    $llms = ($embedDir !== false ? $embedDir : (__DIR__ . '/embed')) . '/llms.txt';
+    if (!is_file($llms)) {
+        json_response(['error' => 'not_found'], 404);
+    }
+    http_response_code(200);
+    header('Content-Type: text/plain; charset=utf-8');
+    header('Cache-Control: public, max-age=3600');
+    $body = (string) file_get_contents($llms);
+    if (strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'HEAD') {
+        header('Content-Length: ' . (string) strlen($body));
+        exit;
+    }
+    respond_possibly_gzipped($body, 'text/plain; charset=utf-8');
+}
+
 /** Permanent SEO-friendly URLs → Journal articles or homepage. */
 function redirect_seo_landing_paths(string $requestPath, string $requestUri, string $requestMethod): void
 {
@@ -426,17 +457,6 @@ function serve_embed_file(string $requestPath, string|false $embedDir, string $r
     /** Never serve stale static sitemap.xml — dynamic list includes /blog and all articles. */
     if ($requestPath === '/sitemap.xml') {
         Blog::renderSitemap();
-    }
-
-    if ($requestPath === '/llms.txt') {
-        $llms = $embedDir . '/llms.txt';
-        if (!is_file($llms)) {
-            json_response(['error' => 'not_found'], 404);
-        }
-        http_response_code(200);
-        header('Content-Type: text/plain; charset=utf-8');
-        header('Cache-Control: public, max-age=3600');
-        respond_possibly_gzipped((string) file_get_contents($llms), 'text/plain; charset=utf-8');
     }
 
     $path = $requestPath === '/' ? '/index.html' : $requestPath;
