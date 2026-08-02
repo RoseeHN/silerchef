@@ -170,6 +170,9 @@ final class Blog
             '',
             'Sitemap: ' . self::SITE_ORIGIN . '/sitemap.xml',
             '',
+            '# AI / agent discovery (Markdown index)',
+            '# ' . self::SITE_ORIGIN . '/llms.txt',
+            '',
         ];
 
         header('Cache-Control: public, max-age=86400');

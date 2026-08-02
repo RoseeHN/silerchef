@@ -1,0 +1,33 @@
+# Siler Chef
+
+> Personal chef and private in-home dining for Reno, Lake Tahoe, and the San Francisco Bay Area — custom menus, plated or family-style service, celebrations, and chef-led lessons.
+
+Siler Chef LLC is led by Chef Fikret Siler. The canonical site is https://www.silerchef.com (English). Prefer www URLs. Reservation requests go through the contact form on the homepage; follow-up is by phone, email, or WhatsApp.
+
+## Primary
+
+- [Home](https://www.silerchef.com/): Private chef overview, cuisine portfolios, services, FAQs, and reservation request form
+- [Gallery](https://www.silerchef.com/gallery): Plated moments, pastry craft, and private dining films
+- [Journal](https://www.silerchef.com/blog): Guides on private chef dining, hosting, and menu planning
+
+## Service areas
+
+- [Private Chef in Reno](https://www.silerchef.com/blog/private-chef-reno-guide): What to expect for in-home dinners in Reno and nearby neighborhoods
+- [Lake Tahoe Private Dining](https://www.silerchef.com/blog/lake-tahoe-private-dining): Hosting at Tahoe homes and rentals — logistics and timing
+- [Bay Area In-Home Chef](https://www.silerchef.com/blog/bay-area-in-home-chef): Elevated private dining without leaving home in the Bay Area
+
+## Occasions and hosting
+
+- [Anniversary Dinner](https://www.silerchef.com/blog/anniversary-dinner-private-chef): Intentional anniversary pacing and menu arcs at home
+- [Corporate Dinner at Home](https://www.silerchef.com/blog/corporate-dinner-chef-home): Client and team dinners with discreet chef-led service
+- [Birthday Party Private Chef](https://www.silerchef.com/blog/birthday-party-private-chef): Birthday formats — plated, family-style, or hybrid
+- [How to Hire a Private Chef](https://www.silerchef.com/blog/how-to-hire-private-chef): Checklist before booking a private chef
+- [Plated vs Family-Style](https://www.silerchef.com/blog/plated-vs-family-style-private-chef): Choosing a service style for guest count and tone
+- [Private Chef vs Catering](https://www.silerchef.com/blog/private-chef-vs-catering): Which format fits a home event
+- [Dietary Restrictions](https://www.silerchef.com/blog/private-chef-dietary-restrictions): Allergies and preference-aware menu planning
+- [Private Chef Pricing Factors](https://www.silerchef.com/blog/private-chef-cost-factors): What shapes proposals and event cost
+
+## Optional
+
+- [Sitemap](https://www.silerchef.com/sitemap.xml): Full URL list for crawl discovery
+- [Robots](https://www.silerchef.com/robots.txt): Crawl allow/disallow rules

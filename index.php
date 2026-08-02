@@ -428,6 +428,17 @@ function serve_embed_file(string $requestPath, string|false $embedDir, string $r
         Blog::renderSitemap();
     }
 
+    if ($requestPath === '/llms.txt') {
+        $llms = $embedDir . '/llms.txt';
+        if (!is_file($llms)) {
+            json_response(['error' => 'not_found'], 404);
+        }
+        http_response_code(200);
+        header('Content-Type: text/plain; charset=utf-8');
+        header('Cache-Control: public, max-age=3600');
+        respond_possibly_gzipped((string) file_get_contents($llms), 'text/plain; charset=utf-8');
+    }
+
     $path = $requestPath === '/' ? '/index.html' : $requestPath;
     if ($path === '/admin') {
         $path = '/admin.html';
