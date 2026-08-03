@@ -1010,10 +1010,8 @@ body.nav-drawer-open {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 28%;
+  object-position: center 30%;
   display: block;
-  /* Soft editorial polish on top of graded masters */
-  filter: contrast(1.04) saturate(1.03) brightness(0.98);
 }
 
 .hero-rotator__slide.is-active {
