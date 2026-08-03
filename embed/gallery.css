@@ -8,6 +8,15 @@
   padding: clamp(1.2rem, 3vw, 2rem) 0 clamp(3rem, 6vw, 5rem);
 }
 
+/* Anchor jumps (#video-gallery, #photo-gallery) clear the fixed header. */
+.gallery-page .gallery-strip[id] {
+  scroll-margin-top: calc(var(--header-offset) + 1.25rem);
+}
+
+.gallery-page .gallery-strip__head {
+  scroll-margin-top: calc(var(--header-offset) + 1.25rem);
+}
+
 .gallery-hero {
   position: relative;
 }
@@ -160,6 +169,15 @@
   overflow: hidden;
   width: 100%;
   mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+}
+
+/* Without JS track setup, overflow:hidden would clip all but one card (empty right side). */
+.gallery-videos--marquee:not(:has(.gallery-videos__track)) {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  overflow: visible;
+  mask-image: none;
 }
 
 .gallery-videos--marquee .gallery-videos__track {
