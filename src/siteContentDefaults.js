@@ -544,7 +544,7 @@ const DEFAULT_SITE_CONTENT = {
       blocks: [
         {
           title: 'Set 1 · Ottoman Grandeur',
-          image: cuisineBlockImage('turkish-cuisine', 2),
+          image: cuisineBlockImage('turkish-cuisine', 1),
           items: [
             item(
               'Appetizer',
@@ -570,7 +570,7 @@ const DEFAULT_SITE_CONTENT = {
         },
         {
           title: 'Set 2 · The Sultan’s Table',
-          image: cuisineBlockImage('turkish-cuisine', 3),
+          image: cuisineBlockImage('turkish-cuisine', 2),
           items: [
             item(
               'Appetizer',
@@ -593,7 +593,7 @@ const DEFAULT_SITE_CONTENT = {
         },
         {
           title: 'Set 3 · Anatolian Silk',
-          image: cuisineBlockImage('turkish-cuisine', 4),
+          image: cuisineBlockImage('turkish-cuisine', 3),
           items: [
             item(
               'Appetizer',
@@ -625,7 +625,7 @@ const DEFAULT_SITE_CONTENT = {
       blocks: [
         {
           title: 'Set 1 · The Global Gastronome',
-          image: cuisineBlockImage('middle-eastern-cuisine', 6),
+          image: cuisineBlockImage('middle-eastern-cuisine', 1),
           items: [
             item(
               'Appetizer',
@@ -651,7 +651,7 @@ const DEFAULT_SITE_CONTENT = {
         },
         {
           title: 'Set 2 · The Continental Fusion',
-          image: cuisineBlockImage('middle-eastern-cuisine', 7),
+          image: cuisineBlockImage('middle-eastern-cuisine', 2),
           items: [
             item(
               'Appetizer',
@@ -677,7 +677,7 @@ const DEFAULT_SITE_CONTENT = {
         },
         {
           title: 'Set 3 · The Silk Road Fusion',
-          image: cuisineBlockImage('middle-eastern-cuisine', 8),
+          image: cuisineBlockImage('middle-eastern-cuisine', 3),
           items: [
             item(
               'Appetizer',

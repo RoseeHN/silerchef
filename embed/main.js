@@ -297,20 +297,10 @@
   }
 
   /**
-   * First paint for detail modal: only files that almost always exist (hero/thumb).
-   * Do NOT invent gallery/01…06 slots — missing files paint as empty grey thumbs.
+   * First paint: one frame only (hero mirrors gallery/01). Avoid thumb + hero twins.
    */
   function buildDetailBootstrapGallery(baseFolder, slug) {
-    const out = [];
-    const seen = new Set();
-    function add(u) {
-      if (!u || seen.has(u)) return;
-      seen.add(u);
-      out.push(u);
-    }
-    add(`${baseFolder}/${slug}/hero.jpg`);
-    add(`${baseFolder}/${slug}/thumb.jpg`);
-    return out;
+    return [`${baseFolder}/${slug}/gallery/01.jpg`];
   }
 
   function probeImageMeta(url) {
@@ -327,51 +317,29 @@
     });
   }
 
-  /**
-   * Prefer sharp, high-pixel frames first. Drop phone/story leftovers under ~1000px
-   * so the detail hero is never upscaled mush.
-   */
-  async function orderGalleryForDisplay(urls) {
+  /** Keep discovery order; drop unbroken low-res leftovers. Never reorder by area. */
+  async function filterGalleryForDisplay(urls) {
     if (!urls || !urls.length) return [];
     const metas = await Promise.all(urls.map((u) => probeImageMeta(u)));
-    const MIN_EDGE = 1000;
-    const valid = metas.filter((m) => m && Math.max(m.w, m.h) >= MIN_EDGE && Math.min(m.w, m.h) >= 700);
-    if (!valid.length) {
-      return metas.filter(Boolean).map((m) => m.url);
+    const MIN_EDGE = 900;
+    const valid = [];
+    for (const m of metas) {
+      if (!m) continue;
+      if (Math.max(m.w, m.h) < MIN_EDGE && Math.min(m.w, m.h) < 700) continue;
+      valid.push(m.url);
     }
-    valid.sort((a, b) => {
-      const aThumb = /\/thumb\.jpe?g$/i.test(a.url) ? 1 : 0;
-      const bThumb = /\/thumb\.jpe?g$/i.test(b.url) ? 1 : 0;
-      if (aThumb !== bThumb) return aThumb - bThumb;
-      const aArea = a.w * a.h;
-      const bArea = b.w * b.h;
-      if (bArea !== aArea) return bArea - aArea;
-      const aLand = a.w >= a.h * 0.92 ? 0 : 1;
-      const bLand = b.w >= b.h * 0.92 ? 0 : 1;
-      return aLand - bLand;
-    });
-    return valid.map((m) => m.url);
+    return valid.length ? valid : metas.filter(Boolean).map((m) => m.url);
   }
 
+  /**
+   * Detail strip = numbered gallery files only (canonical pack order).
+   * Hero/thumb are derivatives of gallery/01 — including them caused triple repeats.
+   * Set card images stay on meal cards; they are not re-injected into the strip.
+   */
   async function collectGalleryUrls(baseFolder, slug) {
-    const copy = getCopy('cuisine', slug) || getCopy('service', slug);
     const base = `${baseFolder}/${slug}`;
     const galleryPath = `${base}/gallery`;
-
-    const [fromGallery, hero, thumb] = await Promise.all([
-      collectNumberedImages(galleryPath),
-      (async () => {
-        return (
-          (await probeUrlExists(`${base}/hero.jpg`)) || (await probeUrlExists(`${base}/hero.jpeg`))
-        );
-      })(),
-      (async () => {
-        return (
-          (await probeUrlExists(`${base}/thumb.jpg`)) || (await probeUrlExists(`${base}/thumb.jpeg`))
-        );
-      })(),
-    ]);
-
+    const fromGallery = await collectNumberedImages(galleryPath);
     const found = [];
     const seen = new Set();
 
@@ -382,26 +350,38 @@
     }
 
     fromGallery.forEach(pushUnique);
-    if (!fromGallery.length) {
+
+    if (!found.length) {
+      const hero =
+        (await probeUrlExists(`${base}/hero.jpg`)) || (await probeUrlExists(`${base}/hero.jpeg`));
+      pushUnique(hero);
       const fromLegacy = await collectNumberedImages(base);
       fromLegacy.forEach(pushUnique);
     }
-    pushUnique(hero);
-    pushUnique(thumb);
 
-    if (copy && Array.isArray(copy.blocks)) {
-      const blockUrls = [];
-      for (const block of copy.blocks) {
-        const raw = typeof block.image === 'string' ? block.image.trim() : '';
-        if (raw) blockUrls.push(raw);
-      }
-      const verified = await Promise.all(blockUrls.map((u) => probeUrlExists(u)));
-      verified.forEach(pushUnique);
-    }
+    return filterGalleryForDisplay(found.slice(0, 24));
+  }
 
-    /** Cap strip size — special-events has hundreds of files; keep the modal snappy. */
-    const capped = found.slice(0, 24);
-    return orderGalleryForDisplay(capped);
+  /** Keep set thumbs aligned to gallery/01… after API merges stale paths. */
+  function normalizeDetailBlockImages(site) {
+    if (!site || typeof site !== 'object') return site;
+    const kinds = [
+      ['cuisines', 'images/cuisines'],
+      ['services', 'images/services-and-occasions'],
+    ];
+    kinds.forEach(([key, folder]) => {
+      const group = site[key];
+      if (!group || typeof group !== 'object') return;
+      Object.keys(group).forEach((slug) => {
+        const copy = group[slug];
+        if (!copy || !Array.isArray(copy.blocks)) return;
+        copy.blocks.forEach((block, idx) => {
+          if (!block || typeof block !== 'object') return;
+          block.image = `${folder}/${slug}/gallery/${pad2(idx + 1)}.jpg`;
+        });
+      });
+    });
+    return site;
   }
 
   function getCopy(kind, slug) {
@@ -1049,6 +1029,7 @@
     });
   }
 
+  window.SC_SITE = normalizeDetailBlockImages(window.SC_SITE || {});
   mountHub('cuisines-mount', CUISINES, 'cuisine', 'images/cuisines', { layout: 'cuisine-premium' });
   mountHub('services-mount', SERVICES, 'service', 'images/services-and-occasions', { layout: 'service-premium' });
   syncConversionStats(window.SC_SITE_STATS || {});
@@ -1618,6 +1599,7 @@
           services: content.services || undefined,
         });
       }
+      window.SC_SITE = normalizeDetailBlockImages(window.SC_SITE || {});
       remountHubs(siteStatsPersist);
     } catch (_) {
       /* ignore */
