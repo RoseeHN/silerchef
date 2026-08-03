@@ -331,6 +331,22 @@
       }
       .btn-primary { background: linear-gradient(135deg, #d4bc6a, #c5a059); color: #1a1510; font-weight: 600; }
       .btn-ghost { border-color: rgba(197, 160, 89, 0.35); color: var(--gold-1); background: transparent; }
+      .text-ticker {
+        margin: 0 0 0.5rem;
+        overflow: hidden;
+        border-block: 1px solid rgba(197, 160, 89, 0.2);
+        background: linear-gradient(180deg, rgba(28, 24, 26, 0.96), rgba(18, 16, 18, 0.98));
+      }
+      .text-ticker__viewport { overflow: hidden; }
+      .text-ticker__track { display: flex; width: max-content; }
+      .text-ticker__seq {
+        display: flex; flex-wrap: nowrap; margin: 0; padding: 0.95rem 0; list-style: none; flex-shrink: 0;
+      }
+      .text-ticker__seq li {
+        padding: 0 1.55rem; white-space: nowrap;
+        font-family: var(--font-display); letter-spacing: 0.06em; text-transform: uppercase;
+        color: rgba(243, 234, 209, 0.88);
+      }
       @media (max-width: 900px) {
         :root { --header-offset: 5.45rem; }
         .hero-inner--split { grid-template-columns: 1fr; }
@@ -339,26 +355,26 @@
     <!-- Non-blocking CSS: critical hero styles above paint first; full CSS follows without blocking parse. -->
     <link
       rel="stylesheet"
-      href="styles.min.css?v=sc-20260801s1"
+      href="styles.min.css?v=sc-20260803t4"
       media="print"
       onload="this.media='all'"
     />
     <link
       rel="stylesheet"
-      href="fonts-display.css?v=sc-20260801s1"
+      href="fonts-display.css?v=sc-20260803t4"
       media="print"
       onload="this.media='all'"
     />
     <link
       rel="stylesheet"
-      href="gallery.css?v=sc-20260801s1"
+      href="gallery.css?v=sc-20260803t4"
       media="print"
       onload="this.media='all'"
     />
     <noscript>
-      <link rel="stylesheet" href="styles.min.css?v=sc-20260801s1" />
-      <link rel="stylesheet" href="fonts-display.css?v=sc-20260801s1" />
-      <link rel="stylesheet" href="gallery.css?v=sc-20260801s1" />
+      <link rel="stylesheet" href="styles.min.css?v=sc-20260803t4" />
+      <link rel="stylesheet" href="fonts-display.css?v=sc-20260803t4" />
+      <link rel="stylesheet" href="gallery.css?v=sc-20260803t4" />
     </noscript>
     <link rel="icon" type="image/png" href="images/brand/silerchef-logo.png" />
   </head>
@@ -543,6 +559,45 @@
               </button>
               <a class="btn btn-ghost" href="#contact">Contact</a>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="text-ticker" aria-label="Signature cuisines and occasions">
+        <div class="text-ticker__viewport">
+          <div class="text-ticker__track">
+            <ul class="text-ticker__seq">
+              <li>Private Chef</li>
+              <li>Reno</li>
+              <li>Lake Tahoe</li>
+              <li>Bay Area</li>
+              <li>French</li>
+              <li>Italian</li>
+              <li>Turkish</li>
+              <li>Greek</li>
+              <li>American</li>
+              <li>Middle Eastern</li>
+              <li>Anniversaries</li>
+              <li>Family Dinners</li>
+              <li>Chef Education</li>
+              <li>In-Home Dining</li>
+            </ul>
+            <ul class="text-ticker__seq" aria-hidden="true">
+              <li>Private Chef</li>
+              <li>Reno</li>
+              <li>Lake Tahoe</li>
+              <li>Bay Area</li>
+              <li>French</li>
+              <li>Italian</li>
+              <li>Turkish</li>
+              <li>Greek</li>
+              <li>American</li>
+              <li>Middle Eastern</li>
+              <li>Anniversaries</li>
+              <li>Family Dinners</li>
+              <li>Chef Education</li>
+              <li>In-Home Dining</li>
+            </ul>
           </div>
         </div>
       </section>
@@ -1908,7 +1963,7 @@
         if (c) window.__SILERCHEF_API_BASE__ = c;
       })();
     </script>
-    <script src="data.js?v=sc-20260801s1" defer></script>
-    <script src="main.js?v=sc-20260801s1" defer></script>
+    <script src="data.js?v=sc-20260803t4" defer></script>
+    <script src="main.js?v=sc-20260803t4" defer></script>
   </body>
 </html>

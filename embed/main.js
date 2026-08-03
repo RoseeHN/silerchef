@@ -297,11 +297,10 @@
   }
 
   /**
-   * First paint for detail modal: hub thumb + numbered gallery JPGs (no probes).
-   * When runtime/API merge leaves `copy.blocks` empty, async scans alone can time out and leave a single thumb.
+   * First paint for detail modal: only files that almost always exist (hero/thumb).
+   * Do NOT invent gallery/01…06 slots — missing files paint as empty grey thumbs.
    */
-  function buildDetailBootstrapGallery(baseFolder, slug, maxSlot) {
-    const cap = typeof maxSlot === 'number' && maxSlot > 0 ? maxSlot : 6;
+  function buildDetailBootstrapGallery(baseFolder, slug) {
     const out = [];
     const seen = new Set();
     function add(u) {
@@ -309,12 +308,49 @@
       seen.add(u);
       out.push(u);
     }
+    add(`${baseFolder}/${slug}/hero.jpg`);
     add(`${baseFolder}/${slug}/thumb.jpg`);
-    const gp = `${baseFolder}/${slug}/gallery`;
-    for (let i = 1; i <= cap; i++) {
-      add(`${gp}/${pad2(i)}.jpg`);
-    }
     return out;
+  }
+
+  function probeImageMeta(url) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () =>
+        resolve({
+          url,
+          w: img.naturalWidth || 0,
+          h: img.naturalHeight || 0,
+        });
+      img.onerror = () => resolve(null);
+      img.src = url;
+    });
+  }
+
+  /**
+   * Prefer sharp, high-pixel frames first. Drop phone/story leftovers under ~1000px
+   * so the detail hero is never upscaled mush.
+   */
+  async function orderGalleryForDisplay(urls) {
+    if (!urls || !urls.length) return [];
+    const metas = await Promise.all(urls.map((u) => probeImageMeta(u)));
+    const MIN_EDGE = 1000;
+    const valid = metas.filter((m) => m && Math.max(m.w, m.h) >= MIN_EDGE && Math.min(m.w, m.h) >= 700);
+    if (!valid.length) {
+      return metas.filter(Boolean).map((m) => m.url);
+    }
+    valid.sort((a, b) => {
+      const aThumb = /\/thumb\.jpe?g$/i.test(a.url) ? 1 : 0;
+      const bThumb = /\/thumb\.jpe?g$/i.test(b.url) ? 1 : 0;
+      if (aThumb !== bThumb) return aThumb - bThumb;
+      const aArea = a.w * a.h;
+      const bArea = b.w * b.h;
+      if (bArea !== aArea) return bArea - aArea;
+      const aLand = a.w >= a.h * 0.92 ? 0 : 1;
+      const bLand = b.w >= b.h * 0.92 ? 0 : 1;
+      return aLand - bLand;
+    });
+    return valid.map((m) => m.url);
   }
 
   async function collectGalleryUrls(baseFolder, slug) {
@@ -322,11 +358,16 @@
     const base = `${baseFolder}/${slug}`;
     const galleryPath = `${base}/gallery`;
 
-    const [fromGallery, hero] = await Promise.all([
+    const [fromGallery, hero, thumb] = await Promise.all([
       collectNumberedImages(galleryPath),
       (async () => {
         return (
           (await probeUrlExists(`${base}/hero.jpg`)) || (await probeUrlExists(`${base}/hero.jpeg`))
+        );
+      })(),
+      (async () => {
+        return (
+          (await probeUrlExists(`${base}/thumb.jpg`)) || (await probeUrlExists(`${base}/thumb.jpeg`))
         );
       })(),
     ]);
@@ -341,33 +382,26 @@
     }
 
     fromGallery.forEach(pushUnique);
-    pushUnique(hero);
-
-    if (copy && Array.isArray(copy.blocks)) {
-      for (const block of copy.blocks) {
-        const raw = typeof block.image === 'string' ? block.image.trim() : '';
-        if (!raw) continue;
-        /** data.js paths are canonical — probing each blocked the carousel on slow scans / timeouts. */
-        pushUnique(raw);
-      }
-    }
-
-    const hasBlockImages =
-      copy &&
-      Array.isArray(copy.blocks) &&
-      copy.blocks.some((b) => b && typeof b.image === 'string' && b.image.trim());
-    if (!hasBlockImages) {
-      for (let i = 1; i <= 12; i++) {
-        pushUnique(`${galleryPath}/${pad2(i)}.jpg`);
-      }
-    }
-
-    if (!found.length) {
+    if (!fromGallery.length) {
       const fromLegacy = await collectNumberedImages(base);
       fromLegacy.forEach(pushUnique);
     }
+    pushUnique(hero);
+    pushUnique(thumb);
 
-    return found;
+    if (copy && Array.isArray(copy.blocks)) {
+      const blockUrls = [];
+      for (const block of copy.blocks) {
+        const raw = typeof block.image === 'string' ? block.image.trim() : '';
+        if (raw) blockUrls.push(raw);
+      }
+      const verified = await Promise.all(blockUrls.map((u) => probeUrlExists(u)));
+      verified.forEach(pushUnique);
+    }
+
+    /** Cap strip size — special-events has hundreds of files; keep the modal snappy. */
+    const capped = found.slice(0, 24);
+    return orderGalleryForDisplay(capped);
   }
 
   function getCopy(kind, slug) {
@@ -377,11 +411,8 @@
   }
 
   function getCardImageSrc(kind, slug, baseFolder) {
-    const copy = getCopy(kind, slug);
-    const firstBlock = copy && Array.isArray(copy.blocks) ? copy.blocks[0] : null;
-    const dynamicImage = firstBlock && typeof firstBlock.image === 'string' ? firstBlock.image.trim() : '';
-    if (dynamicImage) return dynamicImage;
-    return `${baseFolder}/${slug}/thumb.jpg`;
+    /** Prefer rebuilt hi-res hero over legacy block paths that may 404 after gallery cleanup. */
+    return `${baseFolder}/${slug}/hero.jpg`;
   }
 
   function renderBlocks(container, copy, kind, slug) {
@@ -489,7 +520,7 @@
     /* Detail gallery uses CSS marquee + static hero; nothing to clear */
   }
 
-  function setupCarousel(heroEl, stripEl, urls) {
+  function setupCarousel(heroEl, stripEl, urlsInput) {
     resetCarouselTimers();
 
     if (detailHeroPreloadLink) {
@@ -503,6 +534,7 @@
 
     const dock = document.querySelector('.detail-gallery-dock');
     const marqueeRoot = document.getElementById('detail-marquee');
+    const urls = Array.isArray(urlsInput) ? urlsInput.slice() : [];
 
     if (!urls.length) {
       heroEl.removeAttribute('src');
@@ -539,27 +571,46 @@
 
     let currentIdx = 0;
     const sectionName = detailTitle && detailTitle.textContent ? detailTitle.textContent.trim() : '';
-    const lightboxItems = urls.map((url, idx) => {
-      const dish = galleryTitleForUrl(url);
-      const fallback = `Gallery image ${idx + 1}`;
-      const primaryTitle = dish || fallback;
-      return {
-        src: url,
-        alt: primaryTitle,
-        kicker: detailKicker && detailKicker.textContent ? detailKicker.textContent : 'Gallery moment',
-        title: sectionName ? `${sectionName} · ${primaryTitle}` : primaryTitle,
-        text: detailIntro && detailIntro.textContent ? detailIntro.textContent : 'A closer look at this menu direction and its visual language.',
-      };
-    });
+
+    function lightboxItems() {
+      return urls.map((url, idx) => {
+        const dish = galleryTitleForUrl(url);
+        const fallback = `Gallery image ${idx + 1}`;
+        const primaryTitle = dish || fallback;
+        return {
+          src: url,
+          alt: primaryTitle,
+          kicker: detailKicker && detailKicker.textContent ? detailKicker.textContent : 'Gallery moment',
+          title: sectionName ? `${sectionName} · ${primaryTitle}` : primaryTitle,
+          text:
+            detailIntro && detailIntro.textContent
+              ? detailIntro.textContent
+              : 'A closer look at this menu direction and its visual language.',
+        };
+      });
+    }
 
     const prefersReduced =
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const runMarquee = urls.length > 1 && !prefersReduced;
+    function syncMarqueeMode() {
+      const runMarquee = urls.length > 1 && !prefersReduced;
+      if (runMarquee) {
+        const secPerImg = 2.4;
+        const dur = Math.min(100, Math.max(26, urls.length * secPerImg));
+        stripEl.style.setProperty('--detail-marquee-duration', `${dur}s`);
+        if (marqueeRoot) marqueeRoot.classList.remove('detail-marquee--static');
+      } else {
+        stripEl.style.removeProperty('--detail-marquee-duration');
+        if (marqueeRoot) marqueeRoot.classList.add('detail-marquee--static');
+      }
+      return runMarquee;
+    }
 
     function goToIndex(idx) {
       const n = urls.length;
+      if (!n) return;
       currentIdx = ((idx % n) + n) % n;
       heroEl.src = urls[currentIdx];
       const dish = galleryTitleForUrl(urls[currentIdx]);
@@ -571,7 +622,25 @@
     }
 
     heroEl.style.cursor = 'zoom-in';
-    heroEl.onclick = () => openMomentsLightbox(lightboxItems, currentIdx);
+    heroEl.onclick = () => openMomentsLightbox(lightboxItems(), currentIdx);
+
+    function dropBrokenUrl(url) {
+      const at = urls.indexOf(url);
+      if (at < 0) return;
+      urls.splice(at, 1);
+      stripEl.querySelectorAll('.detail-thumb').forEach((el) => {
+        if (el.dataset.thumbUrl === url) el.remove();
+      });
+      stripEl.querySelectorAll('.detail-thumb').forEach((t, i) => {
+        t.dataset.thumbIndex = String(i);
+      });
+      if (!urls.length) {
+        setupCarousel(heroEl, stripEl, []);
+        return;
+      }
+      syncMarqueeMode();
+      goToIndex(Math.min(currentIdx, urls.length - 1));
+    }
 
     function makeThumb(idx, isMarqueeDuplicate) {
       const url = urls[idx];
@@ -579,35 +648,37 @@
       const b = document.createElement('button');
       b.type = 'button';
       b.dataset.thumbIndex = String(idx);
+      b.dataset.thumbUrl = url;
       b.className = 'detail-thumb' + (idx === 0 ? ' is-active' : '');
       b.setAttribute('aria-label', dish ? `Show ${dish}` : 'Show image ' + (idx + 1));
       const im = document.createElement('img');
       im.src = url;
       im.alt = dish || '';
-      if (isMarqueeDuplicate) {
-        /** Second marquee strip is off-screen clone — defer so we do not double-contend with hero + row 1. */
-        im.loading = 'lazy';
-        if ('fetchPriority' in im) {
-          im.fetchPriority = 'low';
-        }
-      } else {
-        im.loading = idx < 2 ? 'eager' : 'lazy';
-        if (idx < 3 && 'fetchPriority' in im) {
-          im.fetchPriority = idx === 0 ? 'high' : 'auto';
-        }
+      /**
+       * Never lazy-load the primary strip: overflow:hidden marquees keep off-screen
+       * thumbs unloaded forever (empty grey slots).
+       */
+      im.loading = isMarqueeDuplicate ? 'lazy' : 'eager';
+      if ('fetchPriority' in im) {
+        im.fetchPriority = isMarqueeDuplicate ? 'low' : idx === 0 ? 'high' : 'auto';
       }
       im.decoding = 'async';
       im.sizes = '140px';
+      im.addEventListener('error', () => dropBrokenUrl(url), { once: true });
       b.appendChild(im);
       b.addEventListener('click', () => {
-        goToIndex(idx);
-        openMomentsLightbox(lightboxItems, idx);
+        const liveIdx = urls.indexOf(url);
+        if (liveIdx < 0) return;
+        goToIndex(liveIdx);
+        openMomentsLightbox(lightboxItems(), liveIdx);
       });
       b.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
-          goToIndex(idx);
-          openMomentsLightbox(lightboxItems, idx);
+          const liveIdx = urls.indexOf(url);
+          if (liveIdx < 0) return;
+          goToIndex(liveIdx);
+          openMomentsLightbox(lightboxItems(), liveIdx);
         }
       });
       return b;
@@ -616,22 +687,14 @@
     const seq1 = document.createElement('div');
     seq1.className = 'detail-marquee__seq';
     urls.forEach((_, idx) => seq1.appendChild(makeThumb(idx, false)));
-
     stripEl.appendChild(seq1);
 
-    if (runMarquee) {
+    if (syncMarqueeMode()) {
       const seq2 = document.createElement('div');
       seq2.className = 'detail-marquee__seq';
       seq2.setAttribute('aria-hidden', 'true');
       urls.forEach((_, idx) => seq2.appendChild(makeThumb(idx, true)));
       stripEl.appendChild(seq2);
-      const secPerImg = 2.4;
-      const dur = Math.min(100, Math.max(26, urls.length * secPerImg));
-      stripEl.style.setProperty('--detail-marquee-duration', `${dur}s`);
-      if (marqueeRoot) marqueeRoot.classList.remove('detail-marquee--static');
-    } else {
-      stripEl.style.removeProperty('--detail-marquee-duration');
-      if (marqueeRoot) marqueeRoot.classList.add('detail-marquee--static');
     }
 
     goToIndex(0);

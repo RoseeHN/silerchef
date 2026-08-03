@@ -632,7 +632,7 @@
       "blocks": [
         {
           "title": "Set 1 · Ottoman Grandeur",
-          "image": "images/cuisines/turkish-cuisine/gallery/01.jpg",
+          "image": "images/cuisines/turkish-cuisine/gallery/02.jpg",
           "items": [
             {
               "name": "Appetizer",
@@ -658,7 +658,7 @@
         },
         {
           "title": "Set 2 · The Sultan’s Table",
-          "image": "images/cuisines/turkish-cuisine/gallery/02.jpg",
+          "image": "images/cuisines/turkish-cuisine/gallery/03.jpg",
           "items": [
             {
               "name": "Appetizer",
@@ -684,7 +684,7 @@
         },
         {
           "title": "Set 3 · Anatolian Silk",
-          "image": "images/cuisines/turkish-cuisine/gallery/03.jpg",
+          "image": "images/cuisines/turkish-cuisine/gallery/04.jpg",
           "items": [
             {
               "name": "Appetizer",
@@ -715,7 +715,7 @@
       "blocks": [
         {
           "title": "Set 1 · The Global Gastronome",
-          "image": "images/cuisines/middle-eastern-cuisine/gallery/01.jpg",
+          "image": "images/cuisines/middle-eastern-cuisine/gallery/06.jpg",
           "items": [
             {
               "name": "Appetizer",
@@ -741,7 +741,7 @@
         },
         {
           "title": "Set 2 · The Continental Fusion",
-          "image": "images/cuisines/middle-eastern-cuisine/gallery/02.jpg",
+          "image": "images/cuisines/middle-eastern-cuisine/gallery/07.jpg",
           "items": [
             {
               "name": "Appetizer",
@@ -767,7 +767,7 @@
         },
         {
           "title": "Set 3 · The Silk Road Fusion",
-          "image": "images/cuisines/middle-eastern-cuisine/gallery/03.jpg",
+          "image": "images/cuisines/middle-eastern-cuisine/gallery/08.jpg",
           "items": [
             {
               "name": "Appetizer",
