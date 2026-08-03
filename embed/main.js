@@ -297,69 +297,38 @@
   }
 
   /**
-   * First paint: one frame only (hero mirrors gallery/01). Avoid thumb + hero twins.
+   * Known contiguous gallery lengths (after pack renumber). Instant strip — no HEAD fan-out.
+   * Missing slots are dropped by carousel img.onerror.
    */
+  const DETAIL_GALLERY_COUNTS = {
+    'american-cuisine': 22,
+    'french-cuisine': 12,
+    'greek-cuisine': 16,
+    'italian-cuisine': 6,
+    'middle-eastern-cuisine': 12,
+    'turkish-cuisine': 8,
+    'anniversary-celebrations': 4,
+    'birthday-events': 4,
+    'chef-education': 4,
+    'family-dinners': 4,
+    'special-events': 24,
+    'special-occasion-dining': 4,
+  };
+
+  /** Immediate gallery URLs in pack order — no network probes before first paint. */
   function buildDetailBootstrapGallery(baseFolder, slug) {
-    return [`${baseFolder}/${slug}/gallery/01.jpg`];
-  }
-
-  function probeImageMeta(url) {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () =>
-        resolve({
-          url,
-          w: img.naturalWidth || 0,
-          h: img.naturalHeight || 0,
-        });
-      img.onerror = () => resolve(null);
-      img.src = url;
-    });
-  }
-
-  /** Keep discovery order; drop unbroken low-res leftovers. Never reorder by area. */
-  async function filterGalleryForDisplay(urls) {
-    if (!urls || !urls.length) return [];
-    const metas = await Promise.all(urls.map((u) => probeImageMeta(u)));
-    const MIN_EDGE = 900;
-    const valid = [];
-    for (const m of metas) {
-      if (!m) continue;
-      if (Math.max(m.w, m.h) < MIN_EDGE && Math.min(m.w, m.h) < 700) continue;
-      valid.push(m.url);
+    const known = DETAIL_GALLERY_COUNTS[slug];
+    const count = typeof known === 'number' && known > 0 ? known : 12;
+    const out = [];
+    for (let i = 1; i <= count; i++) {
+      out.push(`${baseFolder}/${slug}/gallery/${pad2(i)}.jpg`);
     }
-    return valid.length ? valid : metas.filter(Boolean).map((m) => m.url);
+    return out;
   }
 
-  /**
-   * Detail strip = numbered gallery files only (canonical pack order).
-   * Hero/thumb are derivatives of gallery/01 — including them caused triple repeats.
-   * Set card images stay on meal cards; they are not re-injected into the strip.
-   */
+  /** Kept for non-detail callers; detail modal no longer awaits this path. */
   async function collectGalleryUrls(baseFolder, slug) {
-    const base = `${baseFolder}/${slug}`;
-    const galleryPath = `${base}/gallery`;
-    const fromGallery = await collectNumberedImages(galleryPath);
-    const found = [];
-    const seen = new Set();
-
-    function pushUnique(url) {
-      if (!url || seen.has(url)) return;
-      seen.add(url);
-      found.push(url);
-    }
-
-    fromGallery.forEach(pushUnique);
-
-    if (!found.length) {
-      const hero =
-        (await probeUrlExists(`${base}/hero.jpg`)) || (await probeUrlExists(`${base}/hero.jpeg`));
-      pushUnique(hero);
-      const fromLegacy = await collectNumberedImages(base);
-      fromLegacy.forEach(pushUnique);
-    }
-
-    return filterGalleryForDisplay(found.slice(0, 24));
+    return buildDetailBootstrapGallery(baseFolder, slug);
   }
 
   /** Keep set thumbs aligned to gallery/01… after API merges stale paths. */
@@ -733,9 +702,8 @@
 
     renderBlocks(detailBlocks, copy, kind, slug);
 
-    /** Thumb + canonical gallery/01… slots — immediate strip; async pass refines order and adds hero/extras. */
-    const bootstrapUrls = buildDetailBootstrapGallery(baseFolder, slug);
-    setupCarousel(detailHero, detailStrip, bootstrapUrls);
+    /** Full strip immediately from known pack counts — no async HEAD scan (was 16s stall). */
+    setupCarousel(detailHero, detailStrip, buildDetailBootstrapGallery(baseFolder, slug));
 
     overlay.hidden = false;
     overlay.setAttribute('aria-hidden', 'false');
@@ -743,22 +711,6 @@
     lockViewport('detail');
 
     overlay.scrollTop = 0;
-
-    const GALLERY_PROBE_MS = 16000;
-    void (async () => {
-      try {
-        const urls = await Promise.race([
-          collectGalleryUrls(baseFolder, slug),
-          new Promise((_, reject) => {
-            window.setTimeout(() => reject(new Error('gallery-timeout')), GALLERY_PROBE_MS);
-          }),
-        ]);
-        const next = urls && urls.length ? urls : bootstrapUrls;
-        setupCarousel(detailHero, detailStrip, next);
-      } catch {
-        setupCarousel(detailHero, detailStrip, bootstrapUrls);
-      }
-    })();
 
     if (detailClose) {
       try {
