@@ -4697,20 +4697,24 @@ body.scroll-locked {
 
 .module-split-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  gap: clamp(1.5rem, 4vw, 3rem);
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: clamp(0.85rem, 1.8vw, 1.35rem);
   align-items: center;
 }
 
 .module-split-visual {
   position: relative;
+  justify-self: end;
+  width: min(100%, 28rem);
   border-radius: calc(var(--radius) + 4px);
   overflow: hidden;
-  border: 1px solid rgba(197, 160, 89, 0.2);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(197, 160, 89, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 248, 235, 0.05),
+    0 0 0 1px rgba(0, 0, 0, 0.2);
   background: var(--bg-elevated);
   aspect-ratio: 4 / 5;
-  max-height: min(70vh, 600px);
+  max-height: min(68vh, 34rem);
 }
 
 .module-split-visual img {
@@ -5031,6 +5035,8 @@ body.scroll-locked {
 
   .module-split-visual {
     order: -1;
+    justify-self: center;
+    width: min(100%, 28rem);
     max-width: 28rem;
     margin: 0 auto;
     max-height: none;
@@ -5646,10 +5652,10 @@ body.scroll-locked {
   margin: 0;
   border-radius: calc(var(--radius) + 8px);
   overflow: hidden;
-  border: 1px solid rgba(197, 160, 89, 0.22);
+  border: 1px solid rgba(197, 160, 89, 0.2);
   box-shadow:
-    inset 0 1px 0 rgba(255, 248, 235, 0.06),
-    0 24px 70px rgba(0, 0, 0, 0.35);
+    inset 0 1px 0 rgba(255, 248, 235, 0.05),
+    0 0 0 1px rgba(0, 0, 0, 0.2);
   min-height: 100%;
 }
 
@@ -5662,7 +5668,7 @@ body.scroll-locked {
 
 .chef-story-spotlight__visual img {
   object-fit: cover;
-  object-position: center 22%;
+  object-position: center 28%;
 }
 
 /** Desktop: chef portrait fills the lead card height */
