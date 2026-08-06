@@ -372,26 +372,26 @@
     <!-- Non-blocking CSS: critical hero styles above paint first; full CSS follows without blocking parse. -->
     <link
       rel="stylesheet"
-      href="styles.min.css?v=sc-20260806b1"
+      href="styles.min.css?v=sc-20260806e1"
       media="print"
       onload="this.media='all'"
     />
     <link
       rel="stylesheet"
-      href="fonts-display.css?v=sc-20260806b1"
+      href="fonts-display.css?v=sc-20260806e1"
       media="print"
       onload="this.media='all'"
     />
     <link
       rel="stylesheet"
-      href="gallery.css?v=sc-20260806b1"
+      href="gallery.css?v=sc-20260806e1"
       media="print"
       onload="this.media='all'"
     />
     <noscript>
-      <link rel="stylesheet" href="styles.min.css?v=sc-20260806b1" />
-      <link rel="stylesheet" href="fonts-display.css?v=sc-20260806b1" />
-      <link rel="stylesheet" href="gallery.css?v=sc-20260806b1" />
+      <link rel="stylesheet" href="styles.min.css?v=sc-20260806e1" />
+      <link rel="stylesheet" href="fonts-display.css?v=sc-20260806e1" />
+      <link rel="stylesheet" href="gallery.css?v=sc-20260806e1" />
     </noscript>
     <link rel="icon" type="image/png" href="images/brand/silerchef-logo.png" />
   </head>
@@ -425,13 +425,12 @@
         </a>
         <nav id="site-nav" class="site-nav" aria-label="Primary">
           <ul>
-            <li><a href="#home">Home</a></li>
             <li><a href="#cuisines">Cuisines</a></li>
             <li><a href="#video-gallery">Videos</a></li>
             <li><a href="#moments">Photos</a></li>
             <li><a href="/blog">Journal</a></li>
-            <li><a href="#services">Services &amp; Occasions</a></li>
-            <li><a href="#onsite-cooking">On-Site Cooking</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#onsite-cooking">On-Site</a></li>
             <li><a href="#contact">Contact</a></li>
             <li class="site-nav__cta-mobile">
               <button type="button" class="header-cta" data-booking-trigger data-booking-placement="mobile_nav">
@@ -456,25 +455,10 @@
     </header>
 
     <div class="page">
-      <section id="home" class="hero hero--editorial observe">
-        <div class="ambient-sparkles ambient-sparkles--hero" aria-hidden="true">
-          <span class="ambient-sparkles__dot"></span>
-          <span class="ambient-sparkles__dot"></span>
-          <span class="ambient-sparkles__dot"></span>
-          <span class="ambient-sparkles__dot"></span>
-          <span class="ambient-sparkles__dot"></span>
-          <span class="ambient-sparkles__dot"></span>
-          <span class="ambient-sparkles__dot"></span>
-          <span class="ambient-sparkles__dot"></span>
-          <span class="ambient-sparkles__dot"></span>
-          <span class="ambient-sparkles__dot"></span>
-        </div>
+      <section id="home" class="hero hero--stage observe">
+        <div class="hero-glow" aria-hidden="true"></div>
         <div class="shell hero-inner hero-inner--split">
           <div class="hero-panel hero-panel--visual">
-            <div class="hero-floating-card hero-floating-card--north">
-              <span id="hero-floating-north-eyebrow" class="hero-floating-card__eyebrow">Chef-led private dining</span>
-              <strong id="hero-floating-north-title" class="hero-floating-card__title">Restaurant-level presence. At your table.</strong>
-            </div>
             <figure class="hero-frame hero-frame--feature hero-frame--rotator" aria-label="Chef Fikret Siler">
               <div class="hero-rotator">
                 <picture class="hero-rotator__slide is-active">
@@ -485,7 +469,7 @@
                       images/homepage/hero-01-640.webp 640w,
                       images/homepage/hero-01-800.webp 800w
                     "
-                    sizes="(max-width: 900px) 100vw, 48vw"
+                    sizes="(max-width: 900px) 100vw, 52vw"
                   />
                   <img
                     src="images/homepage/hero-01-640.webp"
@@ -495,7 +479,7 @@
                     loading="eager"
                     decoding="async"
                     fetchpriority="high"
-                    sizes="(max-width: 900px) 100vw, 48vw"
+                    sizes="(max-width: 900px) 100vw, 52vw"
                     srcset="
                       images/homepage/hero-01-480.webp 480w,
                       images/homepage/hero-01-640.webp 640w,
@@ -511,7 +495,7 @@
                     height="1280"
                     loading="lazy"
                     decoding="async"
-                    sizes="(max-width: 900px) 100vw, 48vw"
+                    sizes="(max-width: 900px) 100vw, 52vw"
                   />
                 </picture>
                 <picture class="hero-rotator__slide">
@@ -522,61 +506,78 @@
                     height="1280"
                     loading="lazy"
                     decoding="async"
-                    sizes="(max-width: 900px) 100vw, 48vw"
+                    sizes="(max-width: 900px) 100vw, 52vw"
                   />
                 </picture>
               </div>
             </figure>
-            <div class="hero-floating-card hero-floating-card--south">
-              <span id="hero-floating-south-eyebrow" class="hero-floating-card__eyebrow">What’s included</span>
-              <strong id="hero-floating-south-title" class="hero-floating-card__title">Custom menu arc, sourcing, service rhythm, and a polished finish</strong>
-            </div>
           </div>
           <div class="hero-panel hero-panel--copy">
-            <div class="hero-copy-lead">
-              <div class="hero-copy-top">
-                <picture>
-                  <source type="image/webp" srcset="images/brand/silerchef-logo.webp" />
-                  <img
-                    class="brand-logo brand-logo--hero-inline"
-                    src="images/brand/silerchef-logo.png"
-                    width="52"
-                    height="52"
-                    alt=""
-                    decoding="async"
-                  />
-                </picture>
-                <p class="hero-eyebrow">Siler Chef · Reno–Tahoe</p>
+            <div class="hero-copy-top">
+              <picture>
+                <source type="image/webp" srcset="images/brand/silerchef-logo.webp" />
+                <img
+                  class="brand-logo brand-logo--hero-inline"
+                  src="images/brand/silerchef-logo.png"
+                  width="56"
+                  height="56"
+                  alt=""
+                  decoding="async"
+                />
+              </picture>
+              <div class="hero-copy-top__text">
+                <p class="hero-brand">Siler Chef</p>
+                <p id="hero-floating-north-eyebrow" class="hero-kicker">Chef-led private dining</p>
               </div>
-              <h1 class="gold-text hero-headline">Siler Chef — Private &amp; Personal Chef in Reno, Lake Tahoe &amp; the Bay Area</h1>
-              <p class="tagline hero-tagline">Private chef dining at home · Reno · Tahoe · Bay Area</p>
-              <p class="hero-lede">
-                For hosts who want more than dinner, Siler Chef designs globally inspired menus, refined plating, and an
-                effortless service flow that turns home entertaining into a true occasion.
-              </p>
-              <ul class="hero-proof-chips" aria-label="Luxury private dining highlights">
-                <li id="hero-chip-0">Luxury private chef dining</li>
-                <li id="hero-chip-1">Plated or family-style service</li>
-                <li id="hero-chip-2">Reno · Tahoe · Bay Area</li>
-              </ul>
             </div>
-            <div class="hero-mini-grid" aria-label="Signature positioning">
-              <article class="hero-mini-card hero-mini-card--primary">
-                <span id="hero-mini-primary-eyebrow" class="hero-mini-card__eyebrow">Why it lands</span>
-                <strong id="hero-mini-primary-title" class="hero-mini-card__title">This feels like bringing the best seat in the city into your home.</strong>
+            <h1 class="hero-headline">
+              Global flavors, happy tables, unforgettable nights at home
+            </h1>
+            <p id="hero-floating-north-title" class="hero-promise">
+              Restaurant-level presence. At your table.
+            </p>
+            <p class="hero-lede">
+              Restaurant-level menus and service for Reno, Lake Tahoe, Truckee, and Incline Village —
+              cooked and plated where your celebration already is.
+            </p>
+            <div class="hero-included">
+              <span id="hero-floating-south-eyebrow" class="hero-included__eyebrow">What’s included</span>
+              <strong id="hero-floating-south-title" class="hero-included__title"
+                >Professional culinary mastery, global menus, and warm hospitality at home.</strong
+              >
+            </div>
+            <ul class="hero-proof-chips" aria-label="Luxury private dining highlights">
+              <li id="hero-chip-0">Luxury private chef dining</li>
+              <li id="hero-chip-1">Plated or family-style service</li>
+              <li id="hero-chip-2">Reno · Tahoe · Bay Area</li>
+            </ul>
+            <div class="hero-notes" aria-label="Signature positioning">
+              <article class="hero-note">
+                <span id="hero-mini-primary-eyebrow" class="hero-note__eyebrow">Why it lands</span>
+                <strong id="hero-mini-primary-title" class="hero-note__title"
+                  >A globally inspired chef experience designed for the nights your guests remember.</strong
+                >
               </article>
-              <article class="hero-mini-card">
-                <span id="hero-mini-secondary-eyebrow" class="hero-mini-card__eyebrow">Best for</span>
-                <strong id="hero-mini-secondary-title" class="hero-mini-card__title">Anniversaries, executive dinners, birthdays, and nights that deserve a real statement.</strong>
+              <article class="hero-note">
+                <span id="hero-mini-secondary-eyebrow" class="hero-note__eyebrow">Best for</span>
+                <strong id="hero-mini-secondary-title" class="hero-note__title"
+                  >Private dinners, celebrations, and chef-led tables with real five-star discipline.</strong
+                >
               </article>
             </div>
             <div class="hero-actions">
-              <a class="btn btn-primary" href="#cuisines">See Signature Menus</a>
-              <button type="button" class="btn btn-ghost" data-booking-trigger data-booking-placement="hero_check_availability">
-                Check availability
+              <button
+                type="button"
+                class="btn btn-primary"
+                data-booking-trigger
+                data-booking-placement="hero_check_availability"
+              >
+                Reserve your date
               </button>
+              <a class="btn btn-ghost" href="#cuisines">Explore menus</a>
               <a class="btn btn-ghost" href="#contact">Contact</a>
             </div>
+            <p class="hero-tagline hero-locales">Reno · Tahoe · Truckee · Incline Village</p>
           </div>
         </div>
       </section>
@@ -2045,7 +2046,7 @@
         if (c) window.__SILERCHEF_API_BASE__ = c;
       })();
     </script>
-    <script src="data.js?v=sc-20260806b1" defer></script>
-    <script src="main.js?v=sc-20260806b1" defer></script>
+    <script src="data.js?v=sc-20260806e1" defer></script>
+    <script src="main.js?v=sc-20260806e1" defer></script>
   </body>
 </html>

@@ -1268,27 +1268,39 @@ final class Repository
             }
         }
 
-        $legacyHeroHeadline = 'Global Flavors, Happy Tables, Unforgettable Moments';
-        $legacyHeroTagline = 'Reno · Private dining · Bespoke menus';
-        $legacyHeroLede = 'Exquisite world cuisines in the comfort of your home - Chef Siler curates and shapes each experience for your table.';
+        $legacyHeroHeadlines = [
+            'Global Flavors, Happy Tables, Unforgettable Moments',
+            'SilerChef: Global Flavors, Happy Tables, Unforgettable Moments.',
+            'Siler Chef — Private & Personal Chef in Reno, Lake Tahoe & the Bay Area',
+        ];
+        $legacyHeroTaglines = [
+            'Reno · Private dining · Bespoke menus',
+            'Reno · Tahoe · Bay Area · Luxury in-home experiences',
+            'Private chef dining at home · Reno · Tahoe · Bay Area',
+        ];
+        $legacyHeroLedes = [
+            'Exquisite world cuisines in the comfort of your home - Chef Siler curates and shapes each experience for your table.',
+            'For hosts who want more than dinner, Siler Chef designs globally inspired menus, refined plating, and an effortless service flow that turns home entertaining into a true occasion.',
+            'Bringing the world’s most exquisite cuisines to your home for your most special occasions. Experience a unique fusion of professional culinary mastery and the joy of gathering together.',
+        ];
+        $hero = isset($content['site']['hero']) && is_array($content['site']['hero'])
+            ? $content['site']['hero']
+            : [];
+        if (in_array((string) ($hero['headline'] ?? ''), $legacyHeroHeadlines, true)) {
+            $content['site']['hero']['headline'] = 'Global flavors, happy tables, unforgettable nights at home';
+        }
+        if (in_array((string) ($hero['tagline'] ?? ''), $legacyHeroTaglines, true)) {
+            $content['site']['hero']['tagline'] = 'Reno · Tahoe · Truckee · Incline Village';
+        }
+        if (in_array((string) ($hero['lede'] ?? ''), $legacyHeroLedes, true)) {
+            $content['site']['hero']['lede'] =
+                'Restaurant-level menus and service for Reno, Lake Tahoe, Truckee, and Incline Village — cooked and plated where your celebration already is.';
+        }
         $legacyServicesLede = 'Corporate milestones, workshops, family tables, and intimate celebrations - open any card for experience pillars and a full image strip.';
         $legacyCtaSummary = 'Choose a time, tell us about your occasion, and we’ll follow up with menu direction.';
         $legacyBookingLede = 'Tell us about your table - we’ll confirm and shape the menu from here.';
         $legacyBookingSuccess = 'We’ll follow up shortly to confirm timing and menu direction.';
         $legacyContactSubtitle = 'Chef Siler · Reno, Nevada - call, message, or follow.';
-        $hero = isset($content['site']['hero']) && is_array($content['site']['hero'])
-            ? $content['site']['hero']
-            : [];
-        if (($hero['headline'] ?? '') === $legacyHeroHeadline) {
-            $content['site']['hero']['headline'] = 'SilerChef: Global Flavors, Happy Tables, Unforgettable Moments.';
-        }
-        if (($hero['tagline'] ?? '') === $legacyHeroTagline) {
-            $content['site']['hero']['tagline'] = 'Reno · Tahoe · Bay Area · Luxury in-home experiences';
-        }
-        if (($hero['lede'] ?? '') === $legacyHeroLede) {
-            $content['site']['hero']['lede'] =
-                'For hosts who want more than dinner, Siler Chef designs globally inspired menus, refined plating, and an effortless service flow that turns home entertaining into a true occasion.';
-        }
         if (($content['site']['servicesSection']['lede'] ?? '') === $legacyServicesLede) {
             $content['site']['servicesSection']['lede'] =
                 'Corporate milestones, private lessons, family tables, and intimate celebrations - open any card for planning notes, sample flow, and a full image strip.';

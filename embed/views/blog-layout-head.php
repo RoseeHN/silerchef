@@ -69,12 +69,12 @@ $extraHeadHtml = $extraHeadHtml ?? null;
         </a>
         <nav id="site-nav" class="site-nav" aria-label="Primary">
           <ul>
-            <li><a href="/"<?= $activeNav === 'home' ? ' aria-current="page"' : '' ?>>Home</a></li>
             <li><a href="/#cuisines">Cuisines</a></li>
             <li><a href="/#video-gallery">Videos</a></li>
             <li><a href="/#moments">Photos</a></li>
             <li><a href="/blog"<?= $activeNav === 'blog' ? ' aria-current="page"' : '' ?>>Journal</a></li>
-            <li><a href="/#services">Services &amp; Occasions</a></li>
+            <li><a href="/#services">Services</a></li>
+            <li><a href="/#onsite-cooking">On-Site</a></li>
             <li><a href="/#contact">Contact</a></li>
             <li class="site-nav__cta-mobile">
               <a class="header-cta" href="/#contact">Reserve your date</a>
