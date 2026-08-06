@@ -23,9 +23,9 @@
       "cite": "Chef Siler"
     },
     "experience": {
-      "featuredImage": "images/gallery-curated/photos/03-kalamata-food-17-640.webp",
-      "hostingImage": "images/homepage/hero-02-480.webp",
-      "guestImage": "images/homepage/hero-03-480.webp",
+      "featuredImage": "images/homepage/pack-20260806/plated-desserts-640.webp",
+      "hostingImage": "images/homepage/pack-20260806/tahoe-table-640.webp",
+      "guestImage": "images/homepage/pack-20260806/guests-table-640.webp",
       "featuredEyebrow": "The invitation",
       "featuredTitle": "Bringing the world’s most exquisite cuisines home.",
       "featuredBody": "Siler Chef blends professional culinary mastery with the warmth and joy of gathering together, creating refined private dining for your most special occasions.",
@@ -60,14 +60,28 @@
     ],
     "coverage": {
       "eyebrow": "Areas we serve",
-      "title": "Private chef service across Reno, Lake Tahoe, and the Bay Area",
-      "body": "Hosts searching for a private chef in Reno, Lake Tahoe, or the Bay Area can book Siler Chef for in-home dinners, intimate celebrations, corporate meals, and chef-led education sessions with a custom service flow.",
+      "title": "Private chef near you in Reno, Tahoe, Truckee & Incline Village",
+      "body": "Looking for a personal chef, private chef, or chef near me in Reno, Lake Tahoe, South Lake Tahoe, Truckee, or Incline Village? Siler Chef brings on-site cooking and catering to homes, venues, and celebrations across Northern Nevada — with travel for qualified Bay Area events.",
       "chips": [
-        "Reno, Nevada",
+        "Reno",
         "Lake Tahoe",
-        "San Francisco Bay Area",
-        "Travel for qualified events"
+        "South Lake Tahoe",
+        "Truckee",
+        "Incline Village",
+        "Bay Area (qualified events)"
       ]
+    },
+    "onsiteCooking": {
+      "eyebrow": "On-site cooking",
+      "title": "On-Site Cooking Catering",
+      "body": "We cook and serve in your home, private venue, wedding, or special event — from prep through plating — so guests experience restaurant-level food where the celebration already is.",
+      "points": [
+        "In-home private chef dinners and family tables",
+        "Venue and wedding on-site cooking & service",
+        "Custom menus shaped around your brief and dietary needs"
+      ],
+      "primaryLabel": "Request a custom menu",
+      "secondaryLabel": "Contact Chef Siler"
     },
     "cuisinesSection": {
       "lede": "A portrait of world traditions - tap a cuisine for courses, tasting notes, and photography.",
@@ -100,13 +114,18 @@
     },
     "faq": {
       "eyebrow": "Questions clients already ask",
-      "title": "Private chef FAQs for Reno, Lake Tahoe, and the Bay Area",
-      "lede": "Clear answers for searchers comparing private-chef options, planning a reservation, or deciding what to send before the first call.",
+      "title": "Private chef FAQs for Reno, Lake Tahoe, Truckee & Incline Village",
+      "lede": "Clear answers for hosts comparing a personal chef or private chef near me in Reno, Tahoe, Truckee, Incline Village, and the Bay Area.",
       "items": [
         {
           "eyebrow": "Service area",
           "title": "What areas does Siler Chef serve?",
-          "body": "Siler Chef serves Reno, Lake Tahoe, and the San Francisco Bay Area, with travel considered for qualified private events and chef-led occasions."
+          "body": "Siler Chef is a mobile private chef serving Reno, Lake Tahoe, South Lake Tahoe, Truckee, and Incline Village, with travel considered for qualified Bay Area events and chef-led occasions."
+        },
+        {
+          "eyebrow": "On-site cooking",
+          "title": "Do you offer on-site cooking catering?",
+          "body": "Yes. We cook and serve on-site at homes, private venues, weddings, and special events. Share your date, guest count, and menu ideas — we build a custom plan and follow up by phone or email."
         },
         {
           "eyebrow": "Reservation flow",
@@ -142,7 +161,7 @@
       "highlights": [
         "Private chef planning",
         "Fast follow-up",
-        "Reno · Tahoe · Bay Area"
+        "Reno · Tahoe · Truckee · Incline Village"
       ],
       "steps": [
         {
@@ -174,21 +193,21 @@
     "detailNotice": "These are sample menu directions and service outlines - every event can be tailored to your brief, guest list, and dietary needs.",
     "contact": {
       "title": "Contact",
-      "subtitle": "Chef Siler · Reno, Nevada - serving Reno, Lake Tahoe, and the Bay Area.",
+      "subtitle": "Chef Siler · mobile private chef serving Reno, Lake Tahoe, Truckee & Incline Village.",
       "phone": "+1 (775) 389-6677",
       "phoneHref": "tel:+17753896677",
       "email": "silerchef@gmail.com",
       "emailHref": "mailto:silerchef@gmail.com",
       "website": "www.silerchef.com",
       "websiteHref": "https://www.silerchef.com/",
-      "location": "1555 N Sierra St, Reno, NV 89503",
-      "streetAddress": "1555 N Sierra St",
+      "location": "Reno · Lake Tahoe · Truckee · Incline Village",
+      "streetAddress": "",
       "addressLocality": "Reno",
       "addressRegion": "NV",
-      "postalCode": "89503",
+      "postalCode": "",
       "googleMapsHref": "https://www.google.com/maps/place/Siler+Chef+LLC/@39.543334371593346,-119.82424082388114,17z/data=!4m6!3m5!1s0xa180e099e5f7d05b:0x5f23cef288df732e!8m2!3d39.543334371593346!4d-119.82424082388114!16s%2Fg%2F11z80y9ty7",
       "googleMapsEmbedSrc": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3076.721583400254!2d-119.82424082388114!3d39.543334371593346!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xa180e099e5f7d05b%3A0x5f23cef288df732e!2sSiler%20Chef%20LLC!5e0!3m2!1str!2str!4v1780082158534!5m2!1str!2str",
-      "instagramHref": "https://www.instagram.com/silerchef",
+      "instagramHref": "https://www.instagram.com/fikretsilerr",
       "yelpHref": "https://www.yelp.com/biz/siler-chef-reno",
       "whatsappHref": "",
       "facebookHref": "https://www.facebook.com/share/1Eea7fQpfV/?mibextid=wwXIfr"

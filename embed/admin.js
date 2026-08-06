@@ -1143,7 +1143,7 @@
       </label>
       <label class="field field--full">
         <span>Street address (Google Business Profile)</span>
-        <input id="hp-contact-street" type="text" value="${esc(site.contact.streetAddress || '')}" placeholder="1555 N Sierra St" />
+        <input id="hp-contact-street" type="text" value="${esc(site.contact.streetAddress || '')}" placeholder="Leave blank for mobile / service-area chef" />
       </label>
       <label class="field">
         <span>City</span>

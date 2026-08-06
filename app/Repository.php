@@ -1352,15 +1352,28 @@ final class Repository
         ) {
             $content['site']['contact']['googleMapsHref'] = $gbpMapsHref;
         }
-        $legacyLocations = ['Reno, Nevada, USA', 'Reno, Nevada'];
-        if (in_array(trim((string) ($content['site']['contact']['location'] ?? '')), $legacyLocations, true)) {
-            $content['site']['contact']['location'] = '1555 N Sierra St, Reno, NV 89503';
+        $legacyStreetLocations = [
+            'Reno, Nevada, USA',
+            'Reno, Nevada',
+            '1555 N Sierra St, Reno, NV 89503',
+        ];
+        if (in_array(trim((string) ($content['site']['contact']['location'] ?? '')), $legacyStreetLocations, true)) {
+            $content['site']['contact']['location'] = 'Reno · Lake Tahoe · Truckee · Incline Village';
         }
-        if (trim((string) ($content['site']['contact']['streetAddress'] ?? '')) === '') {
-            $content['site']['contact']['streetAddress'] = '1555 N Sierra St';
+        if (trim((string) ($content['site']['contact']['streetAddress'] ?? '')) === '1555 N Sierra St') {
+            $content['site']['contact']['streetAddress'] = '';
+            $content['site']['contact']['postalCode'] = '';
+        }
+        if (trim((string) ($content['site']['contact']['addressLocality'] ?? '')) === '') {
             $content['site']['contact']['addressLocality'] = 'Reno';
             $content['site']['contact']['addressRegion'] = 'NV';
-            $content['site']['contact']['postalCode'] = '89503';
+        }
+        $instagramHref = trim((string) ($content['site']['contact']['instagramHref'] ?? ''));
+        if (
+            $instagramHref === ''
+            || preg_match('#instagram\.com/(silerchef)/?$#i', $instagramHref)
+        ) {
+            $content['site']['contact']['instagramHref'] = 'https://www.instagram.com/fikretsilerr';
         }
         $mapsEmbed = trim((string) ($content['site']['contact']['googleMapsEmbedSrc'] ?? ''));
         if (

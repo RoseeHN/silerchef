@@ -1247,8 +1247,10 @@
           'images/gallery-curated/photos/03-kalamata-food-17-640.webp',
         'images/gallery-curated/photos/03-kalamata-food-17.webp':
           'images/gallery-curated/photos/03-kalamata-food-17-640.webp',
-        'images/homepage/hero-02.jpg': 'images/homepage/hero-02-480.webp',
-        'images/homepage/hero-03.jpg': 'images/homepage/hero-03-480.webp',
+        'images/homepage/hero-02.jpg': 'images/homepage/pack-20260806/tahoe-table-640.webp',
+        'images/homepage/hero-03.jpg': 'images/homepage/pack-20260806/guests-table-640.webp',
+        'images/homepage/hero-02-480.webp': 'images/homepage/pack-20260806/tahoe-table-640.webp',
+        'images/homepage/hero-03-480.webp': 'images/homepage/pack-20260806/guests-table-640.webp',
       };
       const key = String(url || '').trim();
       return map[key] || key;
@@ -1280,6 +1282,22 @@
     coverageChips.forEach((chip, index) => {
       setNodeText(`#coverage-chip-${index}`, chip);
     });
+    const onsiteCooking = site.onsiteCooking || {};
+    setNodeText('#onsite-eyebrow', onsiteCooking.eyebrow);
+    setNodeText('#onsite-cooking-title', onsiteCooking.title);
+    setNodeText('#onsite-body', onsiteCooking.body);
+    const onsitePoints = Array.isArray(onsiteCooking.points) ? onsiteCooking.points : [];
+    onsitePoints.forEach((point, index) => {
+      setNodeText(`#onsite-point-${index}`, point);
+    });
+    const onsitePrimary = document.getElementById('onsite-primary-cta');
+    if (onsitePrimary && onsiteCooking.primaryLabel) {
+      onsitePrimary.textContent = String(onsiteCooking.primaryLabel);
+    }
+    const onsiteSecondary = document.getElementById('onsite-secondary-cta');
+    if (onsiteSecondary && onsiteCooking.secondaryLabel) {
+      onsiteSecondary.textContent = String(onsiteCooking.secondaryLabel);
+    }
     setNodeText('#chef-story-eyebrow', chefStory.eyebrow);
     setNodeText('#chef-story-title', chefStory.title);
     setNodeText('#chef-story-subtitle', chefStory.subtitle);
@@ -1412,7 +1430,8 @@
             url: 'https://www.silerchef.com/',
             name: 'Siler Chef',
             alternateName: ['SilerChef', 'silerchef', 'silerchef.com', 'Chef Siler'],
-            description: 'Personal chef and private in-home dining in Reno, Lake Tahoe, and the Bay Area.',
+            description:
+              'Personal chef, private chef, and on-site cooking catering in Reno, Lake Tahoe, Truckee, Incline Village, and the Bay Area.',
             inLanguage: 'en-US',
             publisher: { '@id': 'https://www.silerchef.com/#business' },
           },
@@ -1430,48 +1449,66 @@
             '@id': 'https://www.silerchef.com/#business',
             name: 'Siler Chef',
             legalName: 'Siler Chef LLC',
-            alternateName: ['SilerChef', 'silerchef', 'silerchef.com', 'Chef Siler', 'Private Chef Reno'],
-            slogan: 'Personal chef · Private dining · Reno · Tahoe · Bay Area',
+            alternateName: [
+              'SilerChef',
+              'silerchef',
+              'silerchef.com',
+              'Chef Siler',
+              'Private Chef Reno',
+              'Personal Chef Lake Tahoe',
+            ],
+            slogan: 'Personal chef · On-site cooking · Reno · Tahoe · Truckee · Incline Village',
             knowsAbout: [
               'Private chef',
               'Personal chef',
+              'Chef near me',
+              'Personal chef near me',
+              'Private chef near me',
+              'On-site cooking catering',
               'In-home dining',
               'Reno Nevada',
               'Lake Tahoe',
+              'South Lake Tahoe',
+              'Truckee',
+              'Incline Village',
               'San Francisco Bay Area',
             ],
             url: 'https://www.silerchef.com/',
             image: 'https://www.silerchef.com/images/homepage/hero-01.jpg',
             logo: 'https://www.silerchef.com/images/brand/silerchef-logo.png',
-            description: 'Private chef services for Reno, Lake Tahoe, and the Bay Area: custom menus, plated and family-style service, private events, and chef-led lessons.',
+            description:
+              'Mobile private chef and on-site cooking catering for Reno, Lake Tahoe, South Lake Tahoe, Truckee, and Incline Village: custom menus, plated and family-style service, weddings, and private events.',
             telephone: contact.phone || '+1-775-389-6677',
             email: contact.email || 'silerchef@gmail.com',
             priceRange: '$$$',
-            address: {
-              '@type': 'PostalAddress',
-              streetAddress: contact.streetAddress || '1555 N Sierra St',
-              addressLocality: contact.addressLocality || 'Reno',
-              addressRegion: contact.addressRegion || 'NV',
-              postalCode: contact.postalCode || '89503',
-              addressCountry: 'US',
-            },
-            geo: {
-              '@type': 'GeoCoordinates',
-              latitude: 39.5433344,
-              longitude: -119.8242408,
-            },
+            address: (() => {
+              const address = {
+                '@type': 'PostalAddress',
+                addressLocality: contact.addressLocality || 'Reno',
+                addressRegion: contact.addressRegion || 'NV',
+                addressCountry: 'US',
+              };
+              const street = String(contact.streetAddress || '').trim();
+              const postal = String(contact.postalCode || '').trim();
+              if (street) address.streetAddress = street;
+              if (postal) address.postalCode = postal;
+              return address;
+            })(),
             founder: { '@id': 'https://www.silerchef.com/#chef' },
             hasMap: normalizeGoogleMapsHref(contact.googleMapsHref),
             areaServed: [
               { '@type': 'City', name: 'Reno', containedInPlace: { '@type': 'State', name: 'Nevada' } },
               { '@type': 'AdministrativeArea', name: 'Lake Tahoe' },
+              { '@type': 'City', name: 'South Lake Tahoe' },
+              { '@type': 'City', name: 'Truckee' },
+              { '@type': 'City', name: 'Incline Village' },
               { '@type': 'AdministrativeArea', name: 'San Francisco Bay Area' },
             ],
             sameAs: (() => {
               const maps = normalizeGoogleMapsHref(contact.googleMapsHref);
               const list = [
                 maps,
-                contact.instagramHref || 'https://www.instagram.com/silerchef',
+                contact.instagramHref || 'https://www.instagram.com/fikretsilerr',
                 contact.facebookHref || 'https://www.facebook.com/share/1Eea7fQpfV/?mibextid=wwXIfr',
               ];
               const yelp = contact.yelpHref && String(contact.yelpHref).trim();
@@ -1483,11 +1520,14 @@
           {
             '@type': 'Service',
             '@id': 'https://www.silerchef.com/#service',
-            serviceType: 'Personal chef and private dining service',
+            serviceType: 'Personal chef, private chef, and on-site cooking catering',
             provider: { '@id': 'https://www.silerchef.com/#business' },
             areaServed: [
               { '@type': 'City', name: 'Reno' },
               { '@type': 'AdministrativeArea', name: 'Lake Tahoe' },
+              { '@type': 'City', name: 'South Lake Tahoe' },
+              { '@type': 'City', name: 'Truckee' },
+              { '@type': 'City', name: 'Incline Village' },
               { '@type': 'AdministrativeArea', name: 'San Francisco Bay Area' },
             ],
             availableLanguage: ['en-US'],
@@ -1496,6 +1536,8 @@
               geographicArea: [
                 { '@type': 'State', name: 'Nevada' },
                 { '@type': 'AdministrativeArea', name: 'Lake Tahoe' },
+                { '@type': 'City', name: 'Truckee' },
+                { '@type': 'City', name: 'Incline Village' },
                 { '@type': 'AdministrativeArea', name: 'San Francisco Bay Area' },
               ],
             },
@@ -1504,6 +1546,7 @@
               name: 'Private chef experiences',
               itemListElement: [
                 { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Private in-home dining' } },
+                { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'On-site cooking catering' } },
                 { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Custom tasting menus' } },
                 { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Chef-led celebrations and events' } },
               ],

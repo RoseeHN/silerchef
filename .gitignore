@@ -13,3 +13,6 @@ silerchef.com pictures */
 IMG_*.MOV
 WhatsApp Image*.jpeg
 WhatsApp Image*.jpg
+
+# Client media drops (source packs; optimized assets live under embed/images)
+drive-download-*/
