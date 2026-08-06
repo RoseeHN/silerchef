@@ -40,7 +40,7 @@
     <link
       rel="preload"
       as="image"
-      href="images/homepage/hero-01-480.webp"
+      href="images/homepage/hero-01-640.webp"
       type="image/webp"
       media="(max-width: 900px)"
       fetchpriority="high"
@@ -48,7 +48,7 @@
     <link
       rel="preload"
       as="image"
-      href="images/homepage/hero-01-640.webp"
+      href="images/homepage/hero-01-1200.webp"
       type="image/webp"
       media="(min-width: 901px)"
       fetchpriority="high"
@@ -284,19 +284,20 @@
         line-height: 1.6;
       }
       .shell { width: min(calc(100% - (var(--page-gutter) * 2)), var(--page-max)); margin: 0 auto; }
-      .site-header { position: fixed; inset: 0 0 auto; z-index: 75; padding: 0.5rem 0 0; }
+      .site-header { position: fixed; inset: 0 0 auto; z-index: 75; padding: 0.55rem 0 0.35rem; background: transparent; box-shadow: none; }
       .header-inner {
         width: min(calc(100% - (var(--page-gutter) * 2)), var(--page-max));
         margin: 0 auto;
-        min-height: 4.7rem;
-        padding: 0.78rem 1.1rem;
+        min-height: 3.55rem;
+        padding: 0.45rem 1.1rem;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
-        border-radius: 1.35rem;
-        border: 1px solid rgba(197, 160, 89, 0.12);
-        background: linear-gradient(180deg, rgba(24, 21, 23, 0.74), rgba(14, 12, 14, 0.9));
+        border-radius: 999px;
+        border: 1px solid rgba(197, 160, 89, 0.16);
+        background: rgba(16, 14, 16, 0.72);
+        box-shadow: inset 0 1px 0 rgba(255, 248, 235, 0.06);
       }
       .brand-lockup { display: inline-flex; align-items: center; gap: 0.75rem; color: inherit; text-decoration: none; }
       .brand-logo--header { width: 2.5rem; height: 2.5rem; display: block; }
@@ -309,21 +310,27 @@
         display: grid;
         grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
         gap: clamp(1.5rem, 4vw, 3.5rem);
-        align-items: start;
+        align-items: stretch;
       }
+      .hero-panel--visual { display: flex; min-width: 0; }
       .hero-frame {
         margin: 0;
         overflow: hidden;
         border-radius: calc(var(--radius) + 10px);
         border: 1px solid rgba(197, 160, 89, 0.22);
         background: var(--bg-elevated);
+        width: 100%;
       }
-      .hero-frame--feature { aspect-ratio: 5 / 4; max-height: min(66vh, 640px); position: relative; }
+      .hero-frame--feature {
+        position: relative;
+        flex: 1 1 auto;
+        min-height: min(72vh, 44rem);
+      }
       .hero-rotator { position: absolute; inset: 0; }
       .hero-rotator__slide { position: absolute; inset: 0; margin: 0; opacity: 0; }
       .hero-rotator__slide.is-active { opacity: 1; }
       .hero-rotator__slide img, .hero-frame img {
-        width: 100%; height: 100%; object-fit: cover; display: block;
+        width: 100%; height: 100%; object-fit: cover; object-position: center 22%; display: block;
       }
       .hero-copy-top { display: flex; align-items: center; gap: 0.85rem; margin-bottom: 1.2rem; }
       .brand-logo--hero-inline { width: 3.25rem; height: 3.25rem; }
@@ -367,31 +374,38 @@
       @media (max-width: 900px) {
         :root { --header-offset: 5.45rem; }
         .hero-inner--split { grid-template-columns: 1fr; }
+        .hero-panel--visual { display: block; }
+        .hero-frame--feature {
+          min-height: 0;
+          aspect-ratio: 4 / 5;
+          max-height: min(68vh, 34rem);
+          flex: none;
+        }
       }
     </style>
     <!-- Non-blocking CSS: critical hero styles above paint first; full CSS follows without blocking parse. -->
     <link
       rel="stylesheet"
-      href="styles.min.css?v=sc-20260806e1"
+      href="styles.min.css?v=sc-20260806f3"
       media="print"
       onload="this.media='all'"
     />
     <link
       rel="stylesheet"
-      href="fonts-display.css?v=sc-20260806e1"
+      href="fonts-display.css?v=sc-20260806f3"
       media="print"
       onload="this.media='all'"
     />
     <link
       rel="stylesheet"
-      href="gallery.css?v=sc-20260806e1"
+      href="gallery.css?v=sc-20260806f3"
       media="print"
       onload="this.media='all'"
     />
     <noscript>
-      <link rel="stylesheet" href="styles.min.css?v=sc-20260806e1" />
-      <link rel="stylesheet" href="fonts-display.css?v=sc-20260806e1" />
-      <link rel="stylesheet" href="gallery.css?v=sc-20260806e1" />
+      <link rel="stylesheet" href="styles.min.css?v=sc-20260806f3" />
+      <link rel="stylesheet" href="fonts-display.css?v=sc-20260806f3" />
+      <link rel="stylesheet" href="gallery.css?v=sc-20260806f3" />
     </noscript>
     <link rel="icon" type="image/png" href="images/brand/silerchef-logo.png" />
   </head>
@@ -465,48 +479,50 @@
                   <source
                     type="image/webp"
                     srcset="
-                      images/homepage/hero-01-480.webp 480w,
                       images/homepage/hero-01-640.webp 640w,
-                      images/homepage/hero-01-800.webp 800w
+                      images/homepage/hero-01-800.webp 800w,
+                      images/homepage/hero-01-1200.webp 1200w,
+                      images/homepage/hero-01.webp 1600w
                     "
-                    sizes="(max-width: 900px) 100vw, 52vw"
+                    sizes="(max-width: 900px) 100vw, 48vw"
                   />
                   <img
-                    src="images/homepage/hero-01-640.webp"
+                    src="images/homepage/hero-01-1200.webp"
                     alt="Chef Fikret Siler smiling at the camera while plating on-site dinner courses"
                     width="1600"
                     height="1280"
                     loading="eager"
                     decoding="async"
                     fetchpriority="high"
-                    sizes="(max-width: 900px) 100vw, 52vw"
+                    sizes="(max-width: 900px) 100vw, 48vw"
                     srcset="
-                      images/homepage/hero-01-480.webp 480w,
                       images/homepage/hero-01-640.webp 640w,
-                      images/homepage/hero-01-800.webp 800w
+                      images/homepage/hero-01-800.webp 800w,
+                      images/homepage/hero-01-1200.webp 1200w,
+                      images/homepage/hero-01.webp 1600w
                     "
                   />
                 </picture>
                 <picture class="hero-rotator__slide">
                   <img
-                    data-src="images/homepage/hero-02-800.webp"
+                    data-src="images/homepage/hero-02-1200.webp"
                     alt="Chef Fikret Siler zesting lime over plated desserts in a home kitchen"
                     width="1600"
                     height="1280"
                     loading="lazy"
                     decoding="async"
-                    sizes="(max-width: 900px) 100vw, 52vw"
+                    sizes="(max-width: 900px) 100vw, 48vw"
                   />
                 </picture>
                 <picture class="hero-rotator__slide">
                   <img
-                    data-src="images/homepage/hero-03-800.webp"
+                    data-src="images/homepage/hero-03-1200.webp"
                     alt="Fresh salad bowls plated for an on-site private chef service"
                     width="1600"
                     height="1280"
                     loading="lazy"
                     decoding="async"
-                    sizes="(max-width: 900px) 100vw, 52vw"
+                    sizes="(max-width: 900px) 100vw, 48vw"
                   />
                 </picture>
               </div>
@@ -700,15 +716,31 @@
         <div class="shell chef-story-portfolio">
           <div class="chef-story-spotlight">
             <figure class="chef-story-spotlight__visual">
-              <img
-                src="images/gallery-curated/photos/01-83a4c077-2caf-4be5-996e-e4996de4fb79.jpg"
-                alt=""
-                width="1600"
-                height="1200"
-                loading="lazy"
-                decoding="async"
-                sizes="(max-width: 900px) 100vw, 44vw"
-              />
+              <picture>
+                <source
+                  type="image/webp"
+                  srcset="
+                    images/homepage/chef-story-640.webp 640w,
+                    images/homepage/chef-story-900.webp 900w,
+                    images/homepage/chef-story.webp 1200w
+                  "
+                  sizes="(max-width: 900px) 100vw, 44vw"
+                />
+                <img
+                  src="images/homepage/chef-story-900.jpg"
+                  alt="Chef Fikret Siler smiling while plating on-site dinner courses"
+                  width="1200"
+                  height="960"
+                  loading="lazy"
+                  decoding="async"
+                  sizes="(max-width: 900px) 100vw, 44vw"
+                  srcset="
+                    images/homepage/chef-story-640.jpg 640w,
+                    images/homepage/chef-story-900.jpg 900w,
+                    images/homepage/chef-story.jpg 1200w
+                  "
+                />
+              </picture>
             </figure>
             <article class="chef-story-spotlight__copy chef-story-card chef-story-card--lead">
               <p id="chef-story-eyebrow" class="chef-story-card__eyebrow">About the Chef</p>
@@ -2046,7 +2078,7 @@
         if (c) window.__SILERCHEF_API_BASE__ = c;
       })();
     </script>
-    <script src="data.js?v=sc-20260806e1" defer></script>
-    <script src="main.js?v=sc-20260806e1" defer></script>
+    <script src="data.js?v=sc-20260806f3" defer></script>
+    <script src="main.js?v=sc-20260806f3" defer></script>
   </body>
 </html>

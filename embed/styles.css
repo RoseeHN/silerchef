@@ -289,7 +289,7 @@ section[id] {
   filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.4));
 }
 
-/* ——— Header (flat frosted bar + single-line nav) ——— */
+/* ——— Header (flush frosted pill, no heavy drop shadow) ——— */
 .site-header {
   position: fixed;
   top: 0;
@@ -297,7 +297,7 @@ section[id] {
   right: 0;
   z-index: 75;
   isolation: isolate;
-  padding: clamp(0.35rem, 0.8vw, 0.55rem) 0 0;
+  padding: clamp(0.45rem, 1vw, 0.7rem) 0 0.35rem;
   background: transparent;
   border-bottom: 0;
   box-shadow: none;
@@ -311,14 +311,16 @@ section[id] {
 }
 
 html.is-scrolled .site-header {
-  padding-top: 0.22rem;
+  padding-top: 0.28rem;
+  padding-bottom: 0.28rem;
 }
 
 /* Narrow viewports: Safari often glitches on sticky + backdrop-filter (black flash / full black). */
 @media (max-width: 1024px) {
   .site-header,
   html.is-scrolled .site-header {
-    padding-top: 0;
+    padding-top: 0.35rem;
+    padding-bottom: 0.25rem;
   }
 }
 
@@ -334,11 +336,13 @@ html.is-scrolled .site-header {
   column-gap: clamp(0.75rem, 2vw, 1.5rem);
   row-gap: 0;
   border-radius: 999px;
-  border: 1px solid rgba(197, 160, 89, 0.14);
-  background: rgba(14, 12, 14, 0.82);
-  backdrop-filter: blur(16px) saturate(1.05);
-  -webkit-backdrop-filter: blur(16px) saturate(1.05);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(197, 160, 89, 0.16);
+  background: rgba(16, 14, 16, 0.72);
+  backdrop-filter: blur(18px) saturate(1.08);
+  -webkit-backdrop-filter: blur(18px) saturate(1.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 248, 235, 0.06),
+    0 0 0 1px rgba(0, 0, 0, 0.18);
   transition:
     padding 0.35s var(--ease),
     background 0.35s var(--ease),
@@ -357,9 +361,11 @@ html.is-scrolled .header-inner {
   min-height: 3.35rem;
   padding-top: 0.4rem;
   padding-bottom: 0.4rem;
-  background: rgba(10, 9, 10, 0.92);
-  border-color: rgba(212, 188, 106, 0.2);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  background: rgba(12, 10, 12, 0.88);
+  border-color: rgba(212, 188, 106, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 248, 235, 0.05),
+    0 0 0 1px rgba(0, 0, 0, 0.22);
   transform: none;
 }
 
@@ -519,7 +525,9 @@ html.is-scrolled .header-inner {
     border-radius: 0 0 18px 18px;
     border-left: 1px solid rgba(197, 160, 89, 0.1);
     border-right: 1px solid rgba(197, 160, 89, 0.1);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 248, 235, 0.05),
+      0 0 0 1px rgba(0, 0, 0, 0.16);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
@@ -741,7 +749,7 @@ body.nav-drawer-open {
   display: grid;
   grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
   gap: clamp(1.75rem, 4vw, 3.5rem);
-  align-items: center;
+  align-items: stretch;
   position: relative;
   z-index: 1;
 }
@@ -749,6 +757,8 @@ body.nav-drawer-open {
 .hero-panel--visual {
   position: relative;
   min-width: 0;
+  display: flex;
+  align-self: stretch;
 }
 
 .hero-panel--copy {
@@ -959,9 +969,10 @@ body.nav-drawer-open {
 }
 
 .hero-frame--feature {
-  aspect-ratio: 4 / 5;
-  max-height: min(78vh, 740px);
   width: 100%;
+  flex: 1 1 auto;
+  min-height: min(72vh, 44rem);
+  align-self: stretch;
 }
 
 .hero-frame--feature img {
@@ -970,6 +981,7 @@ body.nav-drawer-open {
 
 .hero-frame--rotator {
   position: relative;
+  min-height: inherit;
 }
 
 .hero-frame--rotator .hero-rotator {
@@ -1080,9 +1092,15 @@ body.nav-drawer-open {
     text-align: left;
   }
 
+  .hero-panel--visual {
+    display: block;
+  }
+
   .hero-frame--feature {
-    aspect-ratio: 5 / 6;
-    max-height: min(62vh, 560px);
+    aspect-ratio: 4 / 5;
+    max-height: min(68vh, 34rem);
+    min-height: 0;
+    flex: none;
   }
 
   .hero-frame--feature img,
@@ -5621,7 +5639,7 @@ body.scroll-locked {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
   gap: clamp(0.85rem, 2vw, 1.15rem);
-  align-items: start;
+  align-items: stretch;
 }
 
 .chef-story-spotlight__visual {
@@ -5632,26 +5650,30 @@ body.scroll-locked {
   box-shadow:
     inset 0 1px 0 rgba(255, 248, 235, 0.06),
     0 24px 70px rgba(0, 0, 0, 0.35);
+  min-height: 100%;
+}
+
+.chef-story-spotlight__visual picture,
+.chef-story-spotlight__visual img {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .chef-story-spotlight__visual img {
-  width: 100%;
-  display: block;
   object-fit: cover;
+  object-position: center 22%;
 }
 
-/** Desktop: shorter spotlight photo + tighter lead copy */
+/** Desktop: chef portrait fills the lead card height */
 @media (min-width: 981px) {
   .chef-story-spotlight__visual {
     width: 100%;
-    height: min(34vh, 18.5rem);
-    max-height: min(34vh, 18.5rem);
-    min-height: 10.5rem;
+    min-height: 22rem;
   }
 
   .chef-story-spotlight__visual img {
-    height: 100%;
-    min-height: 0;
+    min-height: 22rem;
   }
 
   .chef-story-spotlight .chef-story-card--lead {
