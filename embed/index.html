@@ -283,6 +283,22 @@
         font-family: system-ui, sans-serif;
         line-height: 1.6;
       }
+      /* Kill browser-default blue links before full CSS arrives (FOUC). */
+      a { color: var(--gold-2); text-decoration: none; }
+      a:visited { color: var(--gold-3); }
+      button { color: inherit; font: inherit; }
+      .site-nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: nowrap; gap: 0.05rem; }
+      .site-nav a:not(.header-cta) {
+        display: inline-block;
+        padding: 0.4rem 0.48rem;
+        color: rgba(243, 234, 209, 0.58);
+        text-decoration: none;
+        font-size: 0.68rem;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
       .shell { width: min(calc(100% - (var(--page-gutter) * 2)), var(--page-max)); margin: 0 auto; }
       .site-header { position: fixed; inset: 0 0 auto; z-index: 75; padding: 0.55rem 0 0.35rem; background: transparent; box-shadow: none; }
       .header-inner {
@@ -383,29 +399,24 @@
         }
       }
     </style>
-    <!-- Non-blocking CSS: critical hero styles above paint first; full CSS follows without blocking parse. -->
+    <!-- Core layout CSS is render-blocking to prevent blue-link / category FOUC on first paint. -->
+    <link rel="stylesheet" href="styles.min.css?v=sc-20260807a1" />
     <link
       rel="stylesheet"
-      href="styles.min.css?v=sc-20260806f5"
+      href="fonts-display.css?v=sc-20260807a1"
       media="print"
       onload="this.media='all'"
     />
     <link
       rel="stylesheet"
-      href="fonts-display.css?v=sc-20260806f5"
-      media="print"
-      onload="this.media='all'"
-    />
-    <link
-      rel="stylesheet"
-      href="gallery.css?v=sc-20260806f5"
+      href="gallery.css?v=sc-20260807a1"
       media="print"
       onload="this.media='all'"
     />
     <noscript>
-      <link rel="stylesheet" href="styles.min.css?v=sc-20260806f5" />
-      <link rel="stylesheet" href="fonts-display.css?v=sc-20260806f5" />
-      <link rel="stylesheet" href="gallery.css?v=sc-20260806f5" />
+      <link rel="stylesheet" href="styles.min.css?v=sc-20260807a1" />
+      <link rel="stylesheet" href="fonts-display.css?v=sc-20260807a1" />
+      <link rel="stylesheet" href="gallery.css?v=sc-20260807a1" />
     </noscript>
     <link rel="icon" type="image/png" href="images/brand/silerchef-logo.png" />
   </head>
@@ -716,10 +727,10 @@
                   sizes="(max-width: 900px) 100vw, 44vw"
                 />
                 <img
-                  src="images/homepage/chef-story-900.jpg"
-                  alt="Chef Fikret Siler zesting citrus over plated courses in a private home kitchen"
+                  src="images/homepage/chef-story-900.webp"
+                  alt="Chef Fikret Siler plating identical fish courses with sauce in a private home kitchen"
                   width="1200"
-                  height="960"
+                  height="900"
                   loading="lazy"
                   decoding="async"
                   sizes="(max-width: 900px) 100vw, 44vw"
@@ -757,13 +768,14 @@
             <article class="chef-story-panel">
               <figure class="chef-story-panel__media">
                 <img
-                  src="images/cuisines/french-cuisine/gallery/02.jpg"
+                  src="images/cuisines/french-cuisine/gallery/02-640.webp"
                   alt=""
-                  width="1200"
-                  height="800"
+                  width="900"
+                  height="1200"
                   loading="lazy"
                   decoding="async"
                   sizes="(max-width: 900px) 100vw, 28vw"
+                  srcset="images/cuisines/french-cuisine/gallery/02-640.webp 640w, images/cuisines/french-cuisine/gallery/02-900.webp 900w, images/cuisines/french-cuisine/gallery/02.webp 1200w"
                 />
               </figure>
               <div class="chef-story-panel__content chef-story-card">
@@ -774,13 +786,14 @@
             <article class="chef-story-panel">
               <figure class="chef-story-panel__media">
                 <img
-                  src="images/services-and-occasions/family-dinners/hero.jpg"
+                  src="images/services-and-occasions/family-dinners/hero-640.webp"
                   alt=""
-                  width="1600"
-                  height="1067"
+                  width="1200"
+                  height="900"
                   loading="lazy"
                   decoding="async"
                   sizes="(max-width: 900px) 100vw, 28vw"
+                  srcset="images/services-and-occasions/family-dinners/hero-640.webp 640w, images/services-and-occasions/family-dinners/hero-900.webp 900w, images/services-and-occasions/family-dinners/hero.webp 1200w"
                 />
               </figure>
               <div class="chef-story-panel__content chef-story-card">
@@ -957,26 +970,6 @@
                     webkit-playsinline
                     disableremoteplayback
                     preload="none"
-                    poster="images/gallery-curated/posters/03-img-4367.jpg"
-                  >
-<source src="images/gallery-curated/videos/03-img-4367.mp4" type="video/mp4" />
-                  </video>
-                </div>
-                <div class="video-card__meta">
-                  <span>Chef at work</span>
-                  <strong>Smoker-side prep with a stronger service feel</strong>
-                  <p>Real kitchen movement instead of only plated stills.</p>
-                </div>
-              </article>
-              <article class="video-card">
-                <div class="video-card__media">
-                  <video
-                    controls
-                    muted
-                    playsinline
-                    webkit-playsinline
-                    disableremoteplayback
-                    preload="none"
                     poster="images/gallery-curated/posters/04-img-4368.jpg"
                   >
 <source src="images/gallery-curated/videos/04-img-4368.mp4" type="video/mp4" />
@@ -1105,15 +1098,16 @@
         <section class="module module--split observe">
           <div class="shell module-split-grid">
             <div class="module-split-visual">
-              <img
-                src="images/homepage/craft-split.jpg"
-                alt=""
-                width="1600"
-                height="1067"
-                loading="lazy"
-                decoding="async"
-                sizes="(max-width: 900px) 100vw, (max-width: 1400px) 46vw, 560px"
-              />
+                <img
+                  src="images/homepage/craft-split-900.webp"
+                  alt=""
+                  width="680"
+                  height="1200"
+                  loading="lazy"
+                  decoding="async"
+                  sizes="(max-width: 900px) 100vw, (max-width: 1400px) 46vw, 560px"
+                  srcset="images/homepage/craft-split-640.webp 640w, images/homepage/craft-split-900.webp 900w, images/homepage/craft-split.webp 1200w"
+                />
             </div>
             <div class="module-split-copy">
               <p class="module-eyebrow">The Siler Craft</p>
@@ -1240,12 +1234,13 @@
                   data-moment-alt="Steak and fries plated on a wooden board"
                 >
                   <img
-                    src="images/gallery-curated/photos/03-kalamata-food-17.jpg"
+                    src="images/gallery-curated/photos/03-kalamata-food-17-640.webp"
                     alt="Steak and fries plated on a wooden board"
                     width="800"
                     height="1000"
                     loading="lazy"
                     decoding="async"
+                    srcset="images/gallery-curated/photos/03-kalamata-food-17-640.webp 640w, images/gallery-curated/photos/03-kalamata-food-17.webp 900w"
                     sizes="(max-width: 640px) 50vw, (max-width: 1400px) 25vw, 320px"
                   />
                   <span class="shimmer-gallery__meta">
@@ -1259,22 +1254,23 @@
                   type="button"
                   class="shimmer-gallery__button"
                   data-moment-card
-                  data-moment-kicker="Shareable"
-                  data-moment-title="Casual abundance without losing polish"
-                  data-moment-alt="Loaded fries style shareable plate"
+                  data-moment-kicker="Service line"
+                  data-moment-title="Identical fish courses ready for the table"
+                  data-moment-alt="Row of plated seared fish courses with asparagus and edible flowers"
                 >
                   <img
-                    src="images/gallery-curated/photos/04-kalamata-food-21.jpg"
-                    alt="Loaded fries style shareable plate"
-                    width="800"
-                    height="1000"
+                    src="images/gallery-curated/photos/16-fish-service-640.webp"
+                    alt="Row of plated seared fish courses with asparagus and edible flowers"
+                    width="1600"
+                    height="1200"
                     loading="lazy"
                     decoding="async"
+                    srcset="images/gallery-curated/photos/16-fish-service-640.webp 640w, images/gallery-curated/photos/16-fish-service.webp 900w"
                     sizes="(max-width: 640px) 50vw, (max-width: 1400px) 25vw, 320px"
                   />
                   <span class="shimmer-gallery__meta">
-                    <span class="shimmer-gallery__eyebrow">Shareable</span>
-                    <strong class="shimmer-gallery__title">Casual abundance without losing polish</strong>
+                    <span class="shimmer-gallery__eyebrow">Service line</span>
+                    <strong class="shimmer-gallery__title">Identical fish courses ready for the table</strong>
                   </span>
                 </button>
               </figure>
@@ -1283,22 +1279,23 @@
                   type="button"
                   class="shimmer-gallery__button"
                   data-moment-card
-                  data-moment-kicker="Bar snack"
-                  data-moment-title="Golden appetizer with a more social energy"
-                  data-moment-alt="Crispy fried rings with dip"
+                  data-moment-kicker="Tuna course"
+                  data-moment-title="Seared tuna plated for a full table"
+                  data-moment-alt="Production line of seared tuna plates with microgreens and fig"
                 >
                   <img
-                    src="images/gallery-curated/photos/05-kalamata-food-29.jpg"
-                    alt="Crispy fried rings with dip"
-                    width="800"
-                    height="1000"
+                    src="images/gallery-curated/photos/19-tuna-line-640.webp"
+                    alt="Production line of seared tuna plates with microgreens and fig"
+                    width="1600"
+                    height="1200"
                     loading="lazy"
                     decoding="async"
+                    srcset="images/gallery-curated/photos/19-tuna-line-640.webp 640w, images/gallery-curated/photos/19-tuna-line.webp 900w"
                     sizes="(max-width: 640px) 50vw, (max-width: 1400px) 25vw, 320px"
                   />
                   <span class="shimmer-gallery__meta">
-                    <span class="shimmer-gallery__eyebrow">Bar snack</span>
-                    <strong class="shimmer-gallery__title">Golden appetizer with a more social energy</strong>
+                    <span class="shimmer-gallery__eyebrow">Tuna course</span>
+                    <strong class="shimmer-gallery__title">Seared tuna plated for a full table</strong>
                   </span>
                 </button>
               </figure>
@@ -1312,12 +1309,13 @@
                   data-moment-alt="Seafood-forward plated salad with triangular crisp"
                 >
                   <img
-                    src="images/gallery-curated/photos/06-kalamata-food-34.jpg"
+                    src="images/gallery-curated/photos/06-kalamata-food-34-640.webp"
                     alt="Seafood-forward plated salad with triangular crisp"
                     width="800"
                     height="1000"
                     loading="lazy"
                     decoding="async"
+                    srcset="images/gallery-curated/photos/06-kalamata-food-34-640.webp 640w, images/gallery-curated/photos/06-kalamata-food-34.webp 900w"
                     sizes="(max-width: 640px) 50vw, (max-width: 1400px) 25vw, 320px"
                   />
                   <span class="shimmer-gallery__meta">
@@ -1336,12 +1334,13 @@
                   data-moment-alt="Grilled chicken plate with rice and greens"
                 >
                   <img
-                    src="images/gallery-curated/photos/07-kalamata-food-4.jpg"
+                    src="images/gallery-curated/photos/07-kalamata-food-4-640.webp"
                     alt="Grilled chicken plate with rice and greens"
                     width="800"
                     height="1000"
                     loading="lazy"
                     decoding="async"
+                    srcset="images/gallery-curated/photos/07-kalamata-food-4-640.webp 640w, images/gallery-curated/photos/07-kalamata-food-4.webp 900w"
                     sizes="(max-width: 640px) 50vw, (max-width: 1400px) 25vw, 320px"
                   />
                   <span class="shimmer-gallery__meta">
@@ -1360,12 +1359,13 @@
                   data-moment-alt="Long plated rolls with herbs and garnish"
                 >
                   <img
-                    src="images/gallery-curated/photos/08-kalamata-food-43.jpg"
+                    src="images/gallery-curated/photos/08-kalamata-food-43-640.webp"
                     alt="Long plated rolls with herbs and garnish"
                     width="800"
                     height="1000"
                     loading="lazy"
                     decoding="async"
+                    srcset="images/gallery-curated/photos/08-kalamata-food-43-640.webp 640w, images/gallery-curated/photos/08-kalamata-food-43.webp 900w"
                     sizes="(max-width: 640px) 50vw, (max-width: 1400px) 25vw, 320px"
                   />
                   <span class="shimmer-gallery__meta">
@@ -1384,12 +1384,13 @@
                   data-moment-alt="Stuffed vine leaves plated with lemon and oil"
                 >
                   <img
-                    src="images/gallery-curated/photos/09-kalamata-food-47.jpg"
+                    src="images/gallery-curated/photos/09-kalamata-food-47-640.webp"
                     alt="Stuffed vine leaves plated with lemon and oil"
                     width="800"
                     height="1000"
                     loading="lazy"
                     decoding="async"
+                    srcset="images/gallery-curated/photos/09-kalamata-food-47-640.webp 640w, images/gallery-curated/photos/09-kalamata-food-47.webp 900w"
                     sizes="(max-width: 640px) 50vw, (max-width: 1400px) 25vw, 320px"
                   />
                   <span class="shimmer-gallery__meta">
@@ -1408,12 +1409,13 @@
                   data-moment-alt="Skewers plated with rice and charred vegetables"
                 >
                   <img
-                    src="images/gallery-curated/photos/10-kalamata-food-50.jpg"
+                    src="images/gallery-curated/photos/10-kalamata-food-50-640.webp"
                     alt="Skewers plated with rice and charred vegetables"
                     width="800"
                     height="1000"
                     loading="lazy"
                     decoding="async"
+                    srcset="images/gallery-curated/photos/10-kalamata-food-50-640.webp 640w, images/gallery-curated/photos/10-kalamata-food-50.webp 900w"
                     sizes="(max-width: 640px) 50vw, (max-width: 1400px) 25vw, 320px"
                   />
                   <span class="shimmer-gallery__meta">
@@ -1432,12 +1434,13 @@
                   data-moment-alt="Bruleed dessert topped with blueberries"
                 >
                   <img
-                    src="images/gallery-curated/photos/11-kalamata-food-58.jpg"
+                    src="images/gallery-curated/photos/11-kalamata-food-58-640.webp"
                     alt="Bruleed dessert topped with blueberries"
                     width="800"
                     height="1000"
                     loading="lazy"
                     decoding="async"
+                    srcset="images/gallery-curated/photos/11-kalamata-food-58-640.webp 640w, images/gallery-curated/photos/11-kalamata-food-58.webp 900w"
                     sizes="(max-width: 640px) 50vw, (max-width: 1400px) 25vw, 320px"
                   />
                   <span class="shimmer-gallery__meta">
@@ -1456,12 +1459,13 @@
                   data-moment-alt="Pistachio pastry pieces plated with garnish"
                 >
                   <img
-                    src="images/gallery-curated/photos/12-kalamata-food-61.jpg"
+                    src="images/gallery-curated/photos/12-kalamata-food-61-640.webp"
                     alt="Pistachio pastry pieces plated with garnish"
                     width="800"
                     height="1000"
                     loading="lazy"
                     decoding="async"
+                    srcset="images/gallery-curated/photos/12-kalamata-food-61-640.webp 640w, images/gallery-curated/photos/12-kalamata-food-61.webp 900w"
                     sizes="(max-width: 640px) 50vw, (max-width: 1400px) 25vw, 320px"
                   />
                   <span class="shimmer-gallery__meta">
@@ -1480,12 +1484,13 @@
                   data-moment-alt="Share-style platter with seafood and garnish"
                 >
                   <img
-                    src="images/gallery-curated/photos/13-kalamata-food-69.jpg"
+                    src="images/gallery-curated/photos/13-kalamata-food-69-640.webp"
                     alt="Share-style platter with seafood and garnish"
                     width="800"
                     height="1000"
                     loading="lazy"
                     decoding="async"
+                    srcset="images/gallery-curated/photos/13-kalamata-food-69-640.webp 640w, images/gallery-curated/photos/13-kalamata-food-69.webp 900w"
                     sizes="(max-width: 640px) 50vw, (max-width: 1400px) 25vw, 320px"
                   />
                   <span class="shimmer-gallery__meta">
@@ -1504,12 +1509,13 @@
                   data-moment-alt="Sauced entrée plated over rice with garnish"
                 >
                   <img
-                    src="images/gallery-curated/photos/14-ccda15b7-1ddb-4f89-a3d8-c24ca3d9075a.jpg"
+                    src="images/gallery-curated/photos/14-ccda15b7-1ddb-4f89-a3d8-c24ca3d9075a-640.webp"
                     alt="Sauced entrée plated over rice with garnish"
                     width="800"
                     height="1000"
                     loading="lazy"
                     decoding="async"
+                    srcset="images/gallery-curated/photos/14-ccda15b7-1ddb-4f89-a3d8-c24ca3d9075a-640.webp 640w, images/gallery-curated/photos/14-ccda15b7-1ddb-4f89-a3d8-c24ca3d9075a.webp 900w"
                     sizes="(max-width: 640px) 50vw, (max-width: 1400px) 25vw, 320px"
                   />
                   <span class="shimmer-gallery__meta">
@@ -2067,7 +2073,7 @@
         if (c) window.__SILERCHEF_API_BASE__ = c;
       })();
     </script>
-    <script src="data.js?v=sc-20260806f5" defer></script>
-    <script src="main.js?v=sc-20260806f5" defer></script>
+    <script src="data.js?v=sc-20260807a1" defer></script>
+    <script src="main.min.js?v=sc-20260807a1" defer></script>
   </body>
 </html>

@@ -114,6 +114,16 @@ summary {
   cursor: pointer;
 }
 
+/* Brand link colors — never show browser default blue (visited/unvisited). */
+a {
+  color: var(--gold-2);
+  text-decoration: none;
+}
+
+a:visited {
+  color: var(--gold-3);
+}
+
 button:disabled {
   cursor: not-allowed;
 }
@@ -1304,15 +1314,12 @@ main {
 
 .observe {
   opacity: 0;
-  transform: translate3d(0, 22px, 0);
-  transition:
-    opacity var(--t-reveal) var(--ease-flow),
-    transform var(--t-reveal) var(--ease-flow);
+  /* Opacity-only reveal — avoid transform to reduce CLS / compositor work. */
+  transition: opacity var(--t-reveal) var(--ease-flow);
 }
 
 .observe.is-visible {
   opacity: 1;
-  transform: translate3d(0, 0, 0);
 }
 
 /**
@@ -1931,6 +1938,31 @@ body.detail-open .whatsapp-fab {
 }
 
 /* ——— Hub (click to open detail) ——— */
+#cuisines-mount,
+#services-mount {
+  min-height: clamp(22rem, 58vw, 40rem);
+}
+
+#cuisines-mount:not(:empty),
+#services-mount:not(:empty) {
+  min-height: 0;
+}
+
+/* Skip offscreen layout/paint until near viewport — helps main-thread + LCP contention. */
+.flow-section,
+.module--split,
+.module--gallery-shimmer,
+.module--video-gallery,
+.experience-rail,
+.chef-story-band {
+  content-visibility: auto;
+  contain-intrinsic-size: 800px;
+}
+
+#home.hero {
+  content-visibility: visible;
+}
+
 .hub-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -1949,6 +1981,7 @@ body.detail-open .whatsapp-fab {
   cursor: pointer;
   color: inherit;
   font: inherit;
+  -webkit-tap-highlight-color: transparent;
   transition:
     border-color var(--t-hover-slow) var(--ease-flow),
     box-shadow var(--t-hover-slow) var(--ease-flow),

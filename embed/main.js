@@ -302,17 +302,17 @@
    */
   const DETAIL_GALLERY_COUNTS = {
     'american-cuisine': 22,
-    'french-cuisine': 12,
+    'french-cuisine': 15,
     'greek-cuisine': 16,
     'italian-cuisine': 6,
     'middle-eastern-cuisine': 12,
     'turkish-cuisine': 8,
-    'anniversary-celebrations': 4,
-    'birthday-events': 4,
-    'chef-education': 4,
-    'family-dinners': 4,
-    'special-events': 24,
-    'special-occasion-dining': 4,
+    'anniversary-celebrations': 6,
+    'birthday-events': 6,
+    'chef-education': 6,
+    'family-dinners': 6,
+    'special-events': 8,
+    'special-occasion-dining': 6,
   };
 
   /** Immediate gallery URLs in pack order — no network probes before first paint. */
@@ -866,28 +866,36 @@
       const img = document.createElement('img');
       img.alt = '';
       img.decoding = 'async';
-      /** Hub grids always use thumb.jpg — avoids loading multi‑MB gallery heroes as card art. */
-      img.src = `${baseFolder}/${item.slug}/thumb.jpg`;
+      /** Hub grids prefer WebP thumbs — avoids loading multi‑MB gallery heroes as card art. */
+      const thumbWebp = `${baseFolder}/${item.slug}/thumb.webp`;
+      const thumbJpg = `${baseFolder}/${item.slug}/thumb.jpg`;
+      img.src = thumbWebp;
       // Keep hub thumbs off the LCP critical path so hero-01 wins bandwidth.
       img.loading = 'lazy';
       if ('fetchPriority' in img) img.fetchPriority = 'low';
       if (premium) {
         img.sizes = '(max-width: 640px) 100vw, (max-width: 1100px) 50vw, (max-width: 1500px) 33vw, 460px';
-        img.width = 800;
+        img.width = 480;
         img.height = 600;
       } else {
         img.sizes = '(max-width: 900px) 100vw, (max-width: 1400px) 33vw, 380px';
         img.width = 480;
-        img.height = 360;
+        img.height = 600;
       }
       img.addEventListener('error', function onThumbErr() {
-        img.removeEventListener('error', onThumbErr);
-        img.src = `${baseFolder}/${item.slug}/01.jpg`;
-        img.addEventListener('error', function onSecondErr() {
-          img.removeEventListener('error', onSecondErr);
+        if (img.dataset.thumbStage === 'jpg') {
+          img.removeEventListener('error', onThumbErr);
           visual.classList.add('is-fallback');
           img.remove();
-        });
+          return;
+        }
+        if (img.dataset.thumbStage !== 'jpg-try') {
+          img.dataset.thumbStage = 'jpg-try';
+          img.src = thumbJpg;
+          return;
+        }
+        img.dataset.thumbStage = 'jpg';
+        img.src = `${baseFolder}/${item.slug}/gallery/01.jpg`;
       });
       visual.appendChild(img);
 

@@ -485,9 +485,9 @@ function serve_embed_file(string $requestPath, string|false $embedDir, string $r
         header('Cache-Control: public, max-age=0, must-revalidate');
     } elseif (preg_match('/\.(css|js)$/i', $candidate)) {
         // Fingerprinted via ?v= query in HTML — long cache is safe for repeat visits.
-        header('Cache-Control: public, max-age=604800');
+        header('Cache-Control: public, max-age=31536000, immutable');
     } elseif (preg_match('/\.(png|jpg|jpeg|svg|webp|gif|mp4|webm|mov|woff2?|xml|txt)$/i', $candidate)) {
-        header('Cache-Control: public, max-age=604800');
+        header('Cache-Control: public, max-age=31536000, immutable');
     }
 
     $method = strtoupper($requestMethod);
