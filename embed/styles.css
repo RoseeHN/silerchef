@@ -2152,14 +2152,28 @@ body.detail-open .whatsapp-fab {
 }
 
 .hub-card--cuisine .hub-card-visual {
+  position: relative;
   aspect-ratio: 5 / 6;
+  max-height: min(72vw, 28rem);
   overflow: hidden;
   border-radius: 17px;
 }
 
 .hub-card--cuisine .hub-card-visual img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   transition: transform var(--t-hover-slow) var(--ease-flow);
   transform: scale(1.01);
+}
+
+@media (max-width: 640px) {
+  .hub-card--cuisine .hub-card-visual {
+    max-height: min(58vw, 22rem);
+  }
 }
 
 .hub-card--cuisine:hover .hub-card-visual img,
@@ -4704,7 +4718,7 @@ body.scroll-locked {
 @media (max-width: 900px) {
   .shimmer-gallery {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: minmax(9rem, min(42vw, 14rem));
+    grid-auto-rows: minmax(7.5rem, min(36vw, 11rem));
     gap: clamp(0.85rem, 3vw, 1.25rem);
   }
 
@@ -4719,12 +4733,12 @@ body.scroll-locked {
   .shimmer-gallery__item:nth-child(8) {
     grid-column: span 1;
     grid-row: span 2;
-    max-height: min(52vh, 440px);
+    max-height: min(38vh, 280px);
   }
 
   .shimmer-gallery__item:nth-child(1),
   .shimmer-gallery__item:nth-child(6) {
-    max-height: min(58vh, 480px);
+    max-height: min(42vh, 300px);
   }
 }
 
@@ -5072,7 +5086,7 @@ body.scroll-locked {
     width: min(100%, 28rem);
     max-width: 28rem;
     margin: 0 auto;
-    max-height: none;
+    max-height: min(52vw, 22rem);
     aspect-ratio: 4 / 3;
   }
 }
@@ -5812,15 +5826,19 @@ body.scroll-locked {
 
 .chef-story-signature-strip__media {
   margin: 0;
-  min-height: clamp(14rem, 28vw, 22rem);
+  position: relative;
+  aspect-ratio: 4 / 3;
+  min-height: 0;
+  max-height: min(42vw, 22rem);
+  overflow: hidden;
 }
 
 .chef-story-signature-strip__media img {
   width: 100%;
   height: 100%;
-  min-height: clamp(14rem, 28vw, 22rem);
   display: block;
   object-fit: cover;
+  object-position: center;
 }
 
 .chef-story-signature-strip__copy {
@@ -5941,12 +5959,9 @@ body.scroll-locked {
   }
 
   .chef-story-signature-strip__media {
-    min-height: clamp(12rem, 44vw, 18rem);
+    aspect-ratio: 4 / 3;
+    max-height: min(52vw, 18rem);
     order: -1;
-  }
-
-  .chef-story-signature-strip__media img {
-    min-height: clamp(12rem, 44vw, 18rem);
   }
 }
 

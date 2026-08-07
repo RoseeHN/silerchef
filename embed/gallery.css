@@ -351,8 +351,10 @@
 .gallery-card img {
   width: 100%;
   aspect-ratio: 4 / 5;
+  max-height: min(72vw, 28rem);
   display: block;
   object-fit: cover;
+  object-position: center;
 }
 
 .gallery-card__meta {
