@@ -995,6 +995,41 @@
       const dur = Math.min(95, Math.max(28, cards.length * secPerCard));
       track.style.setProperty('--gallery-marquee-duration', `${dur}s`);
     });
+
+    attachDeferredPosters();
+  }
+
+  /**
+   * Reel posters are markup-level `data-poster` so they do not compete with the hero
+   * for bandwidth before first paint. They resolve once the strip is close to view.
+   */
+  function attachDeferredPosters() {
+    const pending = Array.from(document.querySelectorAll('video[data-poster]'));
+    if (!pending.length) return;
+
+    const apply = (video) => {
+      const src = video.getAttribute('data-poster');
+      if (!src) return;
+      video.removeAttribute('data-poster');
+      video.poster = src;
+    };
+
+    if (!('IntersectionObserver' in window)) {
+      pending.forEach(apply);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          apply(entry.target);
+          observer.unobserve(entry.target);
+        });
+      },
+      { rootMargin: '600px 0px' }
+    );
+    pending.forEach((video) => observer.observe(video));
   }
 
   window.SC_SITE = normalizeDetailBlockImages(window.SC_SITE || {});

@@ -173,6 +173,41 @@
       const duration = Math.min(95, Math.max(28, cards.length * 9));
       track.style.setProperty('--gallery-marquee-duration', `${duration}s`);
     });
+
+    attachDeferredPosters();
+  }
+
+  /**
+   * Reel posters ship as `data-poster` so they stay off the initial page load and
+   * resolve once the strip approaches the viewport.
+   */
+  function attachDeferredPosters() {
+    const pending = Array.from(document.querySelectorAll('video[data-poster]'));
+    if (!pending.length) return;
+
+    const apply = (video) => {
+      const src = video.getAttribute('data-poster');
+      if (!src) return;
+      video.removeAttribute('data-poster');
+      video.poster = src;
+    };
+
+    if (!('IntersectionObserver' in window)) {
+      pending.forEach(apply);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          apply(entry.target);
+          observer.unobserve(entry.target);
+        });
+      },
+      { rootMargin: '600px 0px' }
+    );
+    pending.forEach((video) => observer.observe(video));
   }
 
   initGalleryVideoMarquees();
