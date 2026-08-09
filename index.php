@@ -508,7 +508,17 @@ function serve_embed_file(string $requestPath, string|false $embedDir, string $r
         // Fingerprinted via ?v= query in HTML — long cache is safe for repeat visits.
         header('Cache-Control: public, max-age=31536000, immutable');
     } elseif (preg_match('/\.(png|jpg|jpeg|svg|webp|gif|mp4|webm|mov|woff2?|xml|txt)$/i', $candidate)) {
-        header('Cache-Control: public, max-age=31536000, immutable');
+        // Photos get swapped in place under stable filenames, so only URLs carrying an
+        // explicit ?v= may be cached as immutable. Everything else revalidates against
+        // the ETag below, which costs one 304 instead of stranding a stale photo for a year.
+        $versioned = isset($_GET['v']) && $_GET['v'] !== '';
+        header($versioned
+            ? 'Cache-Control: public, max-age=31536000, immutable'
+            : 'Cache-Control: public, max-age=600, must-revalidate');
+    }
+
+    if (!preg_match('/\.html$/i', $candidate)) {
+        embed_send_validators_or_304($candidate);
     }
 
     $method = strtoupper($requestMethod);
@@ -546,6 +556,47 @@ function serve_embed_file(string $requestPath, string|false $embedDir, string $r
     }
     readfile($candidate);
     exit;
+}
+
+/**
+ * Emit ETag/Last-Modified and short-circuit to 304 when the client already holds the bytes.
+ * The tag is content based, so redeploying untouched files does not invalidate caches.
+ */
+function embed_send_validators_or_304(string $candidate): void
+{
+    $size = filesize($candidate);
+    $mtime = filemtime($candidate);
+    if ($size === false || $mtime === false) {
+        return;
+    }
+
+    $fingerprint = $size <= 4 * 1024 * 1024 ? md5_file($candidate) : 'size-' . $size;
+    if ($fingerprint === false) {
+        return;
+    }
+
+    $etag = '"' . $fingerprint . '"';
+    header('ETag: ' . $etag);
+    header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $mtime) . ' GMT');
+
+    $ifNoneMatch = trim((string) ($_SERVER['HTTP_IF_NONE_MATCH'] ?? ''));
+    if ($ifNoneMatch !== '') {
+        foreach (explode(',', $ifNoneMatch) as $tag) {
+            $tag = trim($tag);
+            if ($tag === '*' || $tag === $etag || $tag === 'W/' . $etag) {
+                http_response_code(304);
+                exit;
+            }
+        }
+
+        return;
+    }
+
+    $ifModifiedSince = strtotime(trim((string) ($_SERVER['HTTP_IF_MODIFIED_SINCE'] ?? '')));
+    if ($ifModifiedSince !== false && $mtime <= $ifModifiedSince) {
+        http_response_code(304);
+        exit;
+    }
 }
 
 /** Gzip text responses when the client accepts it (PageSpeed text-compression). */

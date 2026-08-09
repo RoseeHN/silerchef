@@ -4,6 +4,42 @@
   const GBP_MAPS_HREF =
     'https://www.google.com/maps/place/Siler+Chef+LLC/@39.543334371593346,-119.82424082388114,17z/data=!4m6!3m5!1s0xa180e099e5f7d05b:0x5f23cef288df732e!8m2!3d39.543334371593346!4d-119.82424082388114!16s%2Fg%2F11z80y9ty7';
 
+  /**
+   * Photos are swapped in place under stable filenames, so every generated media URL carries
+   * the deploy's asset version. Without it a returning visitor keeps the previously cached
+   * photo. The version is read off this bundle's own ?v= so it stays in sync with the HTML.
+   */
+  const MEDIA_VERSION = (function readAssetVersion() {
+    const self =
+      document.currentScript || document.querySelector('script[src*="main.min.js"], script[src*="main.js"]');
+    const src = self && self.getAttribute ? String(self.getAttribute('src') || '') : '';
+    const match = /[?&]v=([^&]+)/.exec(src);
+    return match ? match[1] : '';
+  })();
+
+  /** Appends the asset version to a local media path; absolute/data URLs and query URLs pass through. */
+  function mediaUrl(path) {
+    const raw = String(path ?? '');
+    if (!MEDIA_VERSION || !raw || raw.includes('?') || /^(data:|blob:|https?:)/i.test(raw)) {
+      return raw;
+    }
+    return `${raw}?v=${MEDIA_VERSION}`;
+  }
+
+  /** Same as mediaUrl but for a full srcset string, versioning each candidate URL. */
+  function mediaSrcset(srcset) {
+    return String(srcset ?? '')
+      .split(',')
+      .map((candidate) => {
+        const part = candidate.trim();
+        if (!part) return '';
+        const gap = part.indexOf(' ');
+        return gap === -1 ? mediaUrl(part) : `${mediaUrl(part.slice(0, gap))}${part.slice(gap)}`;
+      })
+      .filter(Boolean)
+      .join(', ');
+  }
+
   function normalizeGoogleMapsHref(href) {
     const raw = String(href ?? '').trim();
     if (!raw || /\/place\/@|\/place\/\/@|maps\.google\.com\/maps\?/i.test(raw) || raw.includes('output=embed')) {
@@ -386,7 +422,7 @@
         const fig = document.createElement('figure');
         fig.className = 'meal-card__photo';
         const img = document.createElement('img');
-        img.src = block.image;
+        img.src = mediaUrl(block.image);
         img.alt = galleryTitleForUrl(block.image) || '';
         img.loading = idx < 8 ? 'eager' : 'lazy';
         img.decoding = 'async';
@@ -397,7 +433,7 @@
         img.addEventListener('error', function onBlockImageError() {
           img.removeEventListener('error', onBlockImageError);
           if (fallbackImage && fallbackImage !== block.image) {
-            img.src = fallbackImage;
+            img.src = mediaUrl(fallbackImage);
             img.addEventListener('error', function onFallbackError() {
               img.removeEventListener('error', onFallbackError);
               fig.remove();
@@ -504,7 +540,7 @@
     if (heroWrap) {
       heroWrap.classList.remove('is-empty');
     }
-    const heroUrl = urls[0];
+    const heroUrl = mediaUrl(urls[0]);
     const preload = document.createElement('link');
     preload.rel = 'preload';
     preload.as = 'image';
@@ -561,7 +597,7 @@
       const n = urls.length;
       if (!n) return;
       currentIdx = ((idx % n) + n) % n;
-      heroEl.src = urls[currentIdx];
+      heroEl.src = mediaUrl(urls[currentIdx]);
       const dish = galleryTitleForUrl(urls[currentIdx]);
       heroEl.alt = dish || 'Gallery image ' + (currentIdx + 1);
       stripEl.querySelectorAll('.detail-thumb').forEach((t) => {
@@ -601,7 +637,7 @@
       b.className = 'detail-thumb' + (idx === 0 ? ' is-active' : '');
       b.setAttribute('aria-label', dish ? `Show ${dish}` : 'Show image ' + (idx + 1));
       const im = document.createElement('img');
-      im.src = url;
+      im.src = mediaUrl(url);
       im.alt = dish || '';
       /**
        * Never lazy-load the primary strip: overflow:hidden marquees keep off-screen
@@ -787,7 +823,7 @@
     const text =
       item.text ||
       'A closer look at the atmosphere, plating rhythm, and visual language behind a Siler Chef evening.';
-    momentsImage.src = src;
+    momentsImage.src = mediaUrl(src);
     momentsImage.alt = alt || title;
     momentsKicker.textContent = kicker;
     momentsTitle.textContent = title;
@@ -874,8 +910,8 @@
         kind === 'service'
           ? `${baseFolder}/${item.slug}/thumb-400.webp 400w, ${baseFolder}/${item.slug}/thumb-560.webp 560w, ${thumbWebp} 720w`
           : `${baseFolder}/${item.slug}/thumb-400.webp 400w, ${thumbWebp} 480w`;
-      img.srcset = thumbSrcset;
-      img.src = thumbWebp;
+      img.srcset = mediaSrcset(thumbSrcset);
+      img.src = mediaUrl(thumbWebp);
       // Keep hub thumbs off the LCP critical path so hero-01 wins bandwidth.
       img.loading = 'lazy';
       if ('fetchPriority' in img) img.fetchPriority = 'low';
@@ -899,11 +935,11 @@
           img.dataset.thumbStage = 'jpg-try';
           // Drop the WebP candidates so the JPG fallback is not overridden by srcset.
           img.removeAttribute('srcset');
-          img.src = thumbJpg;
+          img.src = mediaUrl(thumbJpg);
           return;
         }
         img.dataset.thumbStage = 'jpg';
-        img.src = `${baseFolder}/${item.slug}/gallery/01.jpg`;
+        img.src = mediaUrl(`${baseFolder}/${item.slug}/gallery/01.jpg`);
       });
       visual.appendChild(img);
 
@@ -1304,7 +1340,7 @@
         'images/homepage/hero-03-480.webp': 'images/homepage/pack-20260806/guests-table-640.webp',
       };
       const key = String(url || '').trim();
-      return map[key] || key;
+      return mediaUrl(map[key] || key);
     };
     if (featuredImg && typeof experience.featuredImage === 'string' && experience.featuredImage.trim()) {
       featuredImg.src = optimizedImage(experience.featuredImage);
