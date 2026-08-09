@@ -2,13 +2,37 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/app/Support.php';
-require_once __DIR__ . '/app/Blog.php';
-
 $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 $requestPath = rawurldecode(parse_url($requestUri, PHP_URL_PATH) ?: '/');
 $requestMethod = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
 $embedDir = realpath(__DIR__ . '/embed');
+
+/**
+ * Serve /llms.txt before any app bootstrap.
+ * PageSpeed Agentic Browsing times out when this waits on Blog/DB includes.
+ */
+if (in_array($requestMethod, ['GET', 'HEAD'], true) && $requestPath === '/llms.txt') {
+    $llms = ($embedDir !== false ? $embedDir : (__DIR__ . '/embed')) . '/llms.txt';
+    if (!is_file($llms)) {
+        http_response_code(404);
+        header('Content-Type: text/plain; charset=utf-8');
+        echo "not found\n";
+        exit;
+    }
+    http_response_code(200);
+    header('Content-Type: text/plain; charset=utf-8');
+    header('Cache-Control: public, max-age=86400');
+    header('X-Content-Type-Options: nosniff');
+    if ($requestMethod === 'HEAD') {
+        header('Content-Length: ' . (string) filesize($llms));
+        exit;
+    }
+    readfile($llms);
+    exit;
+}
+
+require_once __DIR__ . '/app/Support.php';
+require_once __DIR__ . '/app/Blog.php';
 
 /** Prefer www for SEO (single canonical host). Only applies when traffic reaches this app. */
 if (in_array($requestMethod, ['GET', 'HEAD'], true)) {
@@ -35,7 +59,7 @@ if ($requestMethod === 'OPTIONS') {
 
 /**
  * Serve crawler discovery files before DB bootstrap.
- * PageSpeed / Googlebot sometimes time out when every robots/llms hit waits on Postgres.
+ * PageSpeed / Googlebot sometimes time out when every robots/sitemap hit waits on Postgres.
  */
 if (in_array($requestMethod, ['GET', 'HEAD'], true)) {
     if ($requestPath === '/robots.txt') {
@@ -43,9 +67,6 @@ if (in_array($requestMethod, ['GET', 'HEAD'], true)) {
     }
     if ($requestPath === '/sitemap.xml') {
         Blog::renderSitemap();
-    }
-    if ($requestPath === '/llms.txt') {
-        serve_llms_txt($embedDir);
     }
     serve_google_verification_file($requestPath);
     redirect_seo_landing_paths($requestPath, $requestUri, $requestMethod);
