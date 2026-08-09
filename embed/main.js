@@ -869,6 +869,12 @@
       /** Hub grids prefer WebP thumbs — avoids loading multi‑MB gallery heroes as card art. */
       const thumbWebp = `${baseFolder}/${item.slug}/thumb.webp`;
       const thumbJpg = `${baseFolder}/${item.slug}/thumb.jpg`;
+      /** Service masters are 720w, cuisine masters 480–614w; only 400w exists for every cuisine. */
+      const thumbSrcset =
+        kind === 'service'
+          ? `${baseFolder}/${item.slug}/thumb-400.webp 400w, ${baseFolder}/${item.slug}/thumb-560.webp 560w, ${thumbWebp} 720w`
+          : `${baseFolder}/${item.slug}/thumb-400.webp 400w, ${thumbWebp} 480w`;
+      img.srcset = thumbSrcset;
       img.src = thumbWebp;
       // Keep hub thumbs off the LCP critical path so hero-01 wins bandwidth.
       img.loading = 'lazy';
@@ -891,6 +897,8 @@
         }
         if (img.dataset.thumbStage !== 'jpg-try') {
           img.dataset.thumbStage = 'jpg-try';
+          // Drop the WebP candidates so the JPG fallback is not overridden by srcset.
+          img.removeAttribute('srcset');
           img.src = thumbJpg;
           return;
         }
