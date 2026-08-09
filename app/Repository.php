@@ -24,6 +24,7 @@ final class Repository
         $this->createSchema();
         $this->ensureReservationColumns();
         $this->seedContentIfMissing();
+        $this->refreshStaleServiceCopy();
         $this->seedReservationsIfMissing();
         $this->syncAdminFromEnvironment();
     }
@@ -852,6 +853,46 @@ final class Repository
         $this->setSetting('site_content', $this->loadSeedContent());
     }
 
+    /**
+     * Older installs reused one boilerplate block set for every occasion.
+     * When that marker is still present, replace services from the seed file.
+     */
+    private function refreshStaleServiceCopy(): void
+    {
+        $raw = $this->getSetting('site_content');
+        if (!is_array($raw)) {
+            return;
+        }
+
+        $services = isset($raw['services']) && is_array($raw['services']) ? $raw['services'] : [];
+        $stale = false;
+        foreach ($services as $definition) {
+            if (!is_array($definition)) {
+                continue;
+            }
+            $intro = (string) ($definition['intro'] ?? '');
+            if (str_contains($intro, 'Formats below mirror how we structure')) {
+                $stale = true;
+                break;
+            }
+            $firstTitle = (string) (($definition['blocks'][0]['title'] ?? ''));
+            if ($firstTitle === 'Events & Celebrations') {
+                $stale = true;
+                break;
+            }
+        }
+        if (!$stale) {
+            return;
+        }
+
+        $seed = $this->loadSeedContent();
+        if (!isset($seed['services']) || !is_array($seed['services'])) {
+            return;
+        }
+        $raw['services'] = $seed['services'];
+        $this->setSetting('site_content', $this->normalizeContent($raw));
+    }
+
     private function seedReservationsIfMissing(): void
     {
         $count = (int) $this->pdo->query('SELECT COUNT(*) FROM reservations')->fetchColumn();
@@ -1264,6 +1305,15 @@ final class Repository
         }
         foreach (($seed['services'] ?? []) as $slug => $definition) {
             if (!isset($content['services'][$slug]) || !is_array($content['services'][$slug])) {
+                $content['services'][$slug] = $definition;
+                continue;
+            }
+            $intro = (string) ($content['services'][$slug]['intro'] ?? '');
+            $firstTitle = (string) (($content['services'][$slug]['blocks'][0]['title'] ?? ''));
+            if (
+                str_contains($intro, 'Formats below mirror how we structure')
+                || $firstTitle === 'Events & Celebrations'
+            ) {
                 $content['services'][$slug] = $definition;
             }
         }

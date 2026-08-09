@@ -641,11 +641,191 @@
   global.SC_SITE = {
     cuisines: CUISINE_COPY,
     services: {
-      'anniversary-celebrations': serviceDefaults('anniversary-celebrations', 'anniversary celebrations'),
-      'birthday-events': serviceDefaults('birthday-events', 'birthday gatherings'),
-      'family-dinners': serviceDefaults('family-dinners', 'family dinners'),
-      'special-events': serviceDefaults('special-events', 'special events'),
-      'special-occasion-dining': serviceDefaults('special-occasion-dining', 'special-occasion dining'),
+      'anniversary-celebrations': {
+        intro: "Quiet luxury for milestone nights — paced courses, discreet service, and a table that feels like a private dining room at home.",
+        blocks: [
+          {
+            title: "Evening arc",
+            image: "images/services-and-occasions/anniversary-celebrations/gallery/01.jpg",
+            items: [
+              item("Arrival champagne bites", "Light canapés and a calm welcome while guests settle in."),
+              item("Course pacing", "A deliberate rhythm from first plate to dessert, without rush."),
+            ],
+          },
+          {
+            title: "Menu storytelling",
+            image: "images/services-and-occasions/anniversary-celebrations/gallery/02.jpg",
+            items: [
+              item("Shared memory course", "A dish shaped around a favorite cuisine, travel, or year together."),
+              item("Dietary precision", "Allergies and preferences woven in without calling attention."),
+            ],
+          },
+          {
+            title: "Table & ambiance",
+            image: "images/services-and-occasions/anniversary-celebrations/gallery/03.jpg",
+            items: [
+              item("Intimate plating", "Gold accents, pastry finales, and plates built for photographs."),
+              item("Service style", "Quiet plating nearby — conversation stays at the center."),
+            ],
+          },
+          {
+            title: "Finishing notes",
+            image: "images/services-and-occasions/anniversary-celebrations/gallery/04.jpg",
+            items: [
+              item("Dessert celebration", "A composed dessert course or cake moment timed to the toast."),
+              item("Take-home keepsake", "Printed menu card and leftover notes when it fits the night."),
+            ],
+          },
+        ],
+      },
+      'birthday-events': {
+        intro: "Chef-led birthdays with energy, timing, and a menu that feels festive without turning dinner into a catering line.",
+        blocks: [
+          {
+            title: "Celebration flow",
+            image: "images/services-and-occasions/birthday-events/gallery/01.jpg",
+            items: [
+              item("Welcome bites", "Passed or plated starters while guests arrive and photos happen."),
+              item("Seat-and-serve timing", "Main courses hit the table when the room is ready — not before."),
+            ],
+          },
+          {
+            title: "Festive menu",
+            image: "images/services-and-occasions/birthday-events/gallery/02.jpg",
+            items: [
+              item("Crowd-pleasing courses", "Familiar comforts elevated with fine-dining technique."),
+              item("Surprise dessert", "Powdered plates, chocolate work, or a showpiece dessert for the birthday guest."),
+            ],
+          },
+          {
+            title: "Guest experience",
+            image: "images/services-and-occasions/birthday-events/gallery/03.jpg",
+            items: [
+              item("Kids & mixed diets", "Parallel plates when the guest list spans ages and preferences."),
+              item("Toast window", "A clear pause for speeches without cold food."),
+            ],
+          },
+          {
+            title: "Hosting support",
+            image: "images/services-and-occasions/birthday-events/gallery/04.jpg",
+            items: [
+              item("Kitchen takeover", "Chef and service handle production so the host stays with guests."),
+              item("Cleanup handoff", "Stations reset so the night ends as calmly as it began."),
+            ],
+          },
+        ],
+      },
+      'family-dinners': {
+        intro: "Generous family tables — restaurant-level cooking with the warmth of home, built for sharing and second helpings.",
+        blocks: [
+          {
+            title: "Family-style service",
+            image: "images/services-and-occasions/family-dinners/gallery/01.jpg",
+            items: [
+              item("Shared platters", "Focaccia, proteins, and sides meant to pass down the table."),
+              item("Flexible pacing", "Courses that wait for late arrivals and long conversations."),
+            ],
+          },
+          {
+            title: "Comfort, elevated",
+            image: "images/services-and-occasions/family-dinners/gallery/02.jpg",
+            items: [
+              item("Signature mains", "Short rib, roast, or fish prepared for a full household."),
+              item("Seasonal sides", "Vegetables and grains that feel abundant, not fussy."),
+            ],
+          },
+          {
+            title: "Kitchen fit",
+            image: "images/services-and-occasions/family-dinners/gallery/03.jpg",
+            items: [
+              item("Home kitchen workflow", "Menus sized to your stove, oven, and counter space."),
+              item("Allergy-aware plates", "Clear labeling when the family table mixes restrictions."),
+            ],
+          },
+          {
+            title: "After dinner",
+            image: "images/services-and-occasions/family-dinners/gallery/04.jpg",
+            items: [
+              item("Simple dessert", "A composed sweet or communal pastry to close the meal."),
+              item("Leftovers plan", "Pack-up guidance so tomorrow’s lunch is part of the gift."),
+            ],
+          },
+        ],
+      },
+      'special-events': {
+        intro: "Corporate evenings, community gatherings, and private productions — polished flow from first reception bite to the last plated course.",
+        blocks: [
+          {
+            title: "Event production",
+            image: "images/services-and-occasions/special-events/gallery/01.jpg",
+            items: [
+              item("Reception to seating", "Passed apps, then a clean transition into the dining program."),
+              item("Volume with craft", "Identical plates executed at guest-count scale."),
+            ],
+          },
+          {
+            title: "Menu architecture",
+            image: "images/services-and-occasions/special-events/gallery/02.jpg",
+            items: [
+              item("Stations or plated", "Hybrid formats when mingling matters as much as the meal."),
+              item("Brand & dietary notes", "Corporate or host requirements folded into the tasting path."),
+            ],
+          },
+          {
+            title: "Service choreography",
+            image: "images/services-and-occasions/special-events/gallery/03.jpg",
+            items: [
+              item("Timeline ownership", "Kitchen cues locked to speeches, AV, and venue rules."),
+              item("Staffing plan", "Enough hands for hot food and quiet resets."),
+            ],
+          },
+          {
+            title: "Signature moments",
+            image: "images/services-and-occasions/special-events/gallery/04.jpg",
+            items: [
+              item("Hero course", "A plated main designed to photograph and impress at scale."),
+              item("Closing pass", "Dessert or late-night bites that keep energy high."),
+            ],
+          },
+        ],
+      },
+      'special-occasion-dining': {
+        intro: "Proposals, reunions, and chef’s-table nights — intimate arcs where every course earns the occasion.",
+        blocks: [
+          {
+            title: "Intimate framing",
+            image: "images/services-and-occasions/special-occasion-dining/gallery/01.jpg",
+            items: [
+              item("Small-party focus", "Menus written for two to twelve, not a banquet hall."),
+              item("Chef’s-table energy", "Courses presented with short stories, not a script."),
+            ],
+          },
+          {
+            title: "Course design",
+            image: "images/services-and-occasions/special-occasion-dining/gallery/02.jpg",
+            items: [
+              item("Tasting progression", "Appetizer through dessert with clear peaks and palate resets."),
+              item("Luxury details", "Coral tuiles, precise sauces, and plating built for close viewing."),
+            ],
+          },
+          {
+            title: "The moment",
+            image: "images/services-and-occasions/special-occasion-dining/gallery/03.jpg",
+            items: [
+              item("Cue coordination", "A timed pause for a proposal, gift, or family toast."),
+              item("Discreet service", "Staff presence that supports the room without crowding it."),
+            ],
+          },
+          {
+            title: "Afterglow",
+            image: "images/services-and-occasions/special-occasion-dining/gallery/04.jpg",
+            items: [
+              item("Digestif or dessert wine notes", "Optional pairings to linger after the final plate."),
+              item("Memory keepers", "Menu cards and a photo-ready final course."),
+            ],
+          },
+        ],
+      },
       'chef-education': educationServiceCopy(),
     },
   };

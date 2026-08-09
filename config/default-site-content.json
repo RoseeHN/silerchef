@@ -815,305 +815,305 @@
   },
   "services": {
     "anniversary-celebrations": {
-      "intro": "Planning and culinary framework for anniversary celebrations. Formats below mirror how we structure events, trainings, and invitations.",
+      "intro": "Quiet luxury for milestone nights — paced courses, discreet service, and a table that feels like a private dining room at home.",
       "blocks": [
         {
-          "title": "Events & Celebrations",
+          "title": "Evening arc",
           "image": "images/services-and-occasions/anniversary-celebrations/gallery/01.jpg",
           "items": [
             {
-              "name": "Timeline & flow",
-              "desc": "Arrival bites, seated courses or stations, and a clear rhythm for guests."
+              "name": "Arrival champagne bites",
+              "desc": "Light canapés and a calm welcome while guests settle in."
             },
             {
-              "name": "Venue coordination notes",
-              "desc": "Buffet, plated, or hybrid - aligned with your space and guest count."
+              "name": "Course pacing",
+              "desc": "A deliberate rhythm from first plate to dessert, without rush."
             }
           ]
         },
         {
-          "title": "Workshops & Culinary Training",
+          "title": "Menu storytelling",
           "image": "images/services-and-occasions/anniversary-celebrations/gallery/02.jpg",
           "items": [
             {
-              "name": "Hands-on sessions",
-              "desc": "Technique-focused modules - knife skills, sauces, plating - paced for your group."
+              "name": "Shared memory course",
+              "desc": "A dish shaped around a favorite cuisine, travel, or year together."
             },
             {
-              "name": "Demonstration format",
-              "desc": "Chef-led narrative with tasting flights and Q&A."
+              "name": "Dietary precision",
+              "desc": "Allergies and preferences woven in without calling attention."
             }
           ]
         },
         {
-          "title": "Invitations & Private Gatherings",
+          "title": "Table & ambiance",
           "image": "images/services-and-occasions/anniversary-celebrations/gallery/03.jpg",
           "items": [
             {
-              "name": "Intimate dining format",
-              "desc": "Chef’s table energy with discreet service and conversational pacing."
+              "name": "Intimate plating",
+              "desc": "Gold accents, pastry finales, and plates built for photographs."
             },
             {
-              "name": "Welcome reception styling",
-              "desc": "Passed bites and beverage pairing cadence before the main experience."
+              "name": "Service style",
+              "desc": "Quiet plating nearby — conversation stays at the center."
             }
           ]
         },
         {
-          "title": "Signature Experiences",
+          "title": "Finishing notes",
           "image": "images/services-and-occasions/anniversary-celebrations/gallery/04.jpg",
           "items": [
             {
-              "name": "Custom menu arc",
-              "desc": "Story-led courses reflecting your occasion from first bite to dessert."
+              "name": "Dessert celebration",
+              "desc": "A composed dessert course or cake moment timed to the toast."
             },
             {
-              "name": "Add-on enhancements",
-              "desc": "Wine coordination notes, printed menus, and dietary accommodations."
+              "name": "Take-home keepsake",
+              "desc": "Printed menu card and leftover notes when it fits the night."
             }
           ]
         }
       ]
     },
     "birthday-events": {
-      "intro": "Planning and culinary framework for birthday gatherings. Formats below mirror how we structure events, trainings, and invitations.",
+      "intro": "Chef-led birthdays with energy, timing, and a menu that feels festive without turning dinner into a catering line.",
       "blocks": [
         {
-          "title": "Events & Celebrations",
+          "title": "Celebration flow",
           "image": "images/services-and-occasions/birthday-events/gallery/01.jpg",
           "items": [
             {
-              "name": "Timeline & flow",
-              "desc": "Arrival bites, seated courses or stations, and a clear rhythm for guests."
+              "name": "Welcome bites",
+              "desc": "Passed or plated starters while guests arrive and photos happen."
             },
             {
-              "name": "Venue coordination notes",
-              "desc": "Buffet, plated, or hybrid - aligned with your space and guest count."
+              "name": "Seat-and-serve timing",
+              "desc": "Main courses hit the table when the room is ready — not before."
             }
           ]
         },
         {
-          "title": "Workshops & Culinary Training",
+          "title": "Festive menu",
           "image": "images/services-and-occasions/birthday-events/gallery/02.jpg",
           "items": [
             {
-              "name": "Hands-on sessions",
-              "desc": "Technique-focused modules - knife skills, sauces, plating - paced for your group."
+              "name": "Crowd-pleasing courses",
+              "desc": "Familiar comforts elevated with fine-dining technique."
             },
             {
-              "name": "Demonstration format",
-              "desc": "Chef-led narrative with tasting flights and Q&A."
+              "name": "Surprise dessert",
+              "desc": "Powdered plates, chocolate work, or a showpiece dessert for the birthday guest."
             }
           ]
         },
         {
-          "title": "Invitations & Private Gatherings",
+          "title": "Guest experience",
           "image": "images/services-and-occasions/birthday-events/gallery/03.jpg",
           "items": [
             {
-              "name": "Intimate dining format",
-              "desc": "Chef’s table energy with discreet service and conversational pacing."
+              "name": "Kids & mixed diets",
+              "desc": "Parallel plates when the guest list spans ages and preferences."
             },
             {
-              "name": "Welcome reception styling",
-              "desc": "Passed bites and beverage pairing cadence before the main experience."
+              "name": "Toast window",
+              "desc": "A clear pause for speeches without cold food."
             }
           ]
         },
         {
-          "title": "Signature Experiences",
+          "title": "Hosting support",
           "image": "images/services-and-occasions/birthday-events/gallery/04.jpg",
           "items": [
             {
-              "name": "Custom menu arc",
-              "desc": "Story-led courses reflecting your occasion from first bite to dessert."
+              "name": "Kitchen takeover",
+              "desc": "Chef and service handle production so the host stays with guests."
             },
             {
-              "name": "Add-on enhancements",
-              "desc": "Wine coordination notes, printed menus, and dietary accommodations."
+              "name": "Cleanup handoff",
+              "desc": "Stations reset so the night ends as calmly as it began."
             }
           ]
         }
       ]
     },
     "family-dinners": {
-      "intro": "Planning and culinary framework for family dinners. Formats below mirror how we structure events, trainings, and invitations.",
+      "intro": "Generous family tables — restaurant-level cooking with the warmth of home, built for sharing and second helpings.",
       "blocks": [
         {
-          "title": "Events & Celebrations",
+          "title": "Family-style service",
           "image": "images/services-and-occasions/family-dinners/gallery/01.jpg",
           "items": [
             {
-              "name": "Timeline & flow",
-              "desc": "Arrival bites, seated courses or stations, and a clear rhythm for guests."
+              "name": "Shared platters",
+              "desc": "Focaccia, proteins, and sides meant to pass down the table."
             },
             {
-              "name": "Venue coordination notes",
-              "desc": "Buffet, plated, or hybrid - aligned with your space and guest count."
+              "name": "Flexible pacing",
+              "desc": "Courses that wait for late arrivals and long conversations."
             }
           ]
         },
         {
-          "title": "Workshops & Culinary Training",
+          "title": "Comfort, elevated",
           "image": "images/services-and-occasions/family-dinners/gallery/02.jpg",
           "items": [
             {
-              "name": "Hands-on sessions",
-              "desc": "Technique-focused modules - knife skills, sauces, plating - paced for your group."
+              "name": "Signature mains",
+              "desc": "Short rib, roast, or fish prepared for a full household."
             },
             {
-              "name": "Demonstration format",
-              "desc": "Chef-led narrative with tasting flights and Q&A."
+              "name": "Seasonal sides",
+              "desc": "Vegetables and grains that feel abundant, not fussy."
             }
           ]
         },
         {
-          "title": "Invitations & Private Gatherings",
+          "title": "Kitchen fit",
           "image": "images/services-and-occasions/family-dinners/gallery/03.jpg",
           "items": [
             {
-              "name": "Intimate dining format",
-              "desc": "Chef’s table energy with discreet service and conversational pacing."
+              "name": "Home kitchen workflow",
+              "desc": "Menus sized to your stove, oven, and counter space."
             },
             {
-              "name": "Welcome reception styling",
-              "desc": "Passed bites and beverage pairing cadence before the main experience."
+              "name": "Allergy-aware plates",
+              "desc": "Clear labeling when the family table mixes restrictions."
             }
           ]
         },
         {
-          "title": "Signature Experiences",
+          "title": "After dinner",
           "image": "images/services-and-occasions/family-dinners/gallery/04.jpg",
           "items": [
             {
-              "name": "Custom menu arc",
-              "desc": "Story-led courses reflecting your occasion from first bite to dessert."
+              "name": "Simple dessert",
+              "desc": "A composed sweet or communal pastry to close the meal."
             },
             {
-              "name": "Add-on enhancements",
-              "desc": "Wine coordination notes, printed menus, and dietary accommodations."
+              "name": "Leftovers plan",
+              "desc": "Pack-up guidance so tomorrow’s lunch is part of the gift."
             }
           ]
         }
       ]
     },
     "special-events": {
-      "intro": "Planning and culinary framework for special events. Formats below mirror how we structure events, trainings, and invitations.",
+      "intro": "Corporate evenings, community gatherings, and private productions — polished flow from first reception bite to the last plated course.",
       "blocks": [
         {
-          "title": "Events & Celebrations",
+          "title": "Event production",
           "image": "images/services-and-occasions/special-events/gallery/01.jpg",
           "items": [
             {
-              "name": "Timeline & flow",
-              "desc": "Arrival bites, seated courses or stations, and a clear rhythm for guests."
+              "name": "Reception to seating",
+              "desc": "Passed apps, then a clean transition into the dining program."
             },
             {
-              "name": "Venue coordination notes",
-              "desc": "Buffet, plated, or hybrid - aligned with your space and guest count."
+              "name": "Volume with craft",
+              "desc": "Identical plates executed at guest-count scale."
             }
           ]
         },
         {
-          "title": "Workshops & Culinary Training",
+          "title": "Menu architecture",
           "image": "images/services-and-occasions/special-events/gallery/02.jpg",
           "items": [
             {
-              "name": "Hands-on sessions",
-              "desc": "Technique-focused modules - knife skills, sauces, plating - paced for your group."
+              "name": "Stations or plated",
+              "desc": "Hybrid formats when mingling matters as much as the meal."
             },
             {
-              "name": "Demonstration format",
-              "desc": "Chef-led narrative with tasting flights and Q&A."
+              "name": "Brand & dietary notes",
+              "desc": "Corporate or host requirements folded into the tasting path."
             }
           ]
         },
         {
-          "title": "Invitations & Private Gatherings",
+          "title": "Service choreography",
           "image": "images/services-and-occasions/special-events/gallery/03.jpg",
           "items": [
             {
-              "name": "Intimate dining format",
-              "desc": "Chef’s table energy with discreet service and conversational pacing."
+              "name": "Timeline ownership",
+              "desc": "Kitchen cues locked to speeches, AV, and venue rules."
             },
             {
-              "name": "Welcome reception styling",
-              "desc": "Passed bites and beverage pairing cadence before the main experience."
+              "name": "Staffing plan",
+              "desc": "Enough hands for hot food and quiet resets."
             }
           ]
         },
         {
-          "title": "Signature Experiences",
+          "title": "Signature moments",
           "image": "images/services-and-occasions/special-events/gallery/04.jpg",
           "items": [
             {
-              "name": "Custom menu arc",
-              "desc": "Story-led courses reflecting your occasion from first bite to dessert."
+              "name": "Hero course",
+              "desc": "A plated main designed to photograph and impress at scale."
             },
             {
-              "name": "Add-on enhancements",
-              "desc": "Wine coordination notes, printed menus, and dietary accommodations."
+              "name": "Closing pass",
+              "desc": "Dessert or late-night bites that keep energy high."
             }
           ]
         }
       ]
     },
     "special-occasion-dining": {
-      "intro": "Planning and culinary framework for special-occasion dining. Formats below mirror how we structure events, trainings, and invitations.",
+      "intro": "Proposals, reunions, and chef’s-table nights — intimate arcs where every course earns the occasion.",
       "blocks": [
         {
-          "title": "Events & Celebrations",
+          "title": "Intimate framing",
           "image": "images/services-and-occasions/special-occasion-dining/gallery/01.jpg",
           "items": [
             {
-              "name": "Timeline & flow",
-              "desc": "Arrival bites, seated courses or stations, and a clear rhythm for guests."
+              "name": "Small-party focus",
+              "desc": "Menus written for two to twelve, not a banquet hall."
             },
             {
-              "name": "Venue coordination notes",
-              "desc": "Buffet, plated, or hybrid - aligned with your space and guest count."
+              "name": "Chef’s-table energy",
+              "desc": "Courses presented with short stories, not a script."
             }
           ]
         },
         {
-          "title": "Workshops & Culinary Training",
+          "title": "Course design",
           "image": "images/services-and-occasions/special-occasion-dining/gallery/02.jpg",
           "items": [
             {
-              "name": "Hands-on sessions",
-              "desc": "Technique-focused modules - knife skills, sauces, plating - paced for your group."
+              "name": "Tasting progression",
+              "desc": "Appetizer through dessert with clear peaks and palate resets."
             },
             {
-              "name": "Demonstration format",
-              "desc": "Chef-led narrative with tasting flights and Q&A."
+              "name": "Luxury details",
+              "desc": "Coral tuiles, precise sauces, and plating built for close viewing."
             }
           ]
         },
         {
-          "title": "Invitations & Private Gatherings",
+          "title": "The moment",
           "image": "images/services-and-occasions/special-occasion-dining/gallery/03.jpg",
           "items": [
             {
-              "name": "Intimate dining format",
-              "desc": "Chef’s table energy with discreet service and conversational pacing."
+              "name": "Cue coordination",
+              "desc": "A timed pause for a proposal, gift, or family toast."
             },
             {
-              "name": "Welcome reception styling",
-              "desc": "Passed bites and beverage pairing cadence before the main experience."
+              "name": "Discreet service",
+              "desc": "Staff presence that supports the room without crowding it."
             }
           ]
         },
         {
-          "title": "Signature Experiences",
+          "title": "Afterglow",
           "image": "images/services-and-occasions/special-occasion-dining/gallery/04.jpg",
           "items": [
             {
-              "name": "Custom menu arc",
-              "desc": "Story-led courses reflecting your occasion from first bite to dessert."
+              "name": "Digestif or dessert wine notes",
+              "desc": "Optional pairings to linger after the final plate."
             },
             {
-              "name": "Add-on enhancements",
-              "desc": "Wine coordination notes, printed menus, and dietary accommodations."
+              "name": "Memory keepers",
+              "desc": "Menu cards and a photo-ready final course."
             }
           ]
         }

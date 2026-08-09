@@ -311,7 +311,7 @@
     'birthday-events': 6,
     'chef-education': 6,
     'family-dinners': 6,
-    'special-events': 8,
+    'special-events': 6,
     'special-occasion-dining': 6,
   };
 
@@ -1978,38 +1978,7 @@
     placement: 'page_load',
   });
 
-  (function initHeroRotator() {
-    const root = document.querySelector('.hero-rotator');
-    if (!root) return;
-    const slides = root.querySelectorAll('.hero-rotator__slide');
-    if (slides.length < 2) return;
-    const reduce =
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) {
-      slides.forEach((s, i) => s.classList.toggle('is-active', i === 0));
-      return;
-    }
-    let idx = 0;
-    function ensureSlideSrc(slide) {
-      if (!slide) return;
-      const img = slide.tagName === 'IMG' ? slide : slide.querySelector('img');
-      if (!img || img.getAttribute('src')) return;
-      const pending = img.getAttribute('data-src');
-      if (!pending) return;
-      img.setAttribute('src', pending);
-      img.removeAttribute('data-src');
-      img.removeAttribute('data-src-fallback');
-    }
-    // Start later so LCP/Speed Index stay on hero-01 during the critical window.
-    window.setTimeout(() => {
-      window.setInterval(() => {
-        idx = (idx + 1) % slides.length;
-        ensureSlideSrc(slides[idx]);
-        slides.forEach((s, j) => s.classList.toggle('is-active', j === idx));
-      }, 6500);
-    }, 12000);
-  })();
+  // Hero stays on hero-01 only (no slideshow) — client preference for a static entry.
 
   (function initChefReel() {
     const section = document.getElementById('reel');
