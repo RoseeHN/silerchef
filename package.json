@@ -10,6 +10,7 @@
     "photos": "node scripts/distribute-photos.mjs",
     "optimize-media": "node scripts/optimize-embed-media.mjs",
     "optimize-hub-thumbs": "node scripts/optimize-hub-thumbs.mjs",
+    "fix-orientation": "node scripts/fix-photo-orientation.mjs",
     "optimize-video": "node scripts/optimize-embed-media.mjs --video-only"
   },
   "engines": {
